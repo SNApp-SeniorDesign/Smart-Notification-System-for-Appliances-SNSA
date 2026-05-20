@@ -15,6 +15,22 @@ class Settings(BaseSettings):
         default="dev_secret",
         description="The secret key for JWT",
     )
+    # algorithm to secure transmit between client and server
+    algorithm: str = Field(
+        default="Algorithm",
+        description="The algorithm used for JWT",
+    )
+
+    access_token_expire_minutes: int = Field(
+        default=10,
+        description="Access token expiration time in minutes",
+    )
+
+    database_url: str = Field(
+        default="sqlite:///./learning_paths.db",
+        alias="DATABASE_URL",
+        description="The database URL",
+    )
 
     # Config for .env file
     model_config = SettingsConfigDict(
