@@ -20,10 +20,14 @@ Base = declarative_base()
 
 
 # Function to getting the current database
-# if not create a database
 def get_db() -> Generator[Session]:
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
+# function to create database
+def create_db_tb() -> None:
+    Base.metadata.create_all(bind=engine)
