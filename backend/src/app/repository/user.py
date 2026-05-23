@@ -35,7 +35,14 @@ class UserRepository:
     "Update"
 
     @staticmethod
-    def update_user(db: Session, db_user: UserDB) -> User:
+    def update_user(db: Session, db_user: User) -> User:
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+
+    @staticmethod
+    def token_revoke(db: Session, db_user: User) -> User:
+        db.user.token_version += 1
         db.commit()
         db.refresh(db_user)
         return db_user
