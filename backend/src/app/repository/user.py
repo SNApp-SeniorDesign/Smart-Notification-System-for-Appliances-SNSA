@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.user import User
+from app.schemas.user import UserDB
 
 
 class UserRepository:
@@ -16,3 +17,17 @@ class UserRepository:
     @staticmethod
     def get_by_id(db: Session, user_id: int) -> User | None:
         return db.query(User).filter(User.id == user_id).first()
+
+    "Create"
+
+    @staticmethod
+    def create_user(db: Session, user_db: UserDB) -> User:
+        db_user = User(
+            username=user_db.username,
+            email=user_db.email,
+            hashed_password=user_db.hashed_password,
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
