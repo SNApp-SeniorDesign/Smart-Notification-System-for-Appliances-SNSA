@@ -18,3 +18,10 @@ class userService:
                 detail="User not found",
             )
         return user_email
+
+    def get_by_id(self, db: Session, id: int) -> UserResponse | None:
+        user_id = self.repository.get_by_id(db, id)
+        if user_id is None:
+            raise HTTPEXception(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
