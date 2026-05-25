@@ -25,3 +25,9 @@ class userService:
             raise HTTPEXception(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
+
+    def is_email_taken(self, db: Session, email: str) -> bool:
+        return self.repository.get_by_mail(db, email) is not None
+
+    def is_username_taken(self, db: Session, username: str) -> bool:
+        return self.repository.get_by_username(db, username) is not None
