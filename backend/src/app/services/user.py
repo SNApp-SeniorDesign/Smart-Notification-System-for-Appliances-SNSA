@@ -2,7 +2,12 @@ from app.repository.user import UserRepository
 from app.schemas.user import UserResponse, UserDB, UserCreate
 from app.core.database import get_db
 from app.exceptions.user import user_not_exist, unauthorized
-from app.core.auth import verify_token, oauth2_schema, get_password_hash
+from app.core.auth import (
+    verify_token,
+    oauth2_schema,
+    get_password_hash,
+    verify_password,
+)
 
 from fastapi import HTTPException, status, Depends
 from typing import Annotated
@@ -80,3 +85,14 @@ class userService:
             hashed_password=hashed_password,
         )
         return self.repository.create_user(db, user_db)
+
+    def authenticate(
+        self, db: Session, email: str, password: str
+    ) -> UserResponse | None:
+        user = self.repository.get_by_mail(db, email)
+        if not user or not verify_password(db, str(user.hashed_password)):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                details="Incorrect Email or Passwords",
+            )
+        return user
