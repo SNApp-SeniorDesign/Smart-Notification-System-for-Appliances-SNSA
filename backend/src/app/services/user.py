@@ -1,5 +1,5 @@
 from app.repository.user import UserRepository
-from app.schemas.user import UserResponse, UserDB, UserCreate
+from app.schemas.user import UserResponse, UserDB, UserCreate, UserUpdate
 from app.core.database import get_db
 from app.exceptions.user import user_not_exist, unauthorized
 from app.core.auth import (
@@ -96,3 +96,16 @@ class userService:
                 details="Incorrect Email or Passwords",
             )
         return user
+
+    "Update"
+
+    def update_user(
+        self, db: Session, db_user: UserResponse, user_db: UserUpdate
+    ) -> UserResponse:
+        if user_db.username:
+            db_user.username = user_db.username
+        if user_db.email:
+            db_user.email = user_db.email
+        if user_db.password:
+            db_user.hashed_password = get_password_hash(user_db.password)
+        return self.repository.update_user(db, db_user)
