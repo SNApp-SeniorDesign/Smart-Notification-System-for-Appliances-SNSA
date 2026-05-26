@@ -15,7 +15,7 @@ from typing import Annotated
 from sqlaalchemy.orm import Session
 
 
-class userService:
+class UserService:
     def __init__(self) -> None:
         self.repository = UserRepository()
 
@@ -109,3 +109,9 @@ class userService:
         if user_db.password:
             db_user.hashed_password = get_password_hash(user_db.password)
         return self.repository.update_user(db, db_user)
+
+    def revoke_tokens(self, db: Session, db_user: UserResponse) -> UserResponse:
+        return self.repository.token_revoke(db, db_user)
+
+
+user_service = UserService()
