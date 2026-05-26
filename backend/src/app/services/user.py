@@ -1,9 +1,8 @@
 from app.repository.user import UserRepository
-from app.schemas.user import UserResponse
+from app.schemas.user import UserResponse, UserDB, UserCreate
 from app.core.database import get_db
 from app.exceptions.user import user_not_exist, unauthorized
-from app.core.auth import verify_token, oauth2_schema
-
+from app.core.auth import verify_token, oauth2_schema, get_password_hash
 
 from fastapi import HTTPException, status, Depends
 from typing import Annotated
@@ -59,3 +58,25 @@ class userService:
                 headers={"WWW-Authenticate": "Bearer"},
             )
         return user
+
+    "Post"
+
+    def register_user(self, db: Session, user_db: UserCreate) -> UserResponse:
+        if self.is_email_taken(db, user_db.email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
+            )
+        if self.is_username_taken(db, user_db.username):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already taken",
+            )
+
+        hashed_password = get_password_hash(user_db.password)
+        user_db = UserDB(
+            username=user_db.username,
+            email=user_db.username,
+            hashed_password=hashed_password,
+        )
+        return self.repository.create_user(db, user_db)
