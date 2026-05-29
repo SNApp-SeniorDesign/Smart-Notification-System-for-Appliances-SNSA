@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "fastapi[all]>=0.135.2",
+    "psycopg[binary]>=3.3.4",
     "requests>=2.33.0",
+    "sqlmodel>=0.0.38",
 ]
 
 [dependency-groups]
@@ -17,3 +19,6 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "ruff>=0.15.8",
 ]
+[tool.pytest.ini_options]
+pythonpath = ["backend/src"]
+testpaths = ["backend/src/app/tests"]

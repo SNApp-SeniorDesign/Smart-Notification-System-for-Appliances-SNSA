@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from datetime import datetime
 
-from .core.settings import settings
+from app.core.settings import settings
 
 app = FastAPI(
     title=settings.app_name,
