@@ -1,10 +1,10 @@
-from pydantic import BaseModel, emailStr, Field
+from pydantic import BaseModel, EmailStr, Field
 from pydantic import field_validator
 
 
 class UserBase(BaseModel):
     username: str
-    email: emailStr
+    email: EmailStr
 
 
 class UserCreate(UserBase):
@@ -25,12 +25,12 @@ class UserDB(UserBase):
 class UserResponse(UserBase):
     id: int
 
-    mdeol_vonfig = {"from_attributes": True}
+    model_config = {"from_attributes": True}
 
 
 class UserUpdate(BaseModel):
     username: str | None = None
-    email: emailStr | None = None
+    email: EmailStr | None = None
     password: str | None = None
 
 

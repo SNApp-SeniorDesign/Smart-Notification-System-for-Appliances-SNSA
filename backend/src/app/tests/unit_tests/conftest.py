@@ -7,7 +7,7 @@ from app.main import app
 from app.core.database import Base, get_db
 
 TEST_DATABASE_URL = (
-    "postgresql+psycopg://learning_app:12345678@localhost:5432/learning_paths_test"
+    "postgresql+psycopg://rune:123456@localhost:5432/learning_paths_test"
 )
 
 engine = create_engine(TEST_DATABASE_URL)
