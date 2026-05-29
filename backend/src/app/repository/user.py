@@ -53,4 +53,3 @@ class UserRepository:
     def delete_user(db: Session, db_user: User) -> None:
         db.delete(db_user)
         db.commit()
-        db.refresh(db_user)
