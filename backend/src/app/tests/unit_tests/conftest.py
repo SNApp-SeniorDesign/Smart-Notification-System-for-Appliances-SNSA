@@ -14,7 +14,7 @@ engine = create_engine(TEST_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def overrideve_get_db():
+def overrides_get_db():
     db = TestingSessionLocal()
     try:
         yield db
@@ -22,7 +22,7 @@ def overrideve_get_db():
         db.close()
 
 
-app.dependency_overrides[get_db] = overrideve_get_db
+app.dependency_overrides[get_db] = overrides_get_db
 
 
 @pytest.fixture(autouse=True)

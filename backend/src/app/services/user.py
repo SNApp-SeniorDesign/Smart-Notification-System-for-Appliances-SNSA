@@ -3,8 +3,8 @@ from app.schemas.user import UserResponse, UserDB, UserCreate, UserUpdate
 from app.core.database import get_db
 from app.exceptions.user import user_not_exist, unauthorized
 from app.core.auth import (
+    oauth2_scheme,
     verify_token,
-    oauth2_schema,
     get_password_hash,
     verify_password,
 )
@@ -12,7 +12,7 @@ from app.core.auth import (
 from fastapi import HTTPException, status, Depends
 from typing import Annotated
 
-from sqlaalchemy.orm import Session
+from sqlalchemy.orm import Session
 
 
 class UserService:
@@ -42,7 +42,7 @@ class UserService:
     def get_current_user(
         self,
         db: Annotated(Session, Depends(get_db)),
-        token: Annotated(str, Depends(oauth2_schema)),
+        token: Annotated(str, Depends(oauth2_scheme)),
     ) -> UserResponse | None:
         payload = verify_token(token)
         user_id = payload.get("sub")
@@ -81,7 +81,7 @@ class UserService:
         hashed_password = get_password_hash(user_db.password)
         user_db = UserDB(
             username=user_db.username,
-            email=user_db.username,
+            email=user_db.email,
             hashed_password=hashed_password,
         )
         return self.repository.create_user(db, user_db)
@@ -90,10 +90,10 @@ class UserService:
         self, db: Session, email: str, password: str
     ) -> UserResponse | None:
         user = self.repository.get_by_mail(db, email)
-        if not user or not verify_password(db, str(user.hashed_password)):
+        if not user or not verify_password(db, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                details="Incorrect Email or Passwords",
+                detail="Incorrect Email or Passwords",
             )
         return user
 
