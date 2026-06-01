@@ -45,7 +45,7 @@ async def login(
 
 @api_router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
-    db: Annotated(Session, Depends(get_db)),
-    current_user: Annotated(UserModel, Depends(user_service.get_current_user)),
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserModel, Depends(user_service.get_current_user)],
 ) -> None:
     user_repository.delete_user(db, current_user)

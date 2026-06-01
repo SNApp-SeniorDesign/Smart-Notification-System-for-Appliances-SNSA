@@ -41,8 +41,8 @@ class UserService:
 
     def get_current_user(
         self,
-        db: Annotated(Session, Depends(get_db)),
-        token: Annotated(str, Depends(oauth2_scheme)),
+        db: Annotated[Session, Depends(get_db)],
+        token: Annotated[str, Depends(oauth2_scheme)],
     ) -> UserResponse | None:
         payload = verify_token(token)
         user_id = payload.get("sub")
@@ -90,7 +90,7 @@ class UserService:
         self, db: Session, email: str, password: str
     ) -> UserResponse | None:
         user = self.repository.get_by_mail(db, email)
-        if not user or not verify_password(db, user.hashed_password):
+        if not user or not verify_password(password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect Email or Passwords",

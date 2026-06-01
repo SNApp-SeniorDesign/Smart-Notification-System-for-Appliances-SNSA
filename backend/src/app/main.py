@@ -1,14 +1,28 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 from datetime import datetime
 
 from app.core.settings import settings
+from app.core.database import create_db_tb
+from app.routes.user import api_router as user_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_tb
+    yield
+
 
 app = FastAPI(
     title=settings.app_name,
     description="Backend API for Smart Notification System Appliance(SNSA)",
     version=settings.app_version,
+    lifespan=lifespan,
 )
+
+app.include_router(user_router)
 
 
 class EventMessage(BaseModel):

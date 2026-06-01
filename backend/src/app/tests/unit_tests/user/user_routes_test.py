@@ -22,6 +22,15 @@ def test_register_user_success(client: TestClient):
 
 
 def test_login_success(client):
+    client.post(
+        "/users/register",
+        json={
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "securepassword123",
+        },
+    )
+
     response = client.post(
         "/users/login",
         data={
