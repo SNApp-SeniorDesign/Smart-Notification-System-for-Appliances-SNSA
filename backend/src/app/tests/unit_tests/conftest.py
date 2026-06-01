@@ -44,3 +44,27 @@ def db():
 @pytest.fixture
 def client():
     return TestClient(app)
+
+
+# Test fixture for to return token
+@pytest.fixture
+def authenticated_user(client):
+    register_response = client.post(
+        "/users/register",
+        json={
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "securepassword123",
+        },
+    )
+
+    assert register_response.status_code == 201, register_response.json()
+
+    response = client.post(
+        "/users/login",
+        data={"username": "test@example.com", "password": "securepassword123"},
+    )
+
+    assert response.status_code == 200, response.json()
+
+    return response.json()["access_token"]
