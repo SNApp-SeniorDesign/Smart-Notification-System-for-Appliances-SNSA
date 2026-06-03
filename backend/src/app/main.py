@@ -1,12 +1,15 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
 
 from app.core.settings import settings
 from app.core.database import create_db_tb
 from app.routes.user import api_router as user_router
+
+NEXT_URL = settings.frontend_url
 
 
 @asynccontextmanager
@@ -23,6 +26,18 @@ app = FastAPI(
 )
 
 app.include_router(user_router)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhos:3000",
+        NEXT_URL,
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 
 class EventMessage(BaseModel):

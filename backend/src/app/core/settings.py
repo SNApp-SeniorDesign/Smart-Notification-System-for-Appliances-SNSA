@@ -32,6 +32,11 @@ class Settings(BaseSettings):
         description="The database URL",
     )
 
+    frontend_url: str = Field(
+        default="Your frontend URL",
+        description="Frontend URL that allowing to communicate",
+    )
+
     # Config for .env file
     model_config = SettingsConfigDict(
         env_file=str(ENV_FILE),
