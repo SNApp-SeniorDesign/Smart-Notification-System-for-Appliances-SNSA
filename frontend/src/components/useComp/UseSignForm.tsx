@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {Controller, useForm} from "react-hook-form"
 import * as z from "zod"
-
+import { toast } from "sonner"
 
 
 const API_URL = process.env.FRONTEND_URL
@@ -65,8 +65,22 @@ export function SignForm({
 
     if(!res.ok){
         const errorData = await res.json()
+        toast.error(`Registration failed: ${errorData?.message || "Unkowne error"}`, {
+            position: "top-center",
+        })
         return
     }
+
+    if(res.status !== 201){
+        toast.error("Unexpected response from server. Please try again later.",{
+            position: "top-center",
+        })
+    }
+
+    toast.success("Account created - please log in to continue", {
+        position: "top-center",
+    })
+    form.reset()
 }
 
      
