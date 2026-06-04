@@ -21,7 +21,7 @@ import * as z from "zod"
 import { toast } from "sonner"
 
 
-const API_URL = process.env.FRONTEND_URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 const formSchema = z.object({
     email: z.string()
@@ -54,10 +54,10 @@ export function SignForm({
         }
     })
     async function onSubmit(data: z.infer<typeof formSchema>){
-        const res = await fetch({API_URL} + "/users/registers",{
+        const res = await fetch(`${API_URL}/users/registers`,{
             method: "POST",
             headers: {
-                "Accept": "application/json",
+                Accept: "application/json",
                 "Content-Type": "application/json",
             },
         body: JSON.stringify(data),
@@ -102,6 +102,17 @@ export function SignForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
+                  {...form.register("email")}
+                  required
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="username">Username</FieldLabel>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="exampleName"
+                  {...form.register("username")}
                   required
                 />
               </Field>
@@ -109,7 +120,11 @@ export function SignForm({
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                    id="password" 
+                    type="password"
+                    {...form.register("password")} 
+                    required />
               </Field>
               <Field>
                 <Button type="submit">Sign Up</Button>
