@@ -98,7 +98,7 @@ export function SignForm({
                 <Input id="password" type="password" required />
               </Field>
               <Field>
-                <Button type="submit">Sign-Up</Button>
+                <Button type="submit">Sign Up</Button>
               </Field>
             </FieldGroup>
           </form>
