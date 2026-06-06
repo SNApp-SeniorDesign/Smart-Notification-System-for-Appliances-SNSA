@@ -4,7 +4,7 @@ test("user can log in and reach dashboard", async ({ page }) => {
 
     await page.goto("/")
 
-    await page.getByRole("button", { name: "Login In"}).first().click()
+    await page.getByRole("button", { name: "Log In"}).first().click()
 
     await page.getByLabel("Email").fill("user@example.com")
     await page.getByLabel("Password").fill("password")
