@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { UseDialSign } from "@/components/useComp/UseDialSign";
 import {UseDeleteButton} from "@/components/useComp/UseDeleteButton"
-
+import {UseDialLog} from "@/components/useComp/UseDialLog"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -31,6 +31,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">{children}
         < UseDialSign />
+        < UseDialLog />
         < UseDeleteButton />
       </body>
     </html>
