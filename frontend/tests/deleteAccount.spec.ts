@@ -1,10 +1,10 @@
-import { test, expect} from "@playwright/test"
+import { test, expect, Page} from "@playwright/test"
 
 test("user can delete their account", async ({ page }) => {
 
     await page.goto("/")
 
-    await page.getByRole("button", { name: "Delete Account"}).first().click()
+    await login(page)
 
     await page.getByLabel("Email").fill("user@example.com")
     await page.getByLabel("Password").fill("password")
@@ -12,3 +12,15 @@ test("user can delete their account", async ({ page }) => {
 
     await expect(page.getByText("Account deleted successfully")).toBeVisible()
 })
+
+async function login(page: Page){
+    await page.goto("/")
+
+    await page.getByRole("button", { name: "Login In"}).first().click()
+
+    await page.getByLabel("Email").fill("user@example.com")
+    await page.getByLabel("Password").fill("password")
+    await page.getByRole("button", { name: "Log In" }).last().click()
+
+    await expect(page.getByText("Login successful")).toBeVisible()
+}
