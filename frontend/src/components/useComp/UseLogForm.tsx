@@ -77,7 +77,7 @@ export function LogForm({
         })
     }
 
-    toast.success("Login successful - redirecting...", {
+    toast.success("Login successful", {
         position: "top-center",
     })
     form.reset()
