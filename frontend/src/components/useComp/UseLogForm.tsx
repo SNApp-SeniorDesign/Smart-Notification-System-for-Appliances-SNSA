@@ -30,10 +30,6 @@ const formSchema = z.object({
             .trim()
             .min(1,"Email is required")
             .email("invalid email address"),
-    username: z.string()
-                .trim()
-                .min(3,"Username must be at least 3 characters")
-                .max(20,"Username must be at most 20 characters"),
     password: z.string()
                 .trim()
                 .min(8, "Password must be at least 8 characters")
@@ -42,7 +38,7 @@ const formSchema = z.object({
 })
 
 
-export function SignForm({
+export function LogForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -51,23 +47,25 @@ export function SignForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             email:"",
-            username:"",
             password:"",
         }
     })
     async function onSubmit(data: z.infer<typeof formSchema>){
-        const res = await fetch(`${API_URL}/users/registers`,{
+        const res = await fetch(`${API_URL}/users/login`,{
             method: "POST",
             headers: {
                 Accept: "application/json",
-                "Content-Type": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded",
             },
-        body: JSON.stringify(data),
+        body: new URLSearchParams({
+            email: data.email,
+            password: data.password
+        }).toString(),
     })
 
     if(!res.ok){
         const errorData = await res.json()
-        toast.error(`Registration failed: ${errorData?.message || "Unkowne error"}`, {
+        toast.error(`Login failed: ${errorData?.message || "Unknown error"}`, {
             position: "top-center",
         })
         return
@@ -79,7 +77,7 @@ export function SignForm({
         })
     }
 
-    toast.success("Account created - please log in to continue", {
+    toast.success("Login successful - redirecting...", {
         position: "top-center",
     })
     form.reset()
@@ -90,13 +88,13 @@ export function SignForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Create your account</CardTitle>
+          <CardTitle>Log in to your account</CardTitle>
           <CardDescription>
-            Enter your information to create your account
+            Enter your information to log in to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form id="signin-form" onSubmit={form.handleSubmit(onSubmit)}>
+          <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -105,16 +103,6 @@ export function SignForm({
                   type="email"
                   placeholder="m@example.com"
                   {...form.register("email")}
-                  required
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="username">Username</FieldLabel>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="exampleName"
-                  {...form.register("username")}
                   required
                 />
               </Field>
@@ -129,7 +117,7 @@ export function SignForm({
                     required />
               </Field>
               <Field>
-                <Button type="submit">Sign Up</Button>
+                <Button type="submit">Log In</Button>
               </Field>
             </FieldGroup>
           </form>
