@@ -21,7 +21,7 @@ import * as z from "zod"
 import { toast } from "sonner"
 
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const formSchema = z.object({
     email: z.string()
@@ -54,7 +54,7 @@ export function SignForm({
         }
     })
     async function onSubmit(data: z.infer<typeof formSchema>){
-        const res = await fetch(`${API_URL}/users/registers`,{
+        const res = await fetch(`${API_URL}/users/register`,{
             method: "POST",
             headers: {
                 Accept: "application/json",
@@ -65,7 +65,7 @@ export function SignForm({
 
     if(!res.ok){
         const errorData = await res.json()
-        toast.error(`Registration failed: ${errorData?.message || "Unkowne error"}`, {
+        toast.error(`Registration failed: ${errorData?.message || "Unknown error"}`, {
             position: "top-center",
         })
         return

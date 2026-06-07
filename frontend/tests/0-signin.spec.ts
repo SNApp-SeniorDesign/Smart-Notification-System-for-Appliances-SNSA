@@ -12,5 +12,5 @@ test("test user can sign in or already exists", async ({ page }) => {
     
     await page.getByRole("button", {name: "Sign Up"}).click()
 
-    await expect(page.getByText("sucess|created|registered|already exists/i")).toBeVisible()
+    await expect(page.getByText(/Account created - please log in to continue|already exists/i)).toBeVisible()
 })

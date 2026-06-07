@@ -23,7 +23,7 @@ import * as z from "zod"
 import { toast } from "sonner"
 
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const formSchema = z.object({
     email: z.string()

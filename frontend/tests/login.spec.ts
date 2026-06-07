@@ -10,5 +10,8 @@ test("user can log in and reach dashboard", async ({ page }) => {
     await page.getByLabel("Password").fill("password")
     await page.getByRole("button", { name: "Log In" }).last().click()
 
+    const token = await page.evaluate(() =>
+        localStorage.getItem("access_token"))
+    expect(token).not.toBeNull()
     await expect(page.getByText("Login successful")).toBeVisible()
 })
