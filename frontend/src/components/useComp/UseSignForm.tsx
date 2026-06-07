@@ -1,3 +1,5 @@
+"use client"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,7 +23,7 @@ import * as z from "zod"
 import { toast } from "sonner"
 
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const formSchema = z.object({
     email: z.string()
@@ -54,7 +56,7 @@ export function SignForm({
         }
     })
     async function onSubmit(data: z.infer<typeof formSchema>){
-        const res = await fetch(`${API_URL}/users/register`,{
+      const res = await fetch("http://127.0.0.1:8000/users/register",{
             method: "POST",
             headers: {
                 Accept: "application/json",

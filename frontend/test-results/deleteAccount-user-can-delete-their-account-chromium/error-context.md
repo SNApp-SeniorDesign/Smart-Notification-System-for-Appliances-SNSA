@@ -25,40 +25,37 @@ Received: null
   - button [ref=e4]: Sign Up
   - button [expanded] [ref=e5]: Log In
   - button [ref=e6]: Delete Account
-  - generic [ref=e11] [cursor=pointer]:
-    - button "Open Next.js Dev Tools" [ref=e12]:
-      - img [ref=e13]
-    - generic [ref=e16]:
-      - button "Open issues overlay" [ref=e17]:
-        - generic [ref=e18]:
-          - generic [ref=e19]: "0"
-          - generic [ref=e20]: "1"
-        - generic [ref=e21]: Issue
-      - button "Collapse issues badge" [ref=e22]:
-        - img [ref=e23]
-  - alert [ref=e25]
-  - dialog "Log in to your Account" [ref=e29]:
-    - generic [ref=e30]:
-      - heading "Log in to your Account" [level=2] [ref=e31]
-      - paragraph [ref=e32]: Enter your email and password to log in to your account
-    - generic [ref=e34]:
-      - generic [ref=e35]:
-        - generic [ref=e36]: Log in to your account
-        - generic [ref=e37]: Enter your information to log in to your account
-      - generic [ref=e40]:
-        - group [ref=e41]:
-          - generic [ref=e42]: Email
-          - textbox "Email" [ref=e43]:
+  - region "Notifications alt+T":
+    - list
+    - list:
+      - listitem [ref=e7]:
+        - img [ref=e9]
+        - generic [ref=e12]: "Login failed: Unknown error"
+  - button "Open Next.js Dev Tools" [ref=e18] [cursor=pointer]:
+    - img [ref=e19]
+  - alert [ref=e22]
+  - dialog "Log in to your Account" [ref=e26]:
+    - generic [ref=e27]:
+      - heading "Log in to your Account" [level=2] [ref=e28]
+      - paragraph [ref=e29]: Enter your email and password to log in to your account
+    - generic [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e33]: Log in to your account
+        - generic [ref=e34]: Enter your information to log in to your account
+      - generic [ref=e37]:
+        - group [ref=e38]:
+          - generic [ref=e39]: Email
+          - textbox "Email" [ref=e40]:
             - /placeholder: m@example.com
             - text: user@example.com
-        - group [ref=e44]:
-          - generic [ref=e46]: Password
-          - textbox "Password" [ref=e47]: password
-        - group [ref=e48]:
-          - button "Log In" [active] [ref=e49]
-    - button "Close" [ref=e50]:
+        - group [ref=e41]:
+          - generic [ref=e43]: Password
+          - textbox "Password" [ref=e44]: password
+        - group [ref=e45]:
+          - button "Log In" [active] [ref=e46]
+    - button "Close" [ref=e47]:
       - img
-      - generic [ref=e51]: Close
+      - generic [ref=e48]: Close
 ```
 
 # Test source

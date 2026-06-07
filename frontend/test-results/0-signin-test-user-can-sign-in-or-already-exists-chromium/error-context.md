@@ -26,6 +26,7 @@ Call log:
 ```
 
 ```yaml
+- region "Notifications alt+T"
 - dialog "Create your Account":
   - heading "Create your Account" [level=2]
   - paragraph: Enter your email, username, and password to create an account

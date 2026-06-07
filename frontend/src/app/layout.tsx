@@ -4,6 +4,10 @@ import "./globals.css";
 import { UseDialSign } from "@/components/useComp/UseDialSign";
 import {UseDeleteButton} from "@/components/useComp/UseDeleteButton"
 import {UseDialLog} from "@/components/useComp/UseDialLog"
+import { Toaster } from "sonner";
+
+
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -33,6 +37,7 @@ export default function RootLayout({
         < UseDialSign />
         < UseDialLog />
         < UseDeleteButton />
+        < Toaster />
       </body>
     </html>
   );
