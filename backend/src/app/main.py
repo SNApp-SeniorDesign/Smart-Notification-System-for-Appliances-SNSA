@@ -14,7 +14,7 @@ NEXT_URL = settings.frontend_url
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    create_db_tb
+    create_db_tb()
     yield
 
 
@@ -31,8 +31,8 @@ app.include_router(user_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhos:3000",
-        NEXT_URL,
+        "http://localhost:3000",
+        "http://127.0.0.1:8000",
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
