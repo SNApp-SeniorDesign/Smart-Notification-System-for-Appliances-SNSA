@@ -6,7 +6,7 @@ test("test user can sign in or already exists", async ({ page }) => {
 
     await page.getByRole("button", {name: "Sign Up"}).first().click()
 
-    await page.getByLabel("Email").fill("test@gmail.com")
+    await page.getByLabel("Email").fill("user@example.com")
     await page.getByLabel("Username").fill("tester")
     await page.getByLabel("Password", { exact: true }).fill("12345678")
     

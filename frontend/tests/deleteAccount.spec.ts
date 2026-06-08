@@ -17,7 +17,7 @@ async function login(page: Page){
     await page.getByRole("button", { name: "Log In"}).first().click()
 
     await page.getByLabel("Email").fill("user@example.com")
-    await page.getByLabel("Password").fill("password")
+    await page.getByLabel("Password").fill("12345678")
     await page.getByRole("button", { name: "Log In" }).last().click()
 
 
