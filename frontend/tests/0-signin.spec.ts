@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test"
+import {Login, Delete, MakeUser} from "./auths"
 
 test("test user can sign in or already exists", async ({ page }) => {
     
@@ -6,11 +7,15 @@ test("test user can sign in or already exists", async ({ page }) => {
 
     await page.getByRole("button", {name: "Sign Up"}).first().click()
 
-    await page.getByLabel("Email").fill("user@example.com")
-    await page.getByLabel("Username").fill("tester")
-    await page.getByLabel("Password", { exact: true }).fill("12345678")
-    
+    const user = MakeUser();
+    await page.getByLabel("Email").fill(user.email)
+    await page.getByLabel("Username").fill(user.username)
+    await page.getByLabel("Password", { exact: true }).fill(user.password)
+
     await page.getByRole("button", {name: "Sign Up"}).click()
 
     await expect(page.getByText(/Account created - please log in to continue|already exists/i)).toBeVisible()
+
+    await Login(page, user)
+    await Delete(page, user)
 })
