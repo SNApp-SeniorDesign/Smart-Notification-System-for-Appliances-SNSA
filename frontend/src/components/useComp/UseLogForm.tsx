@@ -76,6 +76,9 @@ export function LogForm({
             position: "top-center",
         })
     }
+    
+    const tokenData = await res.json()
+    localStorage.setItem("access_toekn", tokenData.access_token)
 
     toast.success("Login successful", {
         position: "top-center",

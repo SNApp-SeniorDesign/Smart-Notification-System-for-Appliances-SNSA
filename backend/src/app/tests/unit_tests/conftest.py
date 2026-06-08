@@ -6,9 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.core.database import Base, get_db
 
-TEST_DATABASE_URL = (
-    "postgresql+psycopg://rune:123456@localhost:5432/learning_paths_test"
-)
+TEST_DATABASE_URL = "postgresql+psycopg://rune:12345678@localhost:5432/snsa_test"
 
 engine = create_engine(TEST_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

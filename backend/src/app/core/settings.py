@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     )
 
     database_url: str = Field(
-        default="sqlite:///./learning_paths.db",
+        default="sqlite:///./snsa.db",
         alias="DATABASE_URL",
         description="The database URL",
     )
