@@ -8,6 +8,10 @@ test("user can log in and reach dashboard", async ({ page }) => {
     const user = MakeUser();
     await signUp(page, user)
     await page.getByRole("button", { name: "Log In"}).first().click()
+    
+    await expect(
+      page.getByRole("heading", { name: "Log in to your account" })
+    ).toBeVisible();
 
     await page.getByLabel("Email").fill(user.email)
     await page.getByLabel("Password").fill(user.password)

@@ -42,7 +42,7 @@ Received: null
           - generic [ref=e33]: Email
           - textbox "Email" [ref=e34]:
             - /placeholder: m@example.com
-            - text: user@example.com
+            - text: user-1780957017071@example.com
         - group [ref=e35]:
           - generic [ref=e37]: Password
           - textbox "Password" [ref=e38]: "12345678"
@@ -56,34 +56,57 @@ Received: null
 # Test source
 
 ```ts
-  1  | import { test, expect, Page} from "@playwright/test"
+  1  | import {Page, expect } from "@playwright/test"
   2  | 
-  3  | test("user can delete their account", async ({ page }) => {
-  4  | 
-  5  |     await page.goto("/")
-  6  | 
-  7  |     await login(page)
-  8  | 
-  9  |     await page.getByRole("button", { name: "Delete Account" }).last().click()
-  10 | 
-  11 |     await expect(page.getByText("Account deleted successfully")).toBeVisible()
-  12 | })
+  3  | 
+  4  | export function MakeUser(){
+  5  |     const id = Date.now() + Math.floor(Math.random() * 10000);
+  6  |     return {
+  7  |         email: `user-${id}@example.com`,
+  8  |         username: `tester-${id}`,
+  9  |         password: "12345678"
+  10 |     }
+  11 | }
+  12 | 
   13 | 
-  14 | async function login(page: Page){
+  14 | export async function signUp(page: Page, user: ReturnType<typeof MakeUser>){
   15 |     await page.goto("/")
   16 | 
-  17 |     await page.getByRole("button", { name: "Log In"}).first().click()
+  17 |     await page.getByRole("button", {name: "Sign Up"}).first().click()
   18 | 
-  19 |     await page.getByLabel("Email").fill("user@example.com")
-  20 |     await page.getByLabel("Password").fill("12345678")
-  21 |     await page.getByRole("button", { name: "Log In" }).last().click()
-  22 | 
-  23 | 
-  24 |     const token = await page.evaluate(() =>
-  25 |         localStorage.getItem("access_token"))
-  26 |     
-> 27 |     expect(token).not.toBeNull()
+  19 |     await page.getByRole("button", { name: "Sign Up" }).first().click();
+  20 |     await page.locator("#email").fill(user.email);
+  21 |     await page.locator("#username").fill(user.username);
+  22 |     await page.locator("#password").fill(user.password);
+  23 |     await page.getByRole("button", { name: "Sign Up" }).last().click();
+  24 | 
+  25 | }
+  26 | 
+  27 | export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
+  28 |     await page.goto("/")
+  29 |     
+  30 |     await page.getByRole("button", { name: "Log In" }).first().click();
+  31 | 
+  32 |     await expect(
+  33 |     page.getByRole("heading", { name: "Log in to your account" })
+  34 |     ).toBeVisible();
+  35 | 
+  36 |     await page.locator("#email").fill(user.email);
+  37 |     await page.locator("#password").fill(user.password);
+  38 |     await page.getByRole("button", { name: "Log In" }).last().click();
+  39 | 
+  40 |     const token = await page.evaluate(() =>
+  41 |         localStorage.getItem("access_token")
+  42 |     );
+  43 | 
+> 44 |     expect(token).not.toBeNull();
      |                      ^ Error: expect(received).not.toBeNull()
-  28 |     await expect(page.getByText("Login successful")).toBeVisible()
-  29 | }
+  45 | 
+  46 | }
+  47 | 
+  48 | export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
+  49 |     await page.goto("/")
+  50 |     await page.getByRole("button", { name: "Delete Account" }).first().click();
+  51 | 
+  52 | }
 ```

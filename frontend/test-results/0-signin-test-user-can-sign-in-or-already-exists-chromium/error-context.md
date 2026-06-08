@@ -6,34 +6,51 @@
 
 # Test info
 
-- Name: login.spec.ts >> user can log in and reach dashboard
-- Location: tests/login.spec.ts:5:0
+- Name: 0-signin.spec.ts >> test user can sign in or already exists
+- Location: tests/0-signin.spec.ts:4:0
 
 # Error details
 
 ```
-Test timeout of 30000ms exceeded.
-```
+Error: expect(received).not.toBeNull()
 
-```
-Error: fill: Test timeout of 30000ms exceeded.
-Call log:
-  - waiting for locator('#email')
-
+Received: null
 ```
 
 # Page snapshot
 
 ```yaml
-- generic [active] [ref=e1]:
-  - heading "Welcome to the Home Page" [level=1] [ref=e3]
-  - button "Sign Up" [ref=e4]
-  - button "Log In" [ref=e5]
-  - button "Delete Account" [ref=e6]
+- generic [ref=e1]:
+  - heading [level=1] [ref=e3]: Welcome to the Home Page
+  - button [ref=e4]: Sign Up
+  - button [expanded] [ref=e5]: Log In
+  - button [ref=e6]: Delete Account
   - region "Notifications alt+T"
   - button "Open Next.js Dev Tools" [ref=e12] [cursor=pointer]:
     - img [ref=e13]
   - alert [ref=e16]
+  - dialog "Log in to your Account" [ref=e20]:
+    - generic [ref=e21]:
+      - heading "Log in to your Account" [level=2] [ref=e22]
+      - paragraph [ref=e23]: Enter your email and password to log in to your account
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e27]: Log in to your account
+        - generic [ref=e28]: Enter your information to log in to your account
+      - generic [ref=e31]:
+        - group [ref=e32]:
+          - generic [ref=e33]: Email
+          - textbox "Email" [ref=e34]:
+            - /placeholder: m@example.com
+            - text: user-1780957012702@example.com
+        - group [ref=e35]:
+          - generic [ref=e37]: Password
+          - textbox "Password" [ref=e38]: "12345678"
+        - group [ref=e39]:
+          - button "Log In" [active] [ref=e40]
+    - button "Close" [ref=e41]:
+      - img
+      - generic [ref=e42]: Close
 ```
 
 # Test source
@@ -58,8 +75,7 @@ Call log:
   17 |     await page.getByRole("button", {name: "Sign Up"}).first().click()
   18 | 
   19 |     await page.getByRole("button", { name: "Sign Up" }).first().click();
-> 20 |     await page.locator("#email").fill(user.email);
-     |                                 ^ Error: fill: Test timeout of 30000ms exceeded.
+  20 |     await page.locator("#email").fill(user.email);
   21 |     await page.locator("#username").fill(user.username);
   22 |     await page.locator("#password").fill(user.password);
   23 |     await page.getByRole("button", { name: "Sign Up" }).last().click();
@@ -83,7 +99,8 @@ Call log:
   41 |         localStorage.getItem("access_token")
   42 |     );
   43 | 
-  44 |     expect(token).not.toBeNull();
+> 44 |     expect(token).not.toBeNull();
+     |                      ^ Error: expect(received).not.toBeNull()
   45 | 
   46 | }
   47 | 

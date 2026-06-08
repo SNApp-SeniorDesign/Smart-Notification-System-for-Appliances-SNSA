@@ -14,6 +14,8 @@ export function MakeUser(){
 export async function signUp(page: Page, user: ReturnType<typeof MakeUser>){
     await page.goto("/")
 
+    await page.getByRole("button", {name: "Sign Up"}).first().click()
+
     await page.getByRole("button", { name: "Sign Up" }).first().click();
     await page.locator("#email").fill(user.email);
     await page.locator("#username").fill(user.username);
@@ -26,6 +28,11 @@ export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
     await page.goto("/")
     
     await page.getByRole("button", { name: "Log In" }).first().click();
+
+    await expect(
+    page.getByRole("heading", { name: "Log in to your account" })
+    ).toBeVisible();
+
     await page.locator("#email").fill(user.email);
     await page.locator("#password").fill(user.password);
     await page.getByRole("button", { name: "Log In" }).last().click();
