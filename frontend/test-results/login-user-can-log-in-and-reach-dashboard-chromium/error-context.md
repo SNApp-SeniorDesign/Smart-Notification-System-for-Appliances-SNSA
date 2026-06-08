@@ -25,37 +25,32 @@ Received: null
   - button [ref=e4]: Sign Up
   - button [expanded] [ref=e5]: Log In
   - button [ref=e6]: Delete Account
-  - region "Notifications alt+T":
-    - list
-    - list:
-      - listitem [ref=e7]:
-        - img [ref=e9]
-        - generic [ref=e12]: "Login failed: Unknown error"
-  - button "Open Next.js Dev Tools" [ref=e18] [cursor=pointer]:
-    - img [ref=e19]
-  - alert [ref=e22]
-  - dialog "Log in to your Account" [ref=e26]:
-    - generic [ref=e27]:
-      - heading "Log in to your Account" [level=2] [ref=e28]
-      - paragraph [ref=e29]: Enter your email and password to log in to your account
-    - generic [ref=e31]:
-      - generic [ref=e32]:
-        - generic [ref=e33]: Log in to your account
-        - generic [ref=e34]: Enter your information to log in to your account
-      - generic [ref=e37]:
-        - group [ref=e38]:
-          - generic [ref=e39]: Email
-          - textbox "Email" [ref=e40]:
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e12] [cursor=pointer]:
+    - img [ref=e13]
+  - alert [ref=e16]
+  - dialog "Log in to your Account" [ref=e20]:
+    - generic [ref=e21]:
+      - heading "Log in to your Account" [level=2] [ref=e22]
+      - paragraph [ref=e23]: Enter your email and password to log in to your account
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e27]: Log in to your account
+        - generic [ref=e28]: Enter your information to log in to your account
+      - generic [ref=e31]:
+        - group [ref=e32]:
+          - generic [ref=e33]: Email
+          - textbox "Email" [ref=e34]:
             - /placeholder: m@example.com
             - text: user@example.com
-        - group [ref=e41]:
-          - generic [ref=e43]: Password
-          - textbox "Password" [ref=e44]: password
-        - group [ref=e45]:
-          - button "Log In" [active] [ref=e46]
-    - button "Close" [ref=e47]:
+        - group [ref=e35]:
+          - generic [ref=e37]: Password
+          - textbox "Password" [ref=e38]: "12345678"
+        - group [ref=e39]:
+          - button "Log In" [active] [ref=e40]
+    - button "Close" [ref=e41]:
       - img
-      - generic [ref=e48]: Close
+      - generic [ref=e42]: Close
 ```
 
 # Test source
@@ -70,7 +65,7 @@ Received: null
   7  |     await page.getByRole("button", { name: "Log In"}).first().click()
   8  | 
   9  |     await page.getByLabel("Email").fill("user@example.com")
-  10 |     await page.getByLabel("Password").fill("password")
+  10 |     await page.getByLabel("Password").fill("12345678")
   11 |     await page.getByRole("button", { name: "Log In" }).last().click()
   12 | 
   13 |     const token = await page.evaluate(() =>

@@ -58,7 +58,7 @@ export function LogForm({
                 "Content-Type": "application/x-www-form-urlencoded",
             },
         body: new URLSearchParams({
-            email: data.email,
+            username: data.email,
             password: data.password
         }).toString(),
     })
@@ -71,14 +71,14 @@ export function LogForm({
         return
     }
 
-    if(res.status !== 201){
+    if(res.status !== 200){
         toast.error("Unexpected response from server. Please try again later.",{
             position: "top-center",
         })
     }
     
     const tokenData = await res.json()
-    localStorage.setItem("access_toekn", tokenData.access_token)
+    localStorage.setItem("access_token", tokenData.access_token)
 
     toast.success("Login successful", {
         position: "top-center",

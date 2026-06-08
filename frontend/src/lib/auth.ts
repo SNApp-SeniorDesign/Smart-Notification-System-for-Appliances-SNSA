@@ -21,3 +21,4 @@ export function clearToken(): void{
     localStorage.removeItem(TOKEN_KEY)
     sessionStorage.removeItem(TOKEN_KEY)
 }
+
