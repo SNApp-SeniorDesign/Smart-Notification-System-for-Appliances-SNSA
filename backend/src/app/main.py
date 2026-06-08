@@ -74,6 +74,3 @@ async def eventTrigger(event_message: EventMessage):
 @app.get("/latest-event")
 async def get_latest_event():
     return latest_event
-
-
-print("DATABASE_URL:", settings.database_url)
