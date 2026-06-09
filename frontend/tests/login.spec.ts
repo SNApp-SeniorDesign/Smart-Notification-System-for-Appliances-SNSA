@@ -17,10 +17,13 @@ test("user can log in and reach dashboard", async ({ page }) => {
     await page.getByLabel("Password").fill(user.password)
     await page.getByRole("button", { name: "Log In" }).last().click()
 
+    await expect(page.getByText("Login successful")).toBeVisible()
+
     const token = await page.evaluate(() =>
         localStorage.getItem("access_token"))
     expect(token).not.toBeNull()
-    await expect(page.getByText("Login successful")).toBeVisible()
+
+    await expect(page.getByRole("dialog")).not.toBeVisible()
 
     await Delete(page, user)
 })

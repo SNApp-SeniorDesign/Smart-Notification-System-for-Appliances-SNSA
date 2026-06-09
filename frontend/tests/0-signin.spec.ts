@@ -16,6 +16,8 @@ test("test user can sign in or already exists", async ({ page }) => {
 
     await expect(page.getByText(/Account created - please log in to continue|already exists/i)).toBeVisible()
 
+    await expect(page.getByRole("dialog")).not.toBeVisible()
+
     await Login(page, user)
     await Delete(page, user)
 })

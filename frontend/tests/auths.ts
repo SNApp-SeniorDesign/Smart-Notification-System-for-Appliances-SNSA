@@ -12,7 +12,6 @@ export function MakeUser(){
 
 
 export async function signUp(page: Page, user: ReturnType<typeof MakeUser>){
-    await page.goto("/")
 
     await page.getByRole("button", {name: "Sign Up"}).first().click()
 
@@ -22,12 +21,17 @@ export async function signUp(page: Page, user: ReturnType<typeof MakeUser>){
     await page.locator("#password").fill(user.password);
     await page.getByRole("button", { name: "Sign Up" }).last().click();
 
+    await expect(page.getByRole("dialog")).not.toBeVisible()
+    
+
 }
 
 export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
-    await page.goto("/")
     
-    await page.getByRole("button", { name: "Log In" }).first().click();
+    const LoginButton = await page.getByRole("button", { name: "Log In" }).first()
+    await expect(LoginButton).toBeVisible()
+    await expect(LoginButton).toBeEnabled()
+    await LoginButton.click();
 
     await expect(
     page.getByRole("heading", { name: "Log in to your account" })
@@ -37,16 +41,13 @@ export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
     await page.locator("#password").fill(user.password);
     await page.getByRole("button", { name: "Log In" }).last().click();
 
-    const token = await page.evaluate(() =>
-        localStorage.getItem("access_token")
-    );
-
-    expect(token).not.toBeNull();
+    await expect(page.getByText("Login successful")).toBeVisible()
+    
+    await expect(page.getByRole("dialog")).not.toBeVisible()
 
 }
 
 export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
-    await page.goto("/")
     await page.getByRole("button", { name: "Delete Account" }).first().click();
 
 }
