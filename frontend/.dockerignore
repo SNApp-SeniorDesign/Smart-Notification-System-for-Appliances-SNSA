@@ -1,0 +1,54 @@
+node_modules/
+
+# Next.js build output — should be regenerated inside the container.
+.next/
+out/
+
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Editor/OS noise
+.DS_Store
+.idea/
+.vscode/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies
+node_modules/
+
+# Bun / package-manager caches
+.bun/
+bun.lockb
+
+# Bun / package-manager caches
+.bun/
+bun.lockb
+
+# Build/cache artifacts
+dist/
+build/
+.cache/
+.turbo/
+.vercel/
+
+# Git
+.git
+.gitignore
+
+# Tests / coverage
+coverage/
+.playwright/
+test-results/
+
+# Editor/OS noise
+Thumbs.db
+
+# Logs
+*.log
+pnpm-debug.log*
