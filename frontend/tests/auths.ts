@@ -51,10 +51,13 @@ export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
 }
 
 export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
-    await page.getByRole("button", { name: "Delete Account" }).first().click();
+    page.once("dialog", async (dialog) => {
+        expect(dialog.message()).toContain(
+        "Are you sure you want to delete your account?"
+        );
 
-    page.on("dialog", async(dialog) => {
-        expect(dialog.message()).toContain("Are you sure you want to delete your account? This action cannot be undone.")
-        await dialog.accept()
-    })
+        await dialog.accept();
+    });
+
+    await page.getByRole("button", { name: "Delete Account" }).click();
 }
