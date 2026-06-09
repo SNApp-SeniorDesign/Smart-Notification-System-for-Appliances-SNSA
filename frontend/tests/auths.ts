@@ -1,5 +1,5 @@
 import {Page, expect } from "@playwright/test"
-
+import "os"
 
 export function MakeUser(){
     const id = Date.now() + Math.floor(Math.random() * 10000);
@@ -13,7 +13,12 @@ export function MakeUser(){
 
 export async function signUp(page: Page, user: ReturnType<typeof MakeUser>){
 
-    await page.getByRole("button", {name: "Sign Up"}).first().click()
+    const SigninButton =  await page.getByRole("button", {name: "Sign Up"}).first()
+    await expect(SigninButton).toBeVisible()
+    await expect(SigninButton).toBeEnabled()
+    await SigninButton.click();
+
+
 
     await page.getByRole("button", { name: "Sign Up" }).first().click();
     await page.locator("#email").fill(user.email);
@@ -50,4 +55,8 @@ export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
 export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
     await page.getByRole("button", { name: "Delete Account" }).first().click();
 
+    page.on("dialog", async(dialog) => {
+        expect(dialog.message()).toContain("Are you sure you want to delete your account? This action cannot be undone.")
+        await dialog.accept()
+    })
 }

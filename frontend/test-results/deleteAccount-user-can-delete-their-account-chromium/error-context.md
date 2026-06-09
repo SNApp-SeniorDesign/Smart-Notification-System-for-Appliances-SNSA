@@ -12,26 +12,29 @@
 # Error details
 
 ```
-Error: expect(locator).toBeVisible() failed
-
-Locator: getByText('Account deleted successfully')
-Expected: visible
-Timeout: 5000ms
-Error: element(s) not found
-
-Call log:
-  - Expect "to.be.visible" with timeout 5000ms
-  - waiting for getByText('Account deleted successfully')
-
+ReferenceError: window is not defined
 ```
 
+# Page snapshot
+
 ```yaml
-- heading "Welcome to the Home Page" [level=1]
-- button "Sign Up"
-- button "Log In"
-- button "Delete Account"
-- region "Notifications alt+T"
-- alert
+- generic [ref=e1]:
+  - heading "Welcome to the Home Page" [level=1] [ref=e3]
+  - button "Sign Up" [ref=e4]
+  - button "Log In" [ref=e5]
+  - button "Delete Account" [active] [ref=e6]
+  - region "Notifications alt+T":
+    - list
+    - list:
+      - listitem [ref=e7]:
+        - img [ref=e9]
+        - generic [ref=e12]: Login successful
+      - listitem [ref=e13]:
+        - img [ref=e15]
+        - generic [ref=e18]: Account created - please log in to continue
+  - button "Open Next.js Dev Tools" [ref=e24] [cursor=pointer]:
+    - img [ref=e25]
+  - alert [ref=e28]
 ```
 
 # Test source
@@ -46,10 +49,22 @@ Call log:
   7  |     await signUp(page, user)
   8  |     await Login(page, user)
   9  | 
-  10 |     await page.getByRole("button", { name: "Delete Account" }).last().click()
+  10 |     await page.getByRole("button", { name: "Delete Account" }).first().click()
   11 | 
-> 12 |     await expect(page.getByText("Account deleted successfully")).toBeVisible()
-     |                                                                 ^ Error: expect(locator).toBeVisible() failed
-  13 | })
-  14 | 
+> 12 |     const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.")
+     |                      ^ ReferenceError: window is not defined
+  13 |     
+  14 |     page.once("dialog", async (dialog) =>{
+  15 |         await dialog.accept()
+  16 |     })
+  17 | 
+  18 |     if(!confirmed) return
+  19 |     
+  20 |     await expect(
+  21 |         page.getByRole("status").filter({
+  22 |             hasText: /Account deleted successfully/i,
+  23 |         })
+  24 |     ).toBeVisible()
+  25 | })
+  26 | 
 ```

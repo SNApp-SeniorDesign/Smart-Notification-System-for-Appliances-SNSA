@@ -96,10 +96,6 @@ export function LogForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Log in to your account</CardTitle>
-          <CardDescription>
-            Enter your information to log in to your account
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>

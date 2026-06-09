@@ -96,10 +96,6 @@ export function SignForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Create your account</CardTitle>
-          <CardDescription>
-            Enter your information to create your account
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <form id="signin-form" onSubmit={form.handleSubmit(onSubmit)}>
