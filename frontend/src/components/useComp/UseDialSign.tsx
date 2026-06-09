@@ -13,11 +13,16 @@ import {
 } from "@/components/ui/dialog"
 import { SignForm } from "@/components/useComp/UseSignForm"
 import * as React from "react"
+import { useState } from "react"
+
+
 
 export function UseDialSign()
-{  return (
+{  
+  const [open, setOpen] = useState(false)
+  return (
 //Dialog component are open
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger
           render={
             <Button>
@@ -32,7 +37,7 @@ export function UseDialSign()
                 Enter your email, username, and password to create an account
             </DialogDescription>
           </DialogHeader>
-            <SignForm />
+            <SignForm onSuccess={() => setOpen(false)} />
         </DialogContent>
     </Dialog>
   )

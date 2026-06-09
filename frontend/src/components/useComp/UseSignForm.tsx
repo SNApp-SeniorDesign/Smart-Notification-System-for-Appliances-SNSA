@@ -41,11 +41,15 @@ const formSchema = z.object({
 
 })
 
+type SignFormProps = React.ComponentProps<"div"> & {
+    onSuccess?: () => void
+}
 
 export function SignForm({
   className,
+  onSuccess,
   ...props
-}: React.ComponentProps<"div">) {
+}: SignFormProps) {
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -82,6 +86,8 @@ export function SignForm({
     toast.success("Account created - please log in to continue", {
         position: "top-center",
     })
+
+    onSuccess?.();
     form.reset()
 }
 
