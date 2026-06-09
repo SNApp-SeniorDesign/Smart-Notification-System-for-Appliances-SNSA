@@ -35,7 +35,7 @@ export function UseDialLog()
                 Enter your email and password to log in to your account
             </DialogDescription>
           </DialogHeader>
-            <LogForm />
+            <LogForm onSuccess={() => setOpen(false)} />
         </DialogContent>
     </Dialog>
   )
