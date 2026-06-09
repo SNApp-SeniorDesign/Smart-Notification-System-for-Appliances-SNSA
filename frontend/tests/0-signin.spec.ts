@@ -5,7 +5,12 @@ test("test user can sign in or already exists", async ({ page }) => {
     
     await page.goto("/")
 
-    await expect(page.getByRole("button", { name: "Sign Up" })).toBeVisible()
+    await page.getByRole("button", { name: "Sign Up"}).first().click()
+    
+    await expect(
+      page.getByRole("heading", { name: "Create your Account" })
+    ).toBeVisible();
+
 
     const user = MakeUser();
     await page.getByLabel("Email").fill(user.email)

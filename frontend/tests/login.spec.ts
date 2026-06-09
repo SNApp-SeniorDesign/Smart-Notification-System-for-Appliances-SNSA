@@ -10,7 +10,7 @@ test("user can log in and reach dashboard", async ({ page }) => {
     await page.getByRole("button", { name: "Log In"}).first().click()
     
     await expect(
-      page.getByRole("heading", { name: "Log in to your account" })
+      page.getByRole("heading", { name: "Log in to your Account" })
     ).toBeVisible();
 
     await page.getByLabel("Email").fill(user.email)

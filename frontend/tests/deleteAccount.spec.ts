@@ -1,25 +1,23 @@
-import { test, expect, Page} from "@playwright/test"
-import {signUp, Login , MakeUser} from "./auths"
+import { test, expect } from "@playwright/test";
+import { MakeUser, signUp, Login } from "./auths";
+
 test("user can delete their account", async ({ page }) => {
+  const user = MakeUser();
 
-    await page.goto("/")
-    const user = MakeUser();
-    await signUp(page, user)
-    await Login(page, user)
+  await signUp(page, user);
+  await Login(page, user);
 
-    await page.getByRole("button", { name: "Delete Account" }).first().click()
+  page.once("dialog", async (dialog) => {
+    expect(dialog.message()).toContain(
+      "Are you sure you want to delete your account?"
+    );
 
-    const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.")
-    
-    page.once("dialog", async (dialog) =>{
-        await dialog.accept()
-    })
+    await dialog.accept();
+  });
 
-    if(!confirmed) return
-    
-    await expect(
-        page.getByRole("status").filter({
-            hasText: /Account deleted successfully/i,
-        })
-    ).toBeVisible()
-})
+  await page.getByRole("button", { name: "Delete Account" }).click();
+
+  await expect(
+    page.getByText(/Account deleted successfully/i)
+  ).toBeVisible();
+});

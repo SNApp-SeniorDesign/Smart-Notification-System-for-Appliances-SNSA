@@ -1,5 +1,4 @@
 import {Page, expect } from "@playwright/test"
-import "os"
 
 export function MakeUser(){
     const id = Date.now() + Math.floor(Math.random() * 10000);
@@ -13,12 +12,11 @@ export function MakeUser(){
 
 export async function signUp(page: Page, user: ReturnType<typeof MakeUser>){
 
-    const SigninButton =  await page.getByRole("button", {name: "Sign Up"}).first()
-    await expect(SigninButton).toBeVisible()
-    await expect(SigninButton).toBeEnabled()
-    await SigninButton.click();
+    await page.getByRole("button", { name: "Sign Up"}).first().click()
 
-
+    await expect(
+      page.getByRole("heading", { name: "Create your Account" })
+    ).toBeVisible();
 
     await page.getByRole("button", { name: "Sign Up" }).first().click();
     await page.locator("#email").fill(user.email);
@@ -39,7 +37,7 @@ export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
     await LoginButton.click();
 
     await expect(
-    page.getByRole("heading", { name: "Log in to your account" })
+    page.getByRole("heading", { name: "Log in to your Account" })
     ).toBeVisible();
 
     await page.locator("#email").fill(user.email);
