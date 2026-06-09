@@ -37,11 +37,15 @@ const formSchema = z.object({
 
 })
 
+type LogFormProps = React.ComponentProps<"div"> & {
+    onSuccess?: () => void
+}
 
 export function LogForm({
   className,
+  onSuccess,
   ...props
-}: React.ComponentProps<"div">) {
+}: LogFormProps) {
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -84,6 +88,7 @@ export function LogForm({
         position: "top-center",
     })
     form.reset()
+    onSuccess?.()
 }
 
      

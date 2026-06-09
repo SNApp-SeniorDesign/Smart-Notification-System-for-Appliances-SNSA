@@ -13,11 +13,14 @@ import {
 } from "@/components/ui/dialog"
 import { LogForm } from "@/components/useComp/UseLogForm"
 import * as React from "react"
+import { useState } from "react"
 
 export function UseDialLog()
-{  return (
+{  
+  const [open, setOpen] = useState(false)
+  return (
 //Dialog component are open
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger
           render={
             <Button>
