@@ -1,10 +1,14 @@
-FROM oven/bun1 AS builder
+FROM oven/bun:latest AS builder
 WORKDIR /app
 
-COPY package.json bun.lcok ./
+COPY package.json bun.lock ./
+
 RUN bun install --frozen-lockfile
 
-COPY..
+COPY . .
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 RUN bun run build
 
 FROM node:20-alpine
@@ -21,4 +25,4 @@ COPY --from=builder /app/public ./public
 
 EXPOSE 3000
 
-CMD {"node", "./server.js"}
+CMD ["node", "./server.js"]
