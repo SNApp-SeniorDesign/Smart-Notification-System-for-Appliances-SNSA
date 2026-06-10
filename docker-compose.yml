@@ -39,9 +39,9 @@ services:
     depends_on:
       - backend
     environment:
-      NEXT_PUBLIC_BACKEND_URL: http://localhost:8000
-      INTERNAL_API_URL: http://backend:8000
+     NEXT_PUBLIC_API_URL: http://localhost:8000
+      INTERNAL_API_URL: http://localhost:8000
     ports:
       - "3000:3000"
 volumes:
-  pgdata:
+  db_data:
