@@ -1,0 +1,51 @@
+.venv/
+
+# Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Test/lint caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local SQLite leftovers from before the Postgres migration
+*.db
+
+# Secrets — passed in at runtime via env_file in compose.
+.env
+
+# Editor/OS noise
+.DS_Store
+.idea/
+.vscode/
+
+# Git
+.git
+.gitignore
+
+# Docker-related
+Dockerfile
+docker-compose.yml
+
+# Logs
+*.log
+
+# Coverage /reports
+.coverage
+htmlcov/
+
+# Build artifacts
+dist/
+build/
+
+# Python packaging leftovers
+*.egg-info/
+
+# Misc caches
+.cache/
+
+# OS junk
+Thumbs.db
