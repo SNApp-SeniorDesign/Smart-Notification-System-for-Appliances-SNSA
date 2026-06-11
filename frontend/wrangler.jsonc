@@ -1,7 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": ".open-next/worker.js",
-	"name": "frontend",
+	"name": "smart-notification-dystem-for-appliances-snsa",
 	"compatibility_date": "2026-06-11",
 	"compatibility_flags": [
 		"nodejs_compat",
