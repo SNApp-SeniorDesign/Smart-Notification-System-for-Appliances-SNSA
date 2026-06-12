@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   title: "Smart Notification System for Appliances (SNSA)",
   description: "SNSA is a smart notification system for appliances that provides users with real-time updates and alerts about their appliances' status and performance. It helps users stay informed about their appliances' health, energy consumption, and maintenance needs, allowing them to optimize their usage and reduce energy costs.",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/icon-192.png",
+  },
 };
 
 export default function RootLayout({
