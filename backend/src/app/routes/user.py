@@ -40,6 +40,15 @@ async def login(
     return Token(access_token=access_token, token_type="bearer")
 
 
+@api_router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+async def Logout(
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserModel, Depends(user_service.get_current_user)],
+) -> None:
+    user_service.revoke_tokens(db, current_user)
+    return None
+
+
 "Delete"
 
 
