@@ -61,6 +61,16 @@ async def update_user(
     return user_service.update_user(db, current_user, user_update)
 
 
+"Get"
+
+
+@api_router.get("/me", response_model=UserSchema)
+async def get_me(
+    current_user: Annotated[UserModel, Depends(user_service.get_current_user)],
+) -> UserSchema:
+    return current_user
+
+
 "Delete"
 
 
