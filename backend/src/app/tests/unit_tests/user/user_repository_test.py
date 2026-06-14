@@ -78,6 +78,14 @@ def test_update_user(db: Session):
     assert user.hashed_password == "modifiedhashedpassword123"
 
 
+def test_token_revoke(db: Session):
+    created = UserRepository.create_user(db, user_db)
+    original_token = created.token_version
+    UserRepository.token_revoke(db, created)
+    updated_user = UserRepository.get_by_id(db, created.id)
+    assert updated_user.token_version == original_token + 1
+
+
 "Delete"
 
 
