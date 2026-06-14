@@ -9,6 +9,8 @@ user_db = UserDB(
     hashed_password="hashedpassword123",
 )
 
+"Post"
+
 
 def test_create_user(db: Session):
 
@@ -16,6 +18,9 @@ def test_create_user(db: Session):
     assert user.id is not None
     assert user.email == "test@example.com"
     assert user.username == "testuser"
+
+
+"Get"
 
 
 def test_get_by_mail_exists(db: Session):
@@ -54,12 +59,29 @@ def test_get_by_id_not_exists(db: Session):
     assert user is None
 
 
+"Update"
+
+
+def test_update_user(db: Session):
+    created = UserRepository.create_user(db, user_db)
+
+    created.username = "modifieduser"
+    created.email = "modified@example.com"
+    created.hashed_password = "modifiedhashedpassword123"
+
+    UserRepository.update_user(db, created)
+
+    user = UserRepository.get_by_id(db, created.id)
+
+    assert user.username == "modifieduser"
+    assert user.email == "modified@example.com"
+    assert user.hashed_password == "modifiedhashedpassword123"
+
+
+"Delete"
+
+
 def test_delete_user(db: Session):
-    user_db = UserDB(
-        username="testuser",
-        email="test@example.com",
-        hashed_password="hashedpassword123",
-    )
     created = UserRepository.create_user(db, user_db)
     UserRepository.delete_user(db, created)
 
