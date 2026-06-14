@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.services.user import user_service
 from app.schemas.user import UserResponse as UserSchema
-from app.schemas.user import UserCreate, Token
+from app.schemas.user import UserCreate, Token, UserUpdate
 from app.models.user import User as UserModel
 from app.repository.user import UserRepository as user_repository
 
@@ -47,6 +47,18 @@ async def Logout(
 ) -> None:
     user_service.revoke_tokens(db, current_user)
     return None
+
+
+"Update"
+
+
+@api_router.put("/update", response_model=UserSchema)
+async def update_user(
+    user_update: UserUpdate,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserModel, Depends(user_service.get_current_user)],
+) -> UserSchema:
+    return user_service.update_user(db, current_user, user_update)
 
 
 "Delete"
