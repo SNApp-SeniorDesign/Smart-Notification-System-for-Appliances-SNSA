@@ -30,7 +30,7 @@ class UserService:
     def get_by_id(self, db: Session, id: int) -> UserResponse | None:
         user_id = self.repository.get_by_id(db, id)
         if user_id is None:
-            user_not_exist
+            user_not_exist()
         return user_id
 
     def is_email_taken(self, db: Session, email: str) -> bool:

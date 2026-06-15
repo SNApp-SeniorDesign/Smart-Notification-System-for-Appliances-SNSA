@@ -42,3 +42,14 @@ def test_get_by_id_success(service, db):
     service.repository.get_by_id.return_value = fake_user
     result = service.get_by_id(db, 1)
     assert result == fake_user
+
+
+def test_get_by_id_not_found(service, db):
+    service.repository.get_by_id.return_value = None
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.get_by_id(db, 99999)
+
+    service.repository.get_by_id.assert_called_once_with(db, 99999)
+
+    assert exc_info.value.status_code == 404
