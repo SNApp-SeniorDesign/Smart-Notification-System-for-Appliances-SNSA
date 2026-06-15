@@ -35,3 +35,10 @@ def test_get_by_mail_not_found(service, db):
     service.repository.get_by_mail.assert_called_once_with(db, "notexist@example.com")
 
     assert exc_info.value.status_code == 404
+
+
+def test_get_by_id_success(service, db):
+    fake_user = Mock(id=1)
+    service.repository.get_by_id.return_value = fake_user
+    result = service.get_by_id(db, 1)
+    assert result == fake_user
