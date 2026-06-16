@@ -59,7 +59,7 @@ class UserService:
         if user.token_version != token_version:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token has been revokded",
+                detail="Token has been revoked",
                 headers={"WWW-Authenticate": "Bearer"},
             )
         return user

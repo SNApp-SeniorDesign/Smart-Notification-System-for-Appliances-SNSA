@@ -129,3 +129,18 @@ def test_get_current_user_user_not_found(service, db):
         with pytest.raises(HTTPException) as exc_info:
             service.get_current_user(db, "fake-token")
     assert exc_info.value.status_code == 404
+
+
+def test_get_current_user_revoked_token(service, db):
+    user = SimpleNamespace(id=1, token_version=4)
+    service.repository.get_by_id.return_value = user
+
+    with patch("app.services.user.verify_token") as mock_verify:
+        mock_verify.return_value = {
+            "sub": "1",
+            "token_version": 3,
+        }
+        with pytest.raises(HTTPException) as exc_info:
+            service.get_current_user(db, "fake-token")
+    assert exc_info.value.status_code == 401
+    assert exc_info.value.detail == "Token has been revoked"
