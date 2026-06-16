@@ -73,3 +73,9 @@ def test_is_username_taken_success(service, db):
     result = service.is_username_taken(db, "tester")
     assert result is True
     service.repository.get_by_username.assert_called_once_with(db, "tester")
+
+
+def test_is_username_taken_fail(service, db):
+    service.repository.get_by_username.return_value = None
+    result = service.is_username_taken(db, "tester")
+    assert result is False
