@@ -94,3 +94,14 @@ def test_get_current_user_success(service, db):
         result = service.get_current_user(db, "fake-token")
     assert result == user
     service.repository.get_by_id.assert_called_once_with(db, 1)
+
+
+def test_get_current_user_missing_sub(service, db):
+    with patch("app.services.user.verify_token") as mock_verify:
+        mock_verify.return_value = {
+            "token_version": 3,
+        }
+        with pytest.raises(HTTPException) as exc_info:
+            service.get_current_user(db, "fake-token")
+
+    assert exc_info.value.status_code == 401
