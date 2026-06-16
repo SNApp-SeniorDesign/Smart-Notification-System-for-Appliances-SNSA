@@ -185,3 +185,17 @@ def test_register_user_email_already_exist(service, db):
     assert exc_info.value.detail == "Email already registered"
 
     service.is_email_taken.assert_called_once_with(db, "test@example.com")
+
+
+def test_register_user_username_already_exist(service, db):
+    service.is_email_taken = Mock(return_value=False)
+    service.is_username_taken = Mock(return_value=True)
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.register_user(db, user_create)
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "Username already taken"
+
+    service.is_email_taken.assert_called_once_with(db, "test@example.com")
+    service.is_username_taken.assert_called_once_with(db, "testuser")
