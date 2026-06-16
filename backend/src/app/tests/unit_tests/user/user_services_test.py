@@ -66,3 +66,10 @@ def test_is_email_taken_fail(service, db):
     service.repository.get_by_mail.return_value = None
     result = service.is_email_taken(db, "test@example.com")
     assert result is False
+
+
+def test_is_username_taken_success(service, db):
+    service.repository.is_username_taken.return_value = object()
+    result = service.is_username_taken(db, "tester")
+    assert result is True
+    service.repository.get_by_username.assert_called_once_with(db, "tester")
