@@ -56,7 +56,7 @@ class UserService:
         if user is None:
             user_not_exist()
 
-        if user.token_version is not token_version:
+        if user.token_version != token_version:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token has been revokded",

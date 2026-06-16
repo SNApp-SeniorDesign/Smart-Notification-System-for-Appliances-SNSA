@@ -1,7 +1,8 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from app.services.user import UserService
 from fastapi import HTTPException
+from types import SimpleNamespace
 
 
 @pytest.fixture
@@ -79,3 +80,17 @@ def test_is_username_taken_fail(service, db):
     service.repository.get_by_username.return_value = None
     result = service.is_username_taken(db, "tester")
     assert result is False
+
+
+def test_get_current_user_success(service, db):
+    user = SimpleNamespace(id=1, token_version=3)
+    service.repository.get_by_id.return_value = user
+
+    with patch("app.services.user.verify_token") as mock_verify:
+        mock_verify.return_value = {
+            "sub": "1",
+            "token_version": 3,
+        }
+        result = service.get_current_user(db, "fake-token")
+    assert result == user
+    service.repository.get_by_id.assert_called_once_with(db, 1)
