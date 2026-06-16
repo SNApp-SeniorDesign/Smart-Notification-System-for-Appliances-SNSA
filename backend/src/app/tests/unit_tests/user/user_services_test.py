@@ -55,8 +55,14 @@ def test_get_by_id_not_found(service, db):
     assert exc_info.value.status_code == 404
 
 
-def test_is_email_taken(service, db):
+def test_is_email_taken_success(service, db):
     service.repository.is_email_taken.return_value = object()
     result = service.is_email_taken(db, "test@example.com")
     assert result is True
     service.repository.get_by_mail.assert_called_once_with(db, "test@example.com")
+
+
+def test_is_email_taken_fail(service, db):
+    service.repository.get_by_mail.return_value = None
+    result = service.is_email_taken(db, "test@example.com")
+    assert result is False
