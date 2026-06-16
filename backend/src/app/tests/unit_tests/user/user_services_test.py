@@ -105,3 +105,27 @@ def test_get_current_user_missing_sub(service, db):
             service.get_current_user(db, "fake-token")
 
     assert exc_info.value.status_code == 401
+
+
+def test_get_current_user_missing_token_version(service, db):
+    with patch("app.services.user.verify_token") as mock_verify:
+        mock_verify.return_value = {
+            "sub": 1,
+        }
+        with pytest.raises(HTTPException) as exc_info:
+            service.get_current_user(db, "fake-token")
+
+    assert exc_info.value.status_code == 401
+
+
+def test_get_current_user_user_not_found(service, db):
+    service.repository.get_by_id.return_value = None
+
+    with patch("app.services.user.verify_token") as mock_verify:
+        mock_verify.return_value = {
+            "sub": "1",
+            "token_version": 3,
+        }
+        with pytest.raises(HTTPException) as exc_info:
+            service.get_current_user(db, "fake-token")
+    assert exc_info.value.status_code == 404
