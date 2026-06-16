@@ -149,11 +149,12 @@ def test_get_current_user_revoked_token(service, db):
 
 "Post"
 
+user_create = UserCreate(
+    username="testuser", email="test@example.com", password="plainpassword123"
+)
+
 
 def test_register_user_success(service, db):
-    user_create = UserCreate(
-        username="testuser", email="test@example.com", password="plainpassword123"
-    )
 
     created_user = UserResponse(id=1, username="testuser", email="test@example.com")
 
@@ -172,3 +173,15 @@ def test_register_user_success(service, db):
     mock_hash.assert_called_once_with("plainpassword123")
 
     service.repository.create_user.assert_called_once()
+
+
+def test_register_user_email_already_exist(service, db):
+    service.is_email_taken = Mock(return_value=True)
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.register_user(db, user_create)
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "Email already registered"
+
+    service.is_email_taken.assert_called_once_with(db, "test@example.com")
