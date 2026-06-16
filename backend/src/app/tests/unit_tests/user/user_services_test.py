@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 from app.services.user import UserService
 from fastapi import HTTPException
 from types import SimpleNamespace
+from app.schemas.user import UserCreate, UserResponse
 
 
 @pytest.fixture
@@ -144,3 +145,30 @@ def test_get_current_user_revoked_token(service, db):
             service.get_current_user(db, "fake-token")
     assert exc_info.value.status_code == 401
     assert exc_info.value.detail == "Token has been revoked"
+
+
+"Post"
+
+
+def test_register_user_success(service, db):
+    user_create = UserCreate(
+        username="testuser", email="test@example.com", password="plainpassword123"
+    )
+
+    created_user = UserResponse(id=1, username="testuser", email="test@example.com")
+
+    service.is_email_taken = Mock(return_value=False)
+    service.is_username_taken = Mock(return_value=False)
+    service.repository.create_user.return_value = created_user
+
+    with patch("app.services.user.get_password_hash") as mock_hash:
+        mock_hash.return_value = "hashedpassword123"
+        result = service.register_user(db, user_create)
+
+    assert result == created_user
+
+    service.is_email_taken.assert_called_once_with(db, "test@example.com")
+    service.is_username_taken.assert_called_once_with(db, "testuser")
+    mock_hash.assert_called_once_with("plainpassword123")
+
+    service.repository.create_user.assert_called_once()
