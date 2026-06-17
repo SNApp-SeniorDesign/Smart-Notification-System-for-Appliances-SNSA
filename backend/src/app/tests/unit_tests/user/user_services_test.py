@@ -229,3 +229,22 @@ def test_authenticate_wrong_user(service, db):
     assert exc_info.value.detail == "Incorrect Email or Passwords"
 
     service.repository.get_by_mail.assert_called_once_with(db, "test@example.com")
+
+
+def test_authenticate_wrong_password(service, db):
+    user = SimpleNamespace(
+        email="test@example.com", hashed_password="hashedpassword123"
+    )
+
+    service.repository.get_by_mail.return_value = user
+
+    with patch("app.services.user.verify_password") as mock_verify:
+        mock_verify.return_value = False
+
+        with pytest.raises(HTTPException) as exc_info:
+            service.authenticate(db, "test@example.com", "plainpassword123")
+
+    assert exc_info.value.status_code == 401
+    assert exc_info.value.detail == "Incorrect Email or Passwords"
+
+    mock_verify.assert_called_once_with("plainpassword123", "hashedpassword123")
