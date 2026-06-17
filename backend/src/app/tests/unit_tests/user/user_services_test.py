@@ -217,3 +217,15 @@ def test_authenticate_success(service, db):
 
     service.repository.get_by_mail.assert_called_once_with(db, "test@example.com")
     mock_verify.assert_called_once_with("plainpassword123", "hashedpassword123")
+
+
+def test_authenticate_wrong_user(service, db):
+    service.repository.get_by_mail.return_value = None
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.authenticate(db, "test@example.com", "plainpassword123")
+
+    assert exc_info.value.status_code == 401
+    assert exc_info.value.detail == "Incorrect Email or Passwords"
+
+    service.repository.get_by_mail.assert_called_once_with(db, "test@example.com")
