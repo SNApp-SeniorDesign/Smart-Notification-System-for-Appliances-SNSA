@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 from app.services.user import UserService
 from fastapi import HTTPException
 from types import SimpleNamespace
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserResponse, UserUpdate
 
 
 @pytest.fixture
@@ -248,3 +248,35 @@ def test_authenticate_wrong_password(service, db):
     assert exc_info.value.detail == "Incorrect Email or Passwords"
 
     mock_verify.assert_called_once_with("plainpassword123", "hashedpassword123")
+
+
+"Update"
+
+
+def test_update_user_all_fields(service, db):
+    db_user = SimpleNamespace(
+        id=1,
+        username="olduser",
+        email="old@example.com",
+        hashed_password="oldhashedpassword",
+    )
+
+    user_update = UserUpdate(
+        username="newuser", email="new@example.com", password="newpassword123"
+    )
+
+    service.repository.update_user.return_value = db_user
+
+    with patch("app.services.user.get_password_hash") as mock_hash:
+        mock_hash.return_value = "newhashedpassword"
+
+        result = service.update_user(db, db_user, user_update)
+
+    assert result == db_user
+
+    assert db_user.username == "newuser"
+    assert db_user.email == "new@example.com"
+    assert db_user.hashed_password == "newhashedpassword"
+
+    mock_hash.assert_called_once_with("newpassword123")
+    service.repository.update_user.assert_called_once_with(db, db_user)
