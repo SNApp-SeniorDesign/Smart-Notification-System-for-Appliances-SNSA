@@ -3,6 +3,12 @@ from app.repository.user import UserRepository
 
 "Post"
 
+payload = {
+    "username": "testuser",
+    "email": "test@example.com",
+    "password": "securepassword123",
+}
+
 
 def test_register_user_success(client: TestClient):
     response = client.post(
@@ -24,12 +30,6 @@ def test_register_user_success(client: TestClient):
 
 
 def test_register_duplicate_email(client: TestClient):
-    payload = {
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "securepassword123",
-    }
-
     client.post("/users/register", json=payload)
 
     response = client.post(
@@ -45,11 +45,6 @@ def test_register_duplicate_email(client: TestClient):
 
 
 def test_register_duplicate_username(client: TestClient):
-    payload = {
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "securepassword123",
-    }
 
     client.post("/users/register", json=payload)
 
@@ -63,6 +58,19 @@ def test_register_duplicate_username(client: TestClient):
     )
     assert response.status_code == 400
     assert response.json()["detail"] == "Username already taken"
+
+
+def test_register_invalid_email(client: TestClient):
+    response = client.post(
+        "/users/register",
+        json={
+            "username": "testuser",
+            "email": "not-an-email",
+            "password": "securepassword123",
+        },
+    )
+
+    assert response.status_code == 422
 
 
 def test_login_success(client):
