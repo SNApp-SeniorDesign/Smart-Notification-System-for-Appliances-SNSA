@@ -296,7 +296,7 @@ def test_update_user_email_only(service, db):
     service.repository.update_user.return_value = db_user
     result = service.update_user(db, db_user, user_update)
 
-    assert result == db_user
+    assert result is db_user
 
     assert db_user.username == "olduser"
     assert db_user.email == "new@example.com"
@@ -319,10 +319,37 @@ def test_update_user_username_only(service, db):
     service.repository.update_user.return_value = db_user
     result = service.update_user(db, db_user, user_update)
 
-    assert result == db_user
+    assert result is db_user
 
     assert db_user.username == "newuser"
     assert db_user.email == "old@example.com"
     assert db_user.hashed_password == "oldhashedpassword"
 
+    service.repository.update_user.assert_called_once_with(db, db_user)
+
+
+def test_update_user_password_only(service, db):
+    db_user = SimpleNamespace(
+        id=1,
+        username="olduser",
+        email="old@example.com",
+        hashed_password="oldhashedpassword",
+    )
+
+    user_update = UserUpdate(password="newpassword123")
+
+    service.repository.update_user.return_value = db_user
+
+    with patch("app.services.user.get_password_hash") as mock_hash:
+        mock_hash.return_value = "newhashedpassword"
+
+        result = service.update_user(db, db_user, user_update)
+
+    assert result is db_user
+
+    assert db_user.hashed_password == "newhashedpassword"
+    assert db_user.username == "olduser"
+    assert db_user.email == "old@example.com"
+
+    mock_hash.assert_called_once_with("newpassword123")
     service.repository.update_user.assert_called_once_with(db, db_user)
