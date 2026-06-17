@@ -199,3 +199,21 @@ def test_register_user_username_already_exist(service, db):
 
     service.is_email_taken.assert_called_once_with(db, "test@example.com")
     service.is_username_taken.assert_called_once_with(db, "testuser")
+
+
+def test_authenticate_success(service, db):
+    user = SimpleNamespace(
+        username="testuser",
+        email="test@example.com",
+        hashed_password="hashedpassword123",
+    )
+    service.repository.get_by_mail.return_value = user
+
+    with patch("app.services.user.verify_password") as mock_verify:
+        mock_verify.return_value = True
+        result = service.authenticate(db, "test@example.com", "plainpassword123")
+
+    assert user == result
+
+    service.repository.get_by_mail.assert_called_once_with(db, "test@example.com")
+    mock_verify.assert_called_once_with("plainpassword123", "hashedpassword123")
