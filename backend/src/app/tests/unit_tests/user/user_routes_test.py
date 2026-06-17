@@ -1,6 +1,8 @@
 from fastapi.testclient import TestClient
 from app.repository.user import UserRepository
 
+"Post"
+
 
 def test_register_user_success(client: TestClient):
     response = client.post(
@@ -19,6 +21,27 @@ def test_register_user_success(client: TestClient):
 
     assert "password" not in data
     assert "hashed_password" not in data
+
+
+def test_register_duplicate_email(client: TestClient):
+    payload = {
+        "username": "testuser",
+        "email": "test@example.com",
+        "password": "securepassword123",
+    }
+
+    client.post("/users/register", json=payload)
+
+    response = client.post(
+        "/users/register",
+        json={
+            "username": "anotheruser",
+            "email": "test@example.com",
+            "password": "differentpassword",
+        },
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Email already registered"
 
 
 def test_login_success(client):
