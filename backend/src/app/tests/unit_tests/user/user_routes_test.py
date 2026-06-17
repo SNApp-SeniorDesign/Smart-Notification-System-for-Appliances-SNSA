@@ -44,6 +44,27 @@ def test_register_duplicate_email(client: TestClient):
     assert response.json()["detail"] == "Email already registered"
 
 
+def test_register_duplicate_username(client: TestClient):
+    payload = {
+        "username": "testuser",
+        "email": "test@example.com",
+        "password": "securepassword123",
+    }
+
+    client.post("/users/register", json=payload)
+
+    response = client.post(
+        "/users/register",
+        json={
+            "username": "testuser",
+            "email": "another@example.com",
+            "password": "differentpassword",
+        },
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Username already taken"
+
+
 def test_login_success(client):
     client.post(
         "/users/register",
