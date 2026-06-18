@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from app.repository.user import UserRepository
+import pytest
 
 "Post"
 
@@ -157,6 +158,41 @@ def test_login_wrong_email(client):
 
     assert response.status_code == 401
     assert response.json()["detail"] == "Incorrect Email or Passwords"
+
+
+"Get"
+
+
+@pytest.fixture
+def auth_headers(client):
+    client.post(
+        "/users/register",
+        json={
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "securepassword123",
+        },
+    )
+
+    response = client.post(
+        "/users/login",
+        data={
+            "username": "test@example.com",
+            "password": "securepassword123",
+        },
+    )
+
+    token = response.json()["access_token"]
+
+    return {"Authorization": f"Bearer {token}"}
+
+
+def test_get_me_success(client, auth_headers):
+
+    response = client.get("/users/me", headers=auth_headers)
+
+    assert response.status_code == 200
+    assert response.json()["email"] == "test@example.com"
 
 
 def test_delete_user_success(client, db, authenticated_user):
