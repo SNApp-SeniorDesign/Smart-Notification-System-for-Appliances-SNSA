@@ -3,7 +3,7 @@ from pydantic import field_validator
 
 
 class UserBase(BaseModel):
-    username: str
+    username: str = Field(min_length=3)
     email: EmailStr
 
 

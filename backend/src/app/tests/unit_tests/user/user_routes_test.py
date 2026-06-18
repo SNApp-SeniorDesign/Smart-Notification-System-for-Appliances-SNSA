@@ -73,6 +73,18 @@ def test_register_invalid_email(client: TestClient):
     assert response.status_code == 422
 
 
+def test_empty_username(client: TestClient):
+    response = client.post(
+        "/users/register",
+        json={
+            "username": "",
+            "email": "test@example.com",
+            "password": "securepassword123",
+        },
+    )
+    assert response.status_code == 422
+
+
 def test_login_success(client):
     client.post(
         "/users/register",
