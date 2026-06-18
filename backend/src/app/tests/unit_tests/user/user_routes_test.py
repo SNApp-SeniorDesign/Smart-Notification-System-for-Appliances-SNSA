@@ -137,6 +137,28 @@ def test_login_wrong_password(client):
     assert response.json()["detail"] == "Incorrect Email or Passwords"
 
 
+def test_login_wrong_email(client):
+    client.post(
+        "/users/register",
+        json={
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "securedpassword123",
+        },
+    )
+
+    response = client.post(
+        "/users/login",
+        data={
+            "username": "wrong@example.com",
+            "password": "securepassowrd123",
+        },
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Incorrect Email or Passwords"
+
+
 def test_delete_user_success(client, db, authenticated_user):
     response = client.delete(
         "/users/me", headers={"Authorization": f"Bearer {authenticated_user}"}
