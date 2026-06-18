@@ -195,6 +195,20 @@ def test_get_me_success(client, auth_headers):
     assert response.json()["email"] == "test@example.com"
 
 
+"Put"
+
+
+def test_update_user_username(client, auth_headers):
+    response = client.put(
+        "/users/update", headers=auth_headers, json={"username": "newusername"}
+    )
+    assert response.status_code == 200
+    assert response.json()["username"] == "newusername"
+
+
+"Delete"
+
+
 def test_delete_user_success(client, db, authenticated_user):
     response = client.delete(
         "/users/me", headers={"Authorization": f"Bearer {authenticated_user}"}
