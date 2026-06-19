@@ -4,24 +4,26 @@ from sqlalchemy import (
     String,
     Boolean,
     ForeignKey,
-    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
+
 class Device(Base):
     __tablename__ = "devices"
 
-    #Account-relate
+    # Account-relate
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     device_name = Column(String, nullable=False)
 
-    #Connection-relate
+    # Connection-relate
     serial_number = Column(String, unique=True, nullable=False)
-    is_paired = Column(Boolean, default = False)
+    is_paired = Column(Boolean, default=False)
 
-    #Status-relate
+    # Status-relate
     device_status = Column(String)
 
     user = relationship("User", back_populates="devices")
