@@ -26,4 +26,4 @@ class Sound(Base):
 
     is_on = Column(Boolean, default=True, nullable=False)
 
-    device = relationship("Device", back_populates="sounds")
+    devices = relationship("Device", back_populates="sounds")
