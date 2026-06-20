@@ -42,3 +42,7 @@ class DeviceUpdate(BaseModel):
     device_name: str | None = None
     device_status: DeviceStatus | None = None
     is_paired: bool | None = None
+
+
+# class DeviceWithSounds(DeviceResponse):
+#     sounds: list[SoundResponse] = []
