@@ -27,4 +27,6 @@ class Device(Base):
     device_status = Column(String)
 
     user = relationship("User", back_populates="devices")
-    # sounds = relationship("Sounds", back_populates="devices", cascade="all, delete-orphan")
+    sounds = relationship(
+        "Sound", back_populates="devices", cascade="all, delete-orphan"
+    )
