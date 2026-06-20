@@ -19,11 +19,14 @@ class Sound(Base):
     )
 
     sound_name = Column(String, nullable=False)
-    sound_file_url = Column(String, nullable=True)
+    sound_file_url = Column(String, nullable=False)
 
     last_detected = Column(DateTime(timezone=True))
     sound_status = Column(String, default="monitoring", nullable=False)
 
     is_on = Column(Boolean, default=True, nullable=False)
 
-    devices = relationship("Device", back_populates="sounds")
+    device = relationship("Device", back_populates="sounds")
+
+    is_synced_to_device = Column(Boolean, default=False, nullable=False)
+    profile_version = Column(Integer, default=1, nullable=False)

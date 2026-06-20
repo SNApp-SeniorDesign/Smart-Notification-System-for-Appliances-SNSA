@@ -28,5 +28,5 @@ class Device(Base):
 
     user = relationship("User", back_populates="devices")
     sounds = relationship(
-        "Sound", back_populates="devices", cascade="all, delete-orphan"
+        "Sound", back_populates="device", cascade="all, delete-orphan"
     )
