@@ -1,13 +1,14 @@
 from pydantic import Field, BaseModel
 from typing import Literal
+from app.schemas.device import SoundResponse
 
-DeviceStatus = Literal["Offline", "Online", "Pairing", "Waiting"]
+DeviceStatus = Literal["offline", "online", "pairing", "waiting"]
 
 
 class DeviceBase(BaseModel):
     "Base that contain all repeated element"
 
-    device_name: str = Field(min_length=3)
+    device_name: str = Field(min_length=1)
 
 
 class DeviceCreate(DeviceBase):
@@ -44,5 +45,5 @@ class DeviceUpdate(BaseModel):
     is_paired: bool | None = None
 
 
-# class DeviceWithSounds(DeviceResponse):
-#     sounds: list[SoundResponse] = []
+class DeviceWithSounds(DeviceResponse):
+    sounds: list[SoundResponse] = []
