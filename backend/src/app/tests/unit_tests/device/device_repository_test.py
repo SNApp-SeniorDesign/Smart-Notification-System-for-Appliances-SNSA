@@ -3,6 +3,21 @@ from app.repository.device import DeviceRepository
 from sqlalchemy.orm import Session
 
 
+"Read"
+
+
+def test_get_by_id(db: Session, user, device):
+    device_response = DeviceRepository.get_by_id(db, device.id, user.id)
+
+    assert device_response is not None
+    assert device_response.id == device.id
+    assert device_response.user_id == user.id
+    assert device_response.device_name == "testDevice"
+    assert device_response.serial_number == "testSerialNumber123"
+    assert device_response.is_paired is False
+    assert device_response.device_status == "offline"
+
+
 "Post"
 
 

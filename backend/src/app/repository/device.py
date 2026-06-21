@@ -8,8 +8,12 @@ class DeviceRepository:
     "read"
 
     @staticmethod
-    def get_by_id(db: Session, device_id: int) -> Device | None:
-        return db.query(Device).filter(Device.id == device_id, Device.user_id).first()
+    def get_by_id(db: Session, device_id: int, user_id: int) -> Device | None:
+        return (
+            db.query(Device)
+            .filter(Device.id == device_id, Device.user_id == user_id)
+            .first()
+        )
 
     "post"
 
