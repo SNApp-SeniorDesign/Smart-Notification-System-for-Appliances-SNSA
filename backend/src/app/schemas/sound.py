@@ -24,6 +24,7 @@ class SoundResponse(SoundBase):
 
 class SoundDB(SoundCreate):
     device_id: int
+    sound_file_url: str
     is_synced_to_device: bool = False
     sound_status: SoundStatus = "offline"
     profile_version: int = 1
