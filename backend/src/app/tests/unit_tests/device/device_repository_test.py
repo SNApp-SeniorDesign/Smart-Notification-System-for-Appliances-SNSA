@@ -3,7 +3,7 @@ from app.repository.device import DeviceRepository
 from sqlalchemy.orm import Session
 
 
-"Read"
+# Read
 
 
 def test_get_by_id(db: Session, user, device):
@@ -18,7 +18,9 @@ def test_get_by_id(db: Session, user, device):
     assert device_response.device_status == "offline"
 
 
-"Post"
+# def test_get_device_with_sound(db: Session, user, device)
+
+# Post
 
 
 def test_create_device(db: Session, user):

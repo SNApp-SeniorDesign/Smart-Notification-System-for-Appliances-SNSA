@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.schemas.device import DeviceDB
 from app.models.device import Device
@@ -11,6 +11,17 @@ class DeviceRepository:
     def get_by_id(db: Session, device_id: int, user_id: int) -> Device | None:
         return (
             db.query(Device)
+            .filter(Device.id == device_id, Device.user_id == user_id)
+            .first()
+        )
+
+    @staticmethod
+    def get_device_with_sound(
+        db: Session, device_id: int, user_id: int
+    ) -> Device | None:
+        return (
+            db.query(Device)
+            .options(joinedload(Device.sounds))
             .filter(Device.id == device_id, Device.user_id == user_id)
             .first()
         )
