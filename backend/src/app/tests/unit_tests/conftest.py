@@ -6,6 +6,12 @@ from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.core.database import Base, get_db
 
+from app.schemas.user import UserDB
+from app.schemas.device import DeviceDB
+
+from app.repository.user import UserRepository
+from app.repository.device import DeviceRepository
+
 TEST_DATABASE_URL = "postgresql+psycopg://rune:12345678@localhost:5432/snsa_test"
 
 engine = create_engine(TEST_DATABASE_URL)
@@ -66,3 +72,24 @@ def authenticated_user(client):
     assert response.status_code == 200, response.json()
 
     return response.json()["access_token"]
+
+
+# fixture to create user for repository
+@pytest.fixture
+def user(db):
+    user = UserDB(
+        username="testuser",
+        email="test@example.com",
+        hashed_password="hashedpassword",
+    )
+
+    return UserRepository.create_user(db, user)
+
+
+# fixture to create device for repository
+@pytest.fixture
+def device(db, user):
+    device = DeviceDB(
+        device_name="testDevice", serial_number="testSerialNumber123", user_id=user.id
+    )
+    return DeviceRepository.create_device(db, device)

@@ -1,6 +1,6 @@
 from pydantic import Field, BaseModel
 from typing import Literal
-from app.schemas.device import SoundResponse
+from app.schemas.sound import SoundResponse
 
 DeviceStatus = Literal["offline", "online", "pairing", "waiting"]
 

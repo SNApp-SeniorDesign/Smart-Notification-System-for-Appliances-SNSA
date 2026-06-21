@@ -18,6 +18,9 @@ class DeviceRepository:
         db_device = Device(
             device_name=device_db.device_name,
             serial_number=device_db.serial_number,
+            user_id=device_db.user_id,
+            is_paired=device_db.is_paired,
+            device_status=device_db.device_status,
         )
         db.add(db_device)
         db.commit()
