@@ -16,7 +16,7 @@ class DeviceRepository:
         )
 
     @staticmethod
-    def get_device_with_sound(
+    def get_device_with_sounds(
         db: Session, device_id: int, user_id: int
     ) -> Device | None:
         return (

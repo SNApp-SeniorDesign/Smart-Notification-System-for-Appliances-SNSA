@@ -18,7 +18,22 @@ def test_get_by_id(db: Session, user, device):
     assert device_response.device_status == "offline"
 
 
-# def test_get_device_with_sound(db: Session, user, device)
+def test_get_device_with_sound(db: Session, user, device, sound):
+    device_sound = DeviceRepository.get_device_with_sounds(db, device.id, user.id)
+
+    assert device_sound is not None
+    assert device_sound.id == device.id
+    assert device_sound.user_id == user.id
+
+    assert len(device_sound.sounds) == 1
+
+    loaded_sound = device_sound.sounds[0]
+
+    assert loaded_sound.id == sound.id
+    assert loaded_sound.device_id == device.id
+    assert loaded_sound.sound_name == "testSound"
+    assert loaded_sound.sound_file_url == "test-audio-files/testSound.wav"
+
 
 # Post
 
