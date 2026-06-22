@@ -8,9 +8,11 @@ from app.core.database import Base, get_db
 
 from app.schemas.user import UserDB
 from app.schemas.device import DeviceDB
+from app.schemas.sound import SoundDB
 
 from app.repository.user import UserRepository
 from app.repository.device import DeviceRepository
+from app.repository.sound import SoundRepository
 
 TEST_DATABASE_URL = "postgresql+psycopg://rune:12345678@localhost:5432/snsa_test"
 
@@ -93,3 +95,14 @@ def device(db, user):
         device_name="testDevice", serial_number="testSerialNumber123", user_id=user.id
     )
     return DeviceRepository.create_device(db, device)
+
+
+# fixture to create sound for repository
+@pytest.fixture
+def sound(db, device):
+    sound = SoundDB(
+        sound_name="testSound",
+        device_id=device.id,
+        sound_file_url="test-audio-files/testSound.wav",
+    )
+    return SoundRepository.create_sound(db, sound)
