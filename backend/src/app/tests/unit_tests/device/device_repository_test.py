@@ -1,7 +1,8 @@
 from app.schemas.device import DeviceDB
 from app.repository.device import DeviceRepository
 from sqlalchemy.orm import Session
-
+from app.schemas.sound import SoundDB
+from app.repository.sound import SoundRepository
 
 # Read
 
@@ -33,6 +34,38 @@ def test_get_device_with_sound(db: Session, user, device, sound):
     assert loaded_sound.device_id == device.id
     assert loaded_sound.sound_name == "testSound"
     assert loaded_sound.sound_file_url == "test-audio-files/testSound.wav"
+
+
+def test_get_device_with_sounds(db: Session, user, device):
+    expected_sounds = [
+        ("Microwave Beep", "test-audio-files/microwave.wav"),
+        ("Washer Done", "test-audio-files/washer.wav"),
+        ("Dryer Done", "test-audio-files/dryer.wav"),
+    ]
+
+    for sound_name, sound_file_url in expected_sounds:
+        SoundRepository.create_sound(
+            db,
+            SoundDB(
+                sound_name=sound_name,
+                device_id=device.id,
+                sound_file_url=sound_file_url,
+            ),
+        )
+    device_with_sounds = DeviceRepository.get_device_with_sounds(
+        db,
+        device.id,
+        user.id,
+    )
+
+    assert device_with_sounds is not None
+    assert len(device_with_sounds.sounds) == len(expected_sounds)
+
+    actual_sounds = {
+        (sound.sound_name, sound.sound_file_url) for sound in device_with_sounds.sounds
+    }
+
+    assert actual_sounds == set(expected_sounds)
 
 
 # Post
