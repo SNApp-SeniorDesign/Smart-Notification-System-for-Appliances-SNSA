@@ -11,13 +11,10 @@ class SoundRepository:
     # Post
     def create_sound(
         db: Session,
-        device_data: Device,
         sound_data: SoundDB,
     ) -> Sound:
 
-        device = (
-            db.query(device_data).filter(device_data.id == sound_data.device_id).first()
-        )
+        device = db.query(Device).filter(Device.id == sound_data.device_id).first()
 
         if not device:
             device_not_exist()
