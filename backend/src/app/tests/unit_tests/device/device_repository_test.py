@@ -114,6 +114,9 @@ def test_create_device(db: Session, user):
     assert device.device_status == "offline"
 
 
+# Update
+
+
 def test_update_device(db: Session, user, device):
     device.device_name = "modifiedDevice"
     device.device_status = "online"
@@ -128,3 +131,12 @@ def test_update_device(db: Session, user, device):
     assert device_new.device_name == "modifiedDevice"
     assert device_new.device_status == "online"
     assert device_new.is_paired is True
+
+
+# Delete
+
+
+def test_delete_device(db: Session, user, device):
+    not_device = DeviceRepository.delete_device(db, device)
+
+    assert not_device is None

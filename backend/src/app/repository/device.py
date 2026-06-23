@@ -53,3 +53,9 @@ class DeviceRepository:
         db.commit()
         db.refresh(device_db)
         return device_db
+
+    # Delete
+    @staticmethod
+    def delete_device(db: Session, device_db: Device) -> None:
+        db.delete(device_db)
+        db.commit()
