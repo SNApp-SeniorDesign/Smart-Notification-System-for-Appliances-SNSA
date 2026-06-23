@@ -112,3 +112,19 @@ def test_create_device(db: Session, user):
 
     assert device.is_paired is False
     assert device.device_status == "offline"
+
+
+def test_update_device(db: Session, user, device):
+    device.device_name = "modifiedDevice"
+    device.device_status = "online"
+    device.is_paired = True
+
+    DeviceRepository.update_device(db, device)
+
+    device_new = DeviceRepository.get_by_id(db, device.id, device.user_id)
+
+    assert device_new is not None
+
+    assert device_new.device_name == "modifiedDevice"
+    assert device_new.device_status == "online"
+    assert device_new.is_paired is True

@@ -5,7 +5,7 @@ from app.models.device import Device
 
 
 class DeviceRepository:
-    "read"
+    # read
 
     @staticmethod
     def get_by_id(db: Session, device_id: int, user_id: int) -> Device | None:
@@ -30,7 +30,7 @@ class DeviceRepository:
     def get_all_by_user(db: Session, user_id: int) -> list[Device]:
         return db.query(Device).filter(Device.user_id == user_id).all()
 
-    "post"
+    # post
 
     @staticmethod
     def create_device(db: Session, device_db: DeviceDB) -> Device:
@@ -45,3 +45,11 @@ class DeviceRepository:
         db.commit()
         db.refresh(db_device)
         return db_device
+
+    # Update
+
+    @staticmethod
+    def update_device(db: Session, device_db: Device) -> Device | None:
+        db.commit()
+        db.refresh(device_db)
+        return device_db
