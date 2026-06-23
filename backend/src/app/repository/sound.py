@@ -1,8 +1,6 @@
 from sqlalchemy.orm import Session
-from app.exceptions.device import device_not_exist
 
 from app.models.sound import Sound
-from app.models.device import Device
 
 from app.schemas.sound import SoundDB
 
@@ -13,11 +11,6 @@ class SoundRepository:
         db: Session,
         sound_data: SoundDB,
     ) -> Sound:
-
-        device = db.query(Device).filter(Device.id == sound_data.device_id).first()
-
-        if not device:
-            device_not_exist()
 
         db_sound = Sound(
             device_id=sound_data.device_id,
@@ -31,3 +24,11 @@ class SoundRepository:
         db.commit()
         db.refresh(db_sound)
         return db_sound
+
+    # Get
+    def get_by_id(db: Session, sound_id: int, device_id: int) -> Sound | None:
+        return (
+            db.query(Sound)
+            .filter(Sound.id == sound_id, Sound.device_id == device_id)
+            .first()
+        )

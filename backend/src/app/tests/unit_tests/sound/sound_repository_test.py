@@ -20,3 +20,18 @@ def test_create_sound(db: Session, user, device):
     assert sound.is_synced_to_device is False
     assert sound.profile_version == 1
     assert sound.sound_status == "offline"
+
+
+# Get
+
+
+def test_get_by_id(db: Session, user, device, sound):
+    sound_result = SoundRepository.get_by_id(db, sound.id, sound.device_id)
+
+    assert sound_result is not None
+    assert sound_result.id == sound.id
+    assert sound_result.sound_name == "testSound"
+    assert sound_result.device_id == device.id
+    assert sound_result.is_synced_to_device is False
+    assert sound_result.profile_version == 1
+    assert sound_result.sound_status == "offline"
