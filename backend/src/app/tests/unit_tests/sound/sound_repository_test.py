@@ -35,3 +35,9 @@ def test_get_by_id(db: Session, user, device, sound):
     assert sound_result.is_synced_to_device is False
     assert sound_result.profile_version == 1
     assert sound_result.sound_status == "offline"
+
+
+def test_get_by_id_return_none(db: Session, device):
+    sound_result = SoundRepository.get_by_id(db, 9999999, device.id)
+
+    assert sound_result is None
