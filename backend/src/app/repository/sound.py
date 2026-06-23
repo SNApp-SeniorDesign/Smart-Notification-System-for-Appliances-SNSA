@@ -38,3 +38,8 @@ class SoundRepository:
         db.commit()
         db.refresh(sound_db)
         return sound_db
+
+    # Delete
+    def delete_sound(db: Session, sound_db: Sound) -> None:
+        db.delete(sound_db)
+        db.commit()

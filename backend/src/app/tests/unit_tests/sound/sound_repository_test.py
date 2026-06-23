@@ -68,3 +68,12 @@ def test_update_sound(db: Session, sound):
     assert sound_new.is_synced_to_device is True
     assert sound_new.profile_version == 2
     assert sound_new.sound_file_url == "new_url/sound_file.wav"
+
+
+# Delete
+
+
+def test_delete_sound(db: Session, sound):
+    sound_not = SoundRepository.delete_sound(db, sound)
+
+    assert sound_not is None
