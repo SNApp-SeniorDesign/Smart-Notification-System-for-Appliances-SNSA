@@ -47,3 +47,24 @@ def test_get_by_id_return_no_device(db: Session, sound):
     sound_result = SoundRepository.get_by_id(db, sound.id, 9999999)
 
     assert sound_result is None
+
+
+# Update
+def test_update_sound(db: Session, sound):
+    sound.sound_name = "modifiedSound"
+    sound.sound_status = "online"
+    sound.is_synced_to_device = True
+    sound.profile_version = 2
+    sound.sound_file_url = "new_url/sound_file.wav"
+
+    SoundRepository.sound_update(db, sound)
+
+    sound_new = SoundRepository.get_by_id(db, sound.id, sound.device_id)
+
+    assert sound_new is not None
+
+    assert sound_new.sound_name == "modifiedSound"
+    assert sound_new.sound_status == "online"
+    assert sound_new.is_synced_to_device is True
+    assert sound_new.profile_version == 2
+    assert sound_new.sound_file_url == "new_url/sound_file.wav"

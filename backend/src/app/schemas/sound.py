@@ -35,3 +35,4 @@ class SoundUpdate(BaseModel):
     sound_status: SoundStatus | None = None
     is_synced_to_device: bool | None = None
     profile_version: int | None = None
+    sound_file_url: str | None = None

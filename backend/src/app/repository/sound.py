@@ -32,3 +32,9 @@ class SoundRepository:
             .filter(Sound.id == sound_id, Sound.device_id == device_id)
             .first()
         )
+
+    # Update
+    def sound_update(db: Session, sound_db: Sound) -> Sound | None:
+        db.commit()
+        db.refresh(sound_db)
+        return sound_db
