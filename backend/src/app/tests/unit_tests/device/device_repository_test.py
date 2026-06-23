@@ -68,6 +68,33 @@ def test_get_device_with_sounds(db: Session, user, device):
     assert actual_sounds == set(expected_sounds)
 
 
+def test_get_all_device(db: Session, user):
+    expected_devices = [
+        ("testdevice", "testSeriaNumber123"),
+        ("DeviceTest", "SerialNumberTest321"),
+        ("Testingde", "3456SerialNumb"),
+    ]
+
+    for device_name, serial_number in expected_devices:
+        DeviceRepository.create_device(
+            db,
+            DeviceDB(
+                device_name=device_name, user_id=user.id, serial_number=serial_number
+            ),
+        )
+
+    actual_device_list = DeviceRepository.get_all_by_user(db, user.id)
+
+    assert actual_device_list is not None
+    assert len(actual_device_list) == len(expected_devices)
+
+    actual_devices = {
+        (device.device_name, device.serial_number) for device in actual_device_list
+    }
+
+    assert actual_devices == set(expected_devices)
+
+
 # Post
 
 

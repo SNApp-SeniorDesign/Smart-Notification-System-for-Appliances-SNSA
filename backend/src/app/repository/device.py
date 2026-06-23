@@ -26,6 +26,10 @@ class DeviceRepository:
             .first()
         )
 
+    @staticmethod
+    def get_all_by_user(db: Session, user_id: int) -> list[Device]:
+        return db.query(Device).filter(Device.user_id == user_id).all()
+
     "post"
 
     @staticmethod
