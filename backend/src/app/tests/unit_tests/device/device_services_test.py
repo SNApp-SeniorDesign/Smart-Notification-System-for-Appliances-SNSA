@@ -23,3 +23,9 @@ def test_is_device_name_taken_success(service, db):
     result = service.is_device_name_taken(db, "TestDevice")
     assert result is True
     service.repository.get_by_device_name.assert_called_once_with(db, "TestDevice")
+
+
+def test_is_device_name_taken_fail(service, db):
+    service.repository.get_by_device_name.return_value = None
+    result = service.is_device_name_taken(db, "TestDevice")
+    assert result is False
