@@ -20,6 +20,10 @@ class DeviceRepository:
         return db.query(Device).filter(Device.device_name == device_name).first()
 
     @staticmethod
+    def get_by_serial_number(db: Session, serial_number: str) -> Device | None:
+        return db.query(Device).filter(Device.serial_number == serial_number).first()
+
+    @staticmethod
     def get_device_with_sounds(
         db: Session, device_id: int, user_id: int
     ) -> Device | None:
