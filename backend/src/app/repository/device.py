@@ -16,6 +16,10 @@ class DeviceRepository:
         )
 
     @staticmethod
+    def get_by_device_name(db: Session, device_name: str) -> Device | None:
+        return db.query(Device).filter(Device.device_name == device_name).first()
+
+    @staticmethod
     def get_device_with_sounds(
         db: Session, device_id: int, user_id: int
     ) -> Device | None:
