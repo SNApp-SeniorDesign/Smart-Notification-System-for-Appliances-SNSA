@@ -67,8 +67,22 @@ def test_get_by_device_name_fail(service, db):
     assert exc_info.value.detail == "Device not found"
 
 
-def test_get_by_serial_number(service, db):
+def test_get_by_serial_number_succcess(service, db):
     fake_device = Mock(serial_number="TestSerialNumber123")
     service.repository.get_by_serial_number.return_value = fake_device
     result = service.get_by_serial_number(db, "TestSerialNumber123")
     assert fake_device == result
+
+
+def test_get_by_serial_number_fail(service, db):
+    service.repository.get_by_serial_number.return_value = None
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.get_by_serial_number(db, "TestSerialNumber123")
+
+    service.repository.get_by_serial_number.assert_called_once_with(
+        db, "TestSerialNumber123"
+    )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.detail == "Device not found"
