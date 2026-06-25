@@ -14,7 +14,7 @@ from app.core.auth import create_access_token
 
 api_router = APIRouter(prefix="/users", tags=["users"])
 
-"Post"
+# Post
 
 
 @api_router.post(
@@ -49,7 +49,7 @@ async def Logout(
     return None
 
 
-"Update"
+# Update
 
 
 @api_router.put("/update", response_model=UserSchema)
@@ -61,7 +61,7 @@ async def update_user(
     return user_service.update_user(db, current_user, user_update)
 
 
-"Get"
+# Get
 
 
 @api_router.get("/me", response_model=UserSchema)
@@ -71,7 +71,7 @@ async def get_me(
     return current_user
 
 
-"Delete"
+# Delete
 
 
 @api_router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)

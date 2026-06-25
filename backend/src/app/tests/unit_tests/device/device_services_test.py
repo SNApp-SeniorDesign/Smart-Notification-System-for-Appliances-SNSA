@@ -65,3 +65,10 @@ def test_get_by_device_name_fail(service, db):
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "Device not found"
+
+
+def test_get_by_serial_number(service, db):
+    fake_device = Mock(serial_number="TestSerialNumber123")
+    service.repository.get_by_serial_number.return_value = fake_device
+    result = service.get_by_serial_number(db, "TestSerialNumber123")
+    assert fake_device == result

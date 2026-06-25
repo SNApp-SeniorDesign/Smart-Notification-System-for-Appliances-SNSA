@@ -23,3 +23,11 @@ class DeviceService:
         if user_device is None:
             device_not_exist()
         return user_device
+
+    def get_by_serial_number(
+        self, db: Session, serial_number: str
+    ) -> DeviceResponse | None:
+        user_device = self.repository.get_by_serial_number(db, serial_number)
+        if user_device is None:
+            device_not_exist()
+        return user_device

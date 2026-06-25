@@ -19,7 +19,7 @@ class UserService:
     def __init__(self) -> None:
         self.repository = UserRepository()
 
-    "Get"
+    # Get
 
     def get_by_mail(self, db: Session, email: str) -> UserResponse | None:
         user_email = self.repository.get_by_mail(db, email)
@@ -64,7 +64,7 @@ class UserService:
             )
         return user
 
-    "Post"
+    # Post
 
     def register_user(self, db: Session, user_db: UserCreate) -> UserResponse:
         if self.is_email_taken(db, user_db.email):
@@ -97,7 +97,7 @@ class UserService:
             )
         return user
 
-    "Update"
+    # Update
 
     def update_user(
         self, db: Session, db_user: UserResponse, user_db: UserUpdate
