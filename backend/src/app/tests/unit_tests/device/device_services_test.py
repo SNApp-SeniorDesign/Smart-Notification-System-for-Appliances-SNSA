@@ -44,3 +44,10 @@ def test_is_serial_number_taken_fail(service, db):
     service.repository.get_by_serial_number.return_value = None
     result = service.is_serial_number_taken(db, "testSerialNumber123")
     assert result is False
+
+
+def test_get_by_device_name(service, db):
+    fake_device = Mock(device_name="testDevice")
+    service.repository.get_by_device_name.return_value = fake_device
+    result = service.get_by_device_name(db, "testDevice")
+    assert fake_device == result
