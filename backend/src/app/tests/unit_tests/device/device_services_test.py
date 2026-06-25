@@ -1,5 +1,7 @@
 import pytest
 from unittest.mock import Mock
+from fastapi import HTTPException
+
 from app.services.device import DeviceService
 
 
@@ -51,3 +53,15 @@ def test_get_by_device_name(service, db):
     service.repository.get_by_device_name.return_value = fake_device
     result = service.get_by_device_name(db, "testDevice")
     assert fake_device == result
+
+
+def test_get_by_device_name_fail(service, db):
+    service.repository.get_by_device_name.return_value = None
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.get_by_device_name(db, "DeviceNotExist")
+
+    service.repository.get_by_device_name.assert_called_once_with(db, "DeviceNotExist")
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.detail == "Device not found"
