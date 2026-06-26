@@ -117,3 +117,10 @@ def test_get_all_device_empty(service, db):
     result = service.get_all_device(db, user_id)
     service.repository.get_all_by_user.assert_called_once_with(db, user_id)
     assert result == []
+
+
+def test_device_by_id(service, db):
+    fake_device = Mock(id=1)
+    service.repository.get_by_id.return_value = fake_device
+    result = service.get_by_device_id(db, 1)
+    assert result == fake_device

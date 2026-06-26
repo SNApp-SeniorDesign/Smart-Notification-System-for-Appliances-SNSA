@@ -1,5 +1,5 @@
 from app.repository.device import DeviceRepository
-from app.schemas.device import DeviceResponse
+from app.models.device import Device
 from app.exceptions.device import device_not_exist
 
 from sqlalchemy.orm import Session
@@ -16,22 +16,29 @@ class DeviceService:
     def is_serial_number_taken(self, db: Session, serial_number: str) -> bool:
         return self.repository.get_by_serial_number(db, serial_number) is not None
 
-    def get_by_device_name(
-        self, db: Session, device_name: str
-    ) -> DeviceResponse | None:
+    def get_by_device_name(self, db: Session, device_name: str) -> Device | None:
         user_device = self.repository.get_by_device_name(db, device_name)
         if user_device is None:
             device_not_exist()
         return user_device
 
-    def get_by_serial_number(
-        self, db: Session, serial_number: str
-    ) -> DeviceResponse | None:
+    def get_by_serial_number(self, db: Session, serial_number: str) -> Device | None:
         user_device = self.repository.get_by_serial_number(db, serial_number)
         if user_device is None:
             device_not_exist()
         return user_device
 
-    def get_all_device(self, db: Session, user_id: int) -> list[DeviceResponse] | None:
+    def get_by_device_id(self, db: Session, device_id: int) -> Device | None:
+        user_device = self.repository.get_by_id(db, device_id)
+        if user_device is None:
+            device_not_exist()
+        return user_device
+
+    def get_all_device(self, db: Session, user_id: int) -> list[Device] | None:
         user_devices = self.repository.get_all_by_user(db, user_id)
         return user_devices
+
+    # def get_device_with_sounds(
+    #     self, db: Session, device_id: int) -> Devices | None:
+    #     device = self.
+    #     return self.repository.get_device_with_sounds(db, device_id, user_id)
