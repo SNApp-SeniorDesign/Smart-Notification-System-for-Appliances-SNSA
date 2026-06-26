@@ -136,3 +136,17 @@ def test_get_device_by_id_fail(service, db):
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "Device not found"
+
+
+def test_get_device_with_sounds_success(service, db):
+    fake_device = Mock(id=1, user_id=100)
+    fake_result = Mock()
+
+    service.get_by_device_id = Mock(return_value=fake_device)
+    service.repository.get_device_with_sounds.return_value = fake_result
+
+    result = service.get_device_with_sounds(db, 1)
+
+    service.get_by_device_id.assert_called_once_with(db, 1)
+    service.repository.get_device_with_sounds.assert_called_once_with(db, 1, 100)
+    assert result == fake_result
