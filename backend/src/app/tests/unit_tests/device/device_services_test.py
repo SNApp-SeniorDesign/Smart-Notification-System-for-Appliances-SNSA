@@ -119,8 +119,20 @@ def test_get_all_device_empty(service, db):
     assert result == []
 
 
-def test_device_by_id(service, db):
+def test_get_device_by_id_success(service, db):
     fake_device = Mock(id=1)
     service.repository.get_by_id.return_value = fake_device
     result = service.get_by_device_id(db, 1)
     assert result == fake_device
+
+
+def test_get_device_by_id_fail(service, db):
+    service.repository.get_by_id.return_value = None
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.get_by_device_id(db, 99999)
+
+    service.repository.get_by_id.assert_called_once_with(db, 99999)
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.detail == "Device not found"
