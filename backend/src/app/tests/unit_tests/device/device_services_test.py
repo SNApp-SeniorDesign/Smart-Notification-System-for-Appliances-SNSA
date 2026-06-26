@@ -105,3 +105,11 @@ def test_get_all_device_success(service, db):
 
     assert result == fake_set_devices
     assert len(result) == 3
+
+
+def test_get_all_device_empty(service, db):
+    user_id = 1
+    service.repository.get_all_by_user.return_value = []
+    result = service.get_all_device(db, user_id)
+    service.repository.get_all_by_user.assert_called_once_with(db, user_id)
+    assert result == []
