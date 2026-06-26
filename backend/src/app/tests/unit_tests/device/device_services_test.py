@@ -30,6 +30,7 @@ def test_is_device_name_taken_success(service, db):
 def test_is_device_name_taken_fail(service, db):
     service.repository.get_by_device_name.return_value = None
     result = service.is_device_name_taken(db, "TestDevice")
+    service.repository.get_by_device_name.assert_called_once_with(db, "TestDevice")
     assert result is False
 
 
@@ -45,6 +46,9 @@ def test_is_serial_number_taken_success(service, db):
 def test_is_serial_number_taken_fail(service, db):
     service.repository.get_by_serial_number.return_value = None
     result = service.is_serial_number_taken(db, "testSerialNumber123")
+    service.repository.get_by_serial_number.assert_called_once_with(
+        db, "testSerialNumber123"
+    )
     assert result is False
 
 
