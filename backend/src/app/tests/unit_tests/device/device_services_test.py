@@ -86,3 +86,22 @@ def test_get_by_serial_number_fail(service, db):
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "Device not found"
+
+
+def test_get_all_device_success(service, db):
+    user_id = 1
+
+    fake_set_devices = [
+        Mock("testdevice", "testSerialNumber123"),
+        Mock("DeviceTest", "SerialNumberTest321"),
+        Mock("Testingde", "3456Serialnumb"),
+    ]
+
+    service.repository.get_all_by_user.return_value = fake_set_devices
+
+    result = service.get_all_device(db, user_id)
+
+    service.repository.get_all_by_user.assert_called_once_with(db, user_id)
+
+    assert result == fake_set_devices
+    assert len(result) == 3

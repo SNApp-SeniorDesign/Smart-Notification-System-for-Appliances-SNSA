@@ -31,3 +31,7 @@ class DeviceService:
         if user_device is None:
             device_not_exist()
         return user_device
+
+    def get_all_device(self, db: Session, user_id: int) -> list[DeviceResponse] | None:
+        user_devices = self.repository.get_all_by_user(db, user_id)
+        return user_devices
