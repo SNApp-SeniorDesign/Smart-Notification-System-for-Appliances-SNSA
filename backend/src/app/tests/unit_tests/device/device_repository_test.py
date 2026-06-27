@@ -92,6 +92,15 @@ def test_get_device_with_sounds(db: Session, user, device):
     assert actual_sounds == set(expected_sounds)
 
 
+def test_get_device_with_sound_fail(db: Session, user, device):
+    result = DeviceRepository.get_device_with_sounds(
+        db,
+        device.id,
+        user_id=9999,
+    )
+    assert result is None
+
+
 def test_get_all_device(db: Session, user):
     expected_devices = [
         ("testdevice", "testSeriaNumber123"),
