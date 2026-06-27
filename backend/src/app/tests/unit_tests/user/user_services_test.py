@@ -1,9 +1,11 @@
 import pytest
 from unittest.mock import Mock, patch
-from app.services.user import UserService
 from fastapi import HTTPException
 from types import SimpleNamespace
-from app.schemas.user import UserCreate, UserResponse, UserUpdate
+
+from app.services.user import UserService
+from app.schemas.user import UserCreate, UserUpdate
+from app.models.user import User
 
 
 @pytest.fixture
@@ -156,7 +158,7 @@ user_create = UserCreate(
 
 def test_register_user_success(service, db):
 
-    created_user = UserResponse(id=1, username="testuser", email="test@example.com")
+    created_user = User(id=1, username="testuser", email="test@example.com")
 
     service.is_email_taken = Mock(return_value=False)
     service.is_username_taken = Mock(return_value=False)

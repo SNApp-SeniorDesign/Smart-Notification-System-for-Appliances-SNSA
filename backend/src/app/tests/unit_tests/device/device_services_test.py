@@ -3,6 +3,7 @@ from unittest.mock import Mock
 from fastapi import HTTPException
 
 from app.services.device import DeviceService
+from app.schemas.device import DeviceCreate, DeviceDB
 
 
 @pytest.fixture
@@ -166,3 +167,33 @@ def test_get_device_with_sound_fail(service, db):
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "Device not found"
+
+
+# Post
+
+
+def test_register_device(service, db):
+    device_create = DeviceCreate(
+        device_name="testDevice", serial_number="TestSerialNum123"
+    )
+
+    created_device = DeviceDB(
+        device_name="testDevice",
+        serial_number="TestSerialNum123",
+        user_id=1,
+        is_paired=True,
+        device_status="online",
+    )
+
+    service.is_device_name_taken = Mock(return_value=False)
+    service.is_serial_number_taken = Mock(return_value=False)
+    service.repository.create_device.return_value = created_device
+
+    result = service.register_device(db, 1, device_create)
+
+    assert result == created_device
+
+    service.is_device_name_taken.assert_called_once_with(db, "testDevice", 1)
+    service.is_serial_number_taken.assert_called_once_with(db, "TestSerialNum123")
+
+    service.repository.create_device.assert_called_once()
