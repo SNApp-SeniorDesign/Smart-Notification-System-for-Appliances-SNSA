@@ -1,5 +1,6 @@
 from app.repository.user import UserRepository
-from app.schemas.user import UserResponse, UserDB, UserCreate, UserUpdate
+from app.schemas.user import UserDB, UserCreate, UserUpdate
+from app.models.user import User
 from app.core.database import get_db
 from app.exceptions.user import user_not_exist, unauthorized
 from app.core.auth import (
@@ -21,13 +22,13 @@ class UserService:
 
     # Get
 
-    def get_by_mail(self, db: Session, email: str) -> UserResponse | None:
+    def get_by_mail(self, db: Session, email: str) -> User | None:
         user_email = self.repository.get_by_mail(db, email)
         if user_email is None:
             user_not_exist()
         return user_email
 
-    def get_by_id(self, db: Session, id: int) -> UserResponse | None:
+    def get_by_id(self, db: Session, id: int) -> User | None:
         user_id = self.repository.get_by_id(db, id)
         if user_id is None:
             user_not_exist()
@@ -43,7 +44,7 @@ class UserService:
         self,
         db: Annotated[Session, Depends(get_db)],
         token: Annotated[str, Depends(oauth2_scheme)],
-    ) -> UserResponse | None:
+    ) -> User | None:
         payload = verify_token(token)
         user_id = payload.get("sub")
 
@@ -66,7 +67,7 @@ class UserService:
 
     # Post
 
-    def register_user(self, db: Session, user_db: UserCreate) -> UserResponse:
+    def register_user(self, db: Session, user_db: UserCreate) -> User:
         if self.is_email_taken(db, user_db.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -86,9 +87,7 @@ class UserService:
         )
         return self.repository.create_user(db, user_db)
 
-    def authenticate(
-        self, db: Session, email: str, password: str
-    ) -> UserResponse | None:
+    def authenticate(self, db: Session, email: str, password: str) -> User | None:
         user = self.repository.get_by_mail(db, email)
         if not user or not verify_password(password, user.hashed_password):
             raise HTTPException(
@@ -99,9 +98,7 @@ class UserService:
 
     # Update
 
-    def update_user(
-        self, db: Session, db_user: UserResponse, user_db: UserUpdate
-    ) -> UserResponse:
+    def update_user(self, db: Session, db_user: User, user_db: UserUpdate) -> User:
         if user_db.username:
             db_user.username = user_db.username
         if user_db.email:
@@ -110,8 +107,12 @@ class UserService:
             db_user.hashed_password = get_password_hash(user_db.password)
         return self.repository.update_user(db, db_user)
 
-    def revoke_tokens(self, db: Session, db_user: UserResponse) -> UserResponse:
+    def revoke_tokens(self, db: Session, db_user: User) -> User:
         return self.repository.token_revoke(db, db_user)
+
+    # Delete
+    def delete_user(self, db: Session, db_user: User) -> None:
+        self.repository.delete_user(db, db_user)
 
 
 user_service = UserService()

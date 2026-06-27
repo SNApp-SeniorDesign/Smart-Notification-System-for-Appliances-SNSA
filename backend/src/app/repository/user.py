@@ -4,7 +4,7 @@ from app.schemas.user import UserDB
 
 
 class UserRepository:
-    "Read"
+    # Read
 
     @staticmethod
     def get_by_mail(db: Session, email: str) -> User | None:
@@ -18,7 +18,7 @@ class UserRepository:
     def get_by_id(db: Session, user_id: int) -> User | None:
         return db.query(User).filter(User.id == user_id).first()
 
-    "Create"
+    # Create
 
     @staticmethod
     def create_user(db: Session, user_db: UserDB) -> User:
@@ -32,7 +32,7 @@ class UserRepository:
         db.refresh(db_user)
         return db_user
 
-    "Update"
+    # Update
 
     @staticmethod
     def update_user(db: Session, db_user: User) -> User:
@@ -47,7 +47,7 @@ class UserRepository:
         db.refresh(db_user)
         return db_user
 
-    "Delete"
+    # Delete
 
     @staticmethod
     def delete_user(db: Session, db_user: User) -> None:

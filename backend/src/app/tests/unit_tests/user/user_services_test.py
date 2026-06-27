@@ -353,3 +353,14 @@ def test_update_user_password_only(service, db):
 
     mock_hash.assert_called_once_with("newpassword123")
     service.repository.update_user.assert_called_once_with(db, db_user)
+
+
+# Delete
+
+
+def test_delete_user(service, db):
+    db_user = Mock()
+    service.repository.detele_user.return_value = None
+    user_delete = service.delete_user(db, db_user)
+    service.repository.delete_user.assert_called_once_with(db, db_user)
+    assert user_delete is None
