@@ -150,3 +150,17 @@ def test_get_device_with_sounds_success(service, db):
     service.get_by_device_id.assert_called_once_with(db, 1)
     service.repository.get_device_with_sounds.assert_called_once_with(db, 1, 100)
     assert result == fake_result
+
+
+def test_get_device_with_sound_fail(service, db):
+    service.get_by_device_id = Mock(
+        side_effect=HTTPException(status_code=404, detail="Device not found")
+    )
+    with pytest.raises(HTTPException) as exc_info:
+        service.get_device_with_sounds(db, 999)
+
+    service.get_by_device_id.assert_called_once_with(db, 999)
+    service.repository.get_device_with_sounds.assert_not_called()
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.detail == "Device not found"
