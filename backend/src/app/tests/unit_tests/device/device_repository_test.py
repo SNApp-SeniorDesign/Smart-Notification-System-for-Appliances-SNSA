@@ -20,7 +20,9 @@ def test_get_by_id(db: Session, user, device):
 
 
 def test_get_by_device_name(db: Session, device):
-    device_response = DeviceRepository.get_by_device_name(db, device.device_name)
+    device_response = DeviceRepository.get_by_device_name(
+        db, device.device_name, device.user_id
+    )
 
     assert device_response is not None
     assert device_response.id == device.id

@@ -22,15 +22,17 @@ def db():
 
 def test_is_device_name_taken_success(service, db):
     service.repository.is_device_name_taken.return_value = object()
-    result = service.is_device_name_taken(db, "TestDevice")
+    result = service.is_device_name_taken(db, "TestDevice", 1)
     assert result is True
-    service.repository.get_by_device_name.assert_called_once_with(db, "TestDevice")
+    service.repository.get_by_device_name.assert_called_once_with(db, "TestDevice", 1)
 
 
 def test_is_device_name_taken_fail(service, db):
     service.repository.get_by_device_name.return_value = None
-    result = service.is_device_name_taken(db, "TestDevice")
-    service.repository.get_by_device_name.assert_called_once_with(db, "TestDevice")
+    result = service.is_device_name_taken(db, "TestDevice", 9999)
+    service.repository.get_by_device_name.assert_called_once_with(
+        db, "TestDevice", 9999
+    )
     assert result is False
 
 

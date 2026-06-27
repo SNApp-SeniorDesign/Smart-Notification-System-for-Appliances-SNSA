@@ -1,7 +1,9 @@
 from app.repository.device import DeviceRepository
 from app.models.device import Device
+from app.schemas.device import DeviceDB, DeviceCreate
 from app.exceptions.device import device_not_exist
 
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 
@@ -10,8 +12,8 @@ class DeviceService:
         self.repository = DeviceRepository
 
     # Get
-    def is_device_name_taken(self, db: Session, device_name: str) -> bool:
-        return self.repository.get_by_device_name(db, device_name) is not None
+    def is_device_name_taken(self, db: Session, device_name: str, user_id: int) -> bool:
+        return self.repository.get_by_device_name(db, device_name, user_id) is not None
 
     def is_serial_number_taken(self, db: Session, serial_number: str) -> bool:
         return self.repository.get_by_serial_number(db, serial_number) is not None
@@ -41,3 +43,27 @@ class DeviceService:
     def get_device_with_sounds(self, db: Session, device_id: int) -> Device | None:
         device = self.get_by_device_id(db, device_id)
         return self.repository.get_device_with_sounds(db, device.id, device.user_id)
+
+    # Post
+    def register_device(
+        self, db: Session, user_id: int, device_db: DeviceCreate
+    ) -> Device:
+        if self.is_device_name_taken(db, device_db.device_name, user_id):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Device name already registered",
+            )
+        if self.is_serial_number_taken(db, device_db.serial_number):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Device serial number already registered",
+            )
+
+        device_db = DeviceDB(
+            device_name=device_db.device_name,
+            serial_number=device_db.serial_number,
+            user_id=user_id,
+            is_paired=True,
+            device_status="online",
+        )
+        return self.repository.create_device(db, device_db)
