@@ -171,12 +171,10 @@ def test_get_device_with_sound_fail(service, db):
 
 # Post
 
+device_create = DeviceCreate(device_name="testDevice", serial_number="TestSerialNum123")
 
-def test_register_device(service, db):
-    device_create = DeviceCreate(
-        device_name="testDevice", serial_number="TestSerialNum123"
-    )
 
+def test_register_device_success(service, db):
     created_device = DeviceDB(
         device_name="testDevice",
         serial_number="TestSerialNum123",
@@ -205,3 +203,17 @@ def test_register_device(service, db):
     assert device_arg.user_id == 1
     assert device_arg.is_paired is True
     assert device_arg.device_status == "online"
+
+
+def test_register_device_name_taken(service, db):
+    service.is_device_name_taken = Mock(return_value=True)
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.register_device(db, 1, device_create)
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "Device name already registered"
+
+    service.is_device_name_taken.assert_called_once_with(
+        db, device_create.device_name, 1
+    )
