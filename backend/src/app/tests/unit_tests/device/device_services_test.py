@@ -217,3 +217,21 @@ def test_register_device_name_taken(service, db):
     service.is_device_name_taken.assert_called_once_with(
         db, device_create.device_name, 1
     )
+
+
+def test_register_device_serial_number_taken(service, db):
+    service.is_device_name_taken = Mock(return_value=False)
+    service.is_serial_number_taken = Mock(return_value=True)
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.register_device(db, 1, device_create)
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "Device serial number already registered"
+
+    service.is_device_name_taken.assert_called_once_with(
+        db, device_create.device_name, 1
+    )
+    service.is_serial_number_taken.assert_called_once_with(
+        db, device_create.serial_number
+    )
