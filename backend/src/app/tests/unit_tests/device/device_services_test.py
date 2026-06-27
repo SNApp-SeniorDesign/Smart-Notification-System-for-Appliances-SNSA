@@ -197,3 +197,11 @@ def test_register_device(service, db):
     service.is_serial_number_taken.assert_called_once_with(db, "TestSerialNum123")
 
     service.repository.create_device.assert_called_once()
+
+    device_arg = service.repository.create_device.call_args.args[1]
+
+    assert device_arg.device_name == "testDevice"
+    assert device_arg.serial_number == "TestSerialNum123"
+    assert device_arg.user_id == 1
+    assert device_arg.is_paired is True
+    assert device_arg.device_status == "online"
