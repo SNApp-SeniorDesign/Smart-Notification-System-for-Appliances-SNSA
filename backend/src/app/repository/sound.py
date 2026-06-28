@@ -7,6 +7,7 @@ from app.schemas.sound import SoundDB
 
 class SoundRepository:
     # Post
+    @staticmethod
     def create_sound(
         db: Session,
         sound_data: SoundDB,
@@ -26,6 +27,7 @@ class SoundRepository:
         return db_sound
 
     # Get
+    @staticmethod
     def get_by_id(db: Session, sound_id: int, device_id: int) -> Sound | None:
         return (
             db.query(Sound)
@@ -33,13 +35,23 @@ class SoundRepository:
             .first()
         )
 
+    @staticmethod
+    def get_by_sound_name(db: Session, sound_name: str, device_id: int) -> Sound | None:
+        return (
+            db.query(Sound)
+            .filter(Sound.sound_name == sound_name, Sound.device_id == device_id)
+            .first()
+        )
+
     # Update
+    @staticmethod
     def sound_update(db: Session, sound_db: Sound) -> Sound | None:
         db.commit()
         db.refresh(sound_db)
         return sound_db
 
     # Delete
+    @staticmethod
     def delete_sound(db: Session, sound_db: Sound) -> None:
         db.delete(sound_db)
         db.commit()
