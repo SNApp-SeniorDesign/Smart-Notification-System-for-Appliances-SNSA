@@ -322,3 +322,30 @@ def test_update_device_is_paired_only(service, db):
     assert db_device.user_id == 1
 
     service.repository.update_device.assert_called_once_with(db, db_device)
+
+
+def test_update_device_device_status_only(service, db):
+
+    db_device = SimpleNamespace(
+        device_name="testDevice",
+        serial_number="TestSerialNum123",
+        user_id=1,
+        is_paired=True,
+        device_status="online",
+    )
+
+    device_update = DeviceUpdate(device_status="offline")
+
+    service.repository.update_device.return_value = db_device
+
+    result = service.update_device(db, db_device, device_update)
+
+    assert result == db_device
+
+    assert db_device.device_name == "testDevice"
+    assert db_device.is_paired is True
+    assert db_device.device_status == "offline"
+    assert db_device.serial_number == "TestSerialNum123"
+    assert db_device.user_id == 1
+
+    service.repository.update_device.assert_called_once_with(db, db_device)
