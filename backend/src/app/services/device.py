@@ -80,3 +80,6 @@ class DeviceService:
             db_device.is_paired = device_db.is_paired
 
         return self.repository.update_device(db, db_device)
+
+    def delete_device(self, db: Session, db_device: Device) -> None:
+        self.repository.delete_device(db, db_device)
