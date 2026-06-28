@@ -1,9 +1,10 @@
 import pytest
 from unittest.mock import Mock
 from fastapi import HTTPException
+from types import SimpleNamespace
 
 from app.services.device import DeviceService
-from app.schemas.device import DeviceCreate, DeviceDB
+from app.schemas.device import DeviceCreate, DeviceDB, DeviceUpdate
 
 
 @pytest.fixture
@@ -235,3 +236,34 @@ def test_register_device_serial_number_taken(service, db):
     service.is_serial_number_taken.assert_called_once_with(
         db, device_create.serial_number
     )
+
+
+# Update
+
+
+def test_update_device_all_fields(service, db):
+    db_device = SimpleNamespace(
+        device_name="testDevice",
+        serial_number="TestSerialNum123",
+        user_id=1,
+        is_paired=True,
+        device_status="online",
+    )
+
+    device_update = DeviceUpdate(
+        device_name="newDeviceName", is_paired=False, device_status="offline"
+    )
+
+    service.repository.update_device.return_value = db_device
+
+    result = service.update_device(db, db_device, device_update)
+
+    assert result == db_device
+
+    assert db_device.device_name == "newDeviceName"
+    assert db_device.is_paired is False
+    assert db_device.device_status == "offline"
+    assert db_device.serial_number == "TestSerialNum123"
+    assert db_device.user_id == 1
+
+    service.repository.update_device.assert_called_once_with(db, db_device)

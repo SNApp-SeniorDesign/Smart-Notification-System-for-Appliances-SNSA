@@ -1,6 +1,6 @@
 from app.repository.device import DeviceRepository
 from app.models.device import Device
-from app.schemas.device import DeviceDB, DeviceCreate
+from app.schemas.device import DeviceDB, DeviceCreate, DeviceUpdate
 from app.exceptions.device import device_not_exist
 
 from fastapi import HTTPException, status
@@ -67,3 +67,16 @@ class DeviceService:
             device_status="online",
         )
         return self.repository.create_device(db, device_db)
+
+    # Update
+    def update_device(
+        self, db: Session, db_device: Device, device_db: DeviceUpdate
+    ) -> Device:
+        if device_db.device_name:
+            db_device.device_name = device_db.device_name
+        if device_db.device_status:
+            db_device.device_status = device_db.device_status
+        if device_db.is_paired is not None:
+            db_device.is_paired = device_db.is_paired
+
+        return self.repository.update_device(db, db_device)
