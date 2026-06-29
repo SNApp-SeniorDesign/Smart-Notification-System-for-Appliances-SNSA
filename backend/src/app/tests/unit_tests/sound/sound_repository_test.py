@@ -38,9 +38,7 @@ def test_get_by_id(db: Session, user, device, sound):
 
 
 def test_get_by_sound_name(db: Session, sound):
-    sound_result = SoundRepository.get_by_sound_name(
-        db, sound.sound_name, sound.device_id
-    )
+    sound_result = SoundRepository.get_by_sound_name(db, sound.sound_name)
 
     assert sound_result is not None
     assert sound_result.id == sound.id
