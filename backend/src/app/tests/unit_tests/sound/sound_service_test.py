@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import Mock
+from fastapi import HTTPException
 
 from app.services.sound import SoundService
 
@@ -33,8 +34,20 @@ def test_is_sound_name_taken_fail(service, db):
     assert result is False
 
 
-def test_get_by_sound_name(service, db):
+def test_get_by_sound_name_success(service, db):
     fake_sound = Mock(sound_name="testsound")
     service.repository.get_by_sound_name.return_value = fake_sound
     result = service.get_by_sound_name(db, "testsound")
     assert fake_sound == result
+
+
+def test_get_sound_name_fail(service, db):
+    service.repository.get_by_sound_name.return_value = None
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.get_by_sound_name(db, "notexistSound")
+
+    service.repository.get_by_sound_name.assert_called_once_with(db, "notexistSound")
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.detail == "Sound not found"
