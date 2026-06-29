@@ -24,3 +24,12 @@ def test_is_sound_name_taken_success(service, db):
     result = service.is_sound_name_taken(db, "testSound", 1)
     assert result is True
     service.repository.get_by_sound_name.assert_called_once_with(db, "testSound", 1)
+
+
+def test_is_sound_name_taken_fail(service, db):
+    service.repository.get_by_sound_name.return_value = None
+    result = service.is_sound_name_taken(db, "nonexistsound", 999999)
+    service.repository.get_by_sound_name.assert_called_once_with(
+        db, "nonexistsound", 999999
+    )
+    assert result is False
