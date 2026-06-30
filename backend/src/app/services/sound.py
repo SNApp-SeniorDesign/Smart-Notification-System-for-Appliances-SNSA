@@ -17,3 +17,5 @@ class SoundService:
         if sound is None:
             sound_not_exist()
         return sound
+
+    # def get_all_sound(self, db: Session, device_id: int) -> list[Sound] | None:

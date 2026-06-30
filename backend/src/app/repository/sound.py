@@ -39,6 +39,10 @@ class SoundRepository:
     def get_by_sound_name(db: Session, sound_name: str) -> Sound | None:
         return db.query(Sound).filter(Sound.sound_name == sound_name).first()
 
+    @staticmethod
+    def get_all_sound(db: Session, device_id: int) -> list[Sound]:
+        return db.query(Sound).filter(Sound.device_id == device_id).all()
+
     # Update
     @staticmethod
     def sound_update(db: Session, sound_db: Sound) -> Sound | None:

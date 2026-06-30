@@ -49,7 +49,7 @@ def test_get_by_sound_name(db: Session, sound):
     assert sound_result.sound_status == "offline"
 
 
-def test_get_by_id_return_no_ssound(db: Session, device):
+def test_get_by_id_return_no_sound(db: Session, device):
     sound_result = SoundRepository.get_by_id(db, 9999999, device.id)
 
     assert sound_result is None
@@ -59,6 +59,35 @@ def test_get_by_id_return_no_device(db: Session, sound):
     sound_result = SoundRepository.get_by_id(db, sound.id, 9999999)
 
     assert sound_result is None
+
+
+def test_get_all_sound(db: Session, device):
+    expected_sound = [
+        ("testsound", "test-audio-files/testSound.wav"),
+        ("Soundtest", "test-audio-files/Soundtest.wav"),
+        ("Testsound", "test-audio-files/Test123.wav"),
+    ]
+
+    for sound_name, sound_file_url in expected_sound:
+        SoundRepository.create_sound(
+            db,
+            SoundDB(
+                sound_name=sound_name,
+                device_id=device.id,
+                sound_file_url=sound_file_url,
+            ),
+        )
+
+    actual_sound_list = SoundRepository.get_all_sound(db, device.id)
+
+    assert actual_sound_list is not None
+    assert len(actual_sound_list) == len(expected_sound)
+
+    actual_sound = [
+        (sound.sound_name, sound.sound_file_url) for sound in actual_sound_list
+    ]
+
+    assert actual_sound == expected_sound
 
 
 # Update
