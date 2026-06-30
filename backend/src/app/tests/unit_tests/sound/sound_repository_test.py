@@ -25,13 +25,13 @@ def test_create_sound(db: Session, user, device):
 # Get
 
 
-def test_get_by_id(db: Session, user, device, sound):
-    sound_result = SoundRepository.get_by_id(db, sound.id, sound.device_id)
+def test_get_by_id(db: Session, sound):
+    sound_result = SoundRepository.get_by_id(db, sound.id)
 
     assert sound_result is not None
     assert sound_result.id == sound.id
     assert sound_result.sound_name == "testSound"
-    assert sound_result.device_id == device.id
+    assert sound_result.device_id == sound.device_id
     assert sound_result.is_synced_to_device is False
     assert sound_result.profile_version == 1
     assert sound_result.sound_status == "offline"
@@ -51,14 +51,8 @@ def test_get_by_sound_name(db: Session, sound):
     assert sound_result.sound_status == "offline"
 
 
-def test_get_by_id_return_no_sound(db: Session, device):
-    sound_result = SoundRepository.get_by_id(db, 9999999, device.id)
-
-    assert sound_result is None
-
-
-def test_get_by_id_return_no_device(db: Session, sound):
-    sound_result = SoundRepository.get_by_id(db, sound.id, 9999999)
+def test_get_by_id_fail(db: Session, sound):
+    sound_result = SoundRepository.get_by_id(db, 99999)
 
     assert sound_result is None
 
@@ -102,7 +96,7 @@ def test_update_sound(db: Session, sound):
 
     SoundRepository.sound_update(db, sound)
 
-    sound_new = SoundRepository.get_by_id(db, sound.id, sound.device_id)
+    sound_new = SoundRepository.get_by_id(db, sound.id)
 
     assert sound_new is not None
 

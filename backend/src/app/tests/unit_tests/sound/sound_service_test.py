@@ -86,10 +86,17 @@ def test_get_all_sound_empty(service, db):
 
 
 def test_get_sound_by_id_success(service, db):
-    fake_sound = Mock(id=1, device_id=1)
+    fake_sound = Mock(id=1)
 
     service.repository.get_by_id.return_value = fake_sound
 
-    result = service.get_sound_by_id(db, 1, 1)
-    service.repository.get_by_id.assert_called_once_with(db, 1, 1)
+    result = service.get_sound_by_id(db, 1)
+    service.repository.get_by_id.assert_called_once_with(db, 1)
     assert result == fake_sound
+
+
+# def test_get_sound_by_id_no_sound(service, db):
+#     service.repository.get_by_id.return_value = None
+
+#     with pytest.raises(HTTPException) as exc_info:
+#         service.get_sound_by_id(db, 99999, 99999)

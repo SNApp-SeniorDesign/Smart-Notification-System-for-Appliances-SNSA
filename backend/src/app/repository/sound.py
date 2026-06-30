@@ -28,12 +28,8 @@ class SoundRepository:
 
     # Get
     @staticmethod
-    def get_by_id(db: Session, sound_id: int, device_id: int) -> Sound | None:
-        return (
-            db.query(Sound)
-            .filter(Sound.id == sound_id, Sound.device_id == device_id)
-            .first()
-        )
+    def get_by_id(db: Session, sound_id: int) -> Sound | None:
+        return db.query(Sound).filter(Sound.id == sound_id).first()
 
     @staticmethod
     def get_by_sound_name(db: Session, sound_name: str, device_id: int) -> Sound | None:
