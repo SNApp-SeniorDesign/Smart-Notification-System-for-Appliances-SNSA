@@ -83,3 +83,13 @@ def test_get_all_sound_empty(service, db):
     result = service.get_all_sound(db, device_id)
     service.repository.get_all_sound.assert_called_once_with(db, device_id)
     assert result == []
+
+
+def test_get_sound_by_id_success(service, db):
+    fake_sound = Mock(id=1, device_id=1)
+
+    service.repository.get_by_id.return_value = fake_sound
+
+    result = service.get_sound_by_id(db, 1, 1)
+    service.repository.get_by_id.assert_called_once_with(db, 1, 1)
+    assert result == fake_sound

@@ -24,4 +24,10 @@ class SoundService:
         device_sound = self.repository.get_all_sound(db, device_id)
         return device_sound
 
-    # def get_sound_by_id(self, db: Session, device_id: int, sound: int)
+    def get_sound_by_id(
+        self, db: Session, device_id: int, sound_id: int
+    ) -> Sound | None:
+        device_sound = self.repository.get_by_id(db, sound_id, device_id)
+        if device_sound is None:
+            sound_not_exist()
+        return device_sound
