@@ -46,6 +46,21 @@ class SoundService:
         self, db: Session, device_id: int, sound_name: str, file: UploadFile
     ) -> Sound:
 
+        sound_file_url = self.save_sound_file(file)
+
+        sound = Sound(
+            device_id=device_id,
+            sound_name=sound_name,
+            sound_file_url=sound_file_url,
+            sound_status="monitoring",
+            is_on=True,
+            is_synced_to_device=False,
+            profile_version=1,
+        )
+
+        return self.repository.create_sound(db, sound)
+
+    def save_sound_file(self, file: UploadFile) -> str:
         if not file.filename:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Sound file is required"
@@ -58,14 +73,21 @@ class SoundService:
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        sound = Sound(
-            device_id=device_id,
-            sound_name=sound_name,
-            sound_file_url=f"/uploads/sounds/{stored_filename}",
-            sound_status="monitoring",
-            is_on=True,
-            is_synced_to_device=False,
-            profile_version=1,
-        )
+        return f"/uploads/sounds/{stored_filename}"
 
-        return self.repository.create_sound(db, sound)
+    # Update
+    # def update_sound(
+    #     self, db: Session, sound: Sound, sound_db: SoundUpdate
+    # ) -> Sound:
+    #     if sound_db.sound_name:
+    #         sound.sound_name = sound_db.sound_name
+    #     if sound_db.sound_status:
+    #         sound.sound_status = sound_db.sound_status
+    #     if sound_db.is_synced_to_device is not None:
+    #         sound.is_synced_to_device = sound_db.is_synced_to_device
+    #     if profile_version:
+    #         sound.profile_version = sound_db.profile_version
+    #     if sound_file_url:
+    #         sound.sound_file_url = sound_db.sound_file_url
+
+    #     return sound
