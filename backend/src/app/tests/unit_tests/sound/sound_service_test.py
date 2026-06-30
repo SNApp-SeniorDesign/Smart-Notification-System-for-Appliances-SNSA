@@ -22,22 +22,24 @@ def db():
 
 def test_is_sound_name_taken_success(service, db):
     service.repository.is_sound_name_taken.return_value = object()
-    result = service.is_sound_name_taken(db, "testSound")
+    result = service.is_sound_name_taken(db, "testSound", 1)
     assert result is True
-    service.repository.get_by_sound_name.assert_called_once_with(db, "testSound")
+    service.repository.get_by_sound_name.assert_called_once_with(db, "testSound", 1)
 
 
 def test_is_sound_name_taken_fail(service, db):
     service.repository.get_by_sound_name.return_value = None
-    result = service.is_sound_name_taken(db, "nonexistsound")
-    service.repository.get_by_sound_name.assert_called_once_with(db, "nonexistsound")
+    result = service.is_sound_name_taken(db, "nonexistsound", 99999)
+    service.repository.get_by_sound_name.assert_called_once_with(
+        db, "nonexistsound", 99999
+    )
     assert result is False
 
 
 def test_get_by_sound_name_success(service, db):
-    fake_sound = Mock(sound_name="testsound")
+    fake_sound = Mock(sound_name="testsound", device_id=1)
     service.repository.get_by_sound_name.return_value = fake_sound
-    result = service.get_by_sound_name(db, "testsound")
+    result = service.get_by_sound_name(db, "testsound", 1)
     assert fake_sound == result
 
 
@@ -45,9 +47,11 @@ def test_get_sound_name_fail(service, db):
     service.repository.get_by_sound_name.return_value = None
 
     with pytest.raises(HTTPException) as exc_info:
-        service.get_by_sound_name(db, "notexistSound")
+        service.get_by_sound_name(db, "notexistSound", 99999)
 
-    service.repository.get_by_sound_name.assert_called_once_with(db, "notexistSound")
+    service.repository.get_by_sound_name.assert_called_once_with(
+        db, "notexistSound", 99999
+    )
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "Sound not found"
