@@ -95,8 +95,13 @@ def test_get_sound_by_id_success(service, db):
     assert result == fake_sound
 
 
-# def test_get_sound_by_id_no_sound(service, db):
-#     service.repository.get_by_id.return_value = None
+def test_get_sound_by_id_fail(service, db):
+    service.repository.get_by_id.return_value = None
 
-#     with pytest.raises(HTTPException) as exc_info:
-#         service.get_sound_by_id(db, 99999, 99999)
+    with pytest.raises(HTTPException) as exc_info:
+        service.get_sound_by_id(db, 99999)
+
+    service.repository.get_by_id.assert_called_once_with(db, 99999)
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.detail == "Sound not found"
