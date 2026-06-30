@@ -51,3 +51,22 @@ def test_get_sound_name_fail(service, db):
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "Sound not found"
+
+
+def test_get_all_sound_success(service, db):
+    device_id = 1
+
+    fake_set_sounds = [
+        Mock("testsound", "test-audio-files/testSound.wav"),
+        Mock("Soundtest", "test-audio-files/Soundtest.wav"),
+        Mock("Testsound", "test-audio-files/Test123.wav"),
+    ]
+
+    service.repository.get_all_sound.return_value = fake_set_sounds
+
+    result = service.get_all_sound(db, device_id)
+
+    service.repository.get_all_sound.assert_called_once_with(db, device_id)
+
+    assert result == fake_set_sounds
+    assert len(result) == 3

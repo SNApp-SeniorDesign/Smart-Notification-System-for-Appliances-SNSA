@@ -18,4 +18,6 @@ class SoundService:
             sound_not_exist()
         return sound
 
-    # def get_all_sound(self, db: Session, device_id: int) -> list[Sound] | None:
+    def get_all_sound(self, db: Session, device_id: int) -> list[Sound] | None:
+        device_sound = self.repository.get_all_sound(db, device_id)
+        return device_sound
