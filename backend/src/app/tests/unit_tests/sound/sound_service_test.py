@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import Mock
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
+from io import BytesIO
 
 from app.services.sound import SoundService
 
@@ -105,3 +106,34 @@ def test_get_sound_by_id_fail(service, db):
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "Sound not found"
+
+
+# Post
+
+
+def test_create_sound_success(service, db):
+    fake_file = UploadFile(filename="test.wav", file=BytesIO(b"fake audio data"))
+
+    fake_created_sound = Mock()
+    service.repository.create_sound.return_value = fake_created_sound
+
+    result = service.create_sound(
+        db=db,
+        device_id=1,
+        sound_name="Microwave Beep",
+        file=fake_file,
+    )
+
+    assert result == fake_created_sound
+    service.repository.create_sound.assert_called_once()
+
+    sound_arg = service.repository.create_sound.call_args.args[1]
+
+    assert sound_arg.device_id == 1
+    assert sound_arg.sound_name == "Microwave Beep"
+    assert sound_arg.sound_file_url.startswith("/uploads/sounds/")
+    assert sound_arg.sound_file_url.endswith(".wav")
+    assert sound_arg.sound_status == "monitoring"
+    assert sound_arg.is_on is True
+    assert sound_arg.is_synced_to_device is False
+    assert sound_arg.profile_version == 1
