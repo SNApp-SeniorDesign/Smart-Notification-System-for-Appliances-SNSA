@@ -70,3 +70,12 @@ def test_get_all_sound_success(service, db):
 
     assert result == fake_set_sounds
     assert len(result) == 3
+
+
+def test_get_all_sound_empty(service, db):
+    device_id = 1
+
+    service.repository.get_all_sound.return_value = []
+    result = service.get_all_sound(db, device_id)
+    service.repository.get_all_sound.assert_called_once_with(db, device_id)
+    assert result == []
