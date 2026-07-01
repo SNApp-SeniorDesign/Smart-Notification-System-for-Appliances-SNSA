@@ -187,3 +187,39 @@ def test_update_sound_metada_only(service, db):
     assert sound.profile_version == 1
     assert sound.sound_file_url == "/uploads/sounds/old_sound.wav"
     service.repository.sound_update.assert_called_once_with(db, sound)
+
+
+def test_update_sound_with_new_file(service, db):
+    sound = SimpleNamespace(
+        id=1,
+        device_id=1,
+        sound_name="Old Sound Name",
+        sound_status="monitoring",
+        is_synced_to_device=True,
+        profile_version=1,
+        sound_file_url="/uploads/sounds/old_sound.wav",
+    )
+
+    sound_update = SoundUpdate(sound_name="New Sound Name")
+
+    file = UploadFile(
+        filename="new.wav",
+        file=BytesIO(b"fake audio data"),
+    )
+
+    service.save_sound_file = Mock(return_value="/uploads/sounds/new_sound.wav")
+    service.delete_sound_file = Mock()
+    service.repository.sound_update.return_value = sound
+
+    result = service.update_sound(db, sound, sound_update, file)
+
+    assert result == sound
+    assert sound.sound_name == "New Sound Name"
+    assert sound.sound_status == "monitoring"
+    assert sound.is_synced_to_device is False
+    assert sound.profile_version == 2
+    assert sound.sound_file_url == "/uploads/sounds/new_sound.wav"
+
+    service.save_sound_file.assert_called_once_with(file)
+    service.delete_sound_file.assert_called_once_with("/uploads/sounds/old_sound.wav")
+    service.repository.sound_update.assert_called_once_with(db, sound)
