@@ -279,3 +279,29 @@ def test_update_sound_no_changes(service, db):
     assert sound.sound_file_url == "/uploads/sounds/old_sound.wav"
 
     service.repository.sound_update.assert_called_once_with(db, sound)
+
+
+# Delete
+
+
+def test_delete_sound(service, db):
+    sound = SimpleNamespace(
+        id=1,
+        device_id=1,
+        sound_name="Sound to Delete",
+        sound_status="monitoring",
+        is_synced_to_device=True,
+        profile_version=1,
+        sound_file_url="/uploads/sounds/sound_to_delete.wav",
+    )
+
+    service.delete_sound_file = Mock()
+    service.repository.delete_sound.return_value = None
+    result = service.delete_sound(db, sound)
+
+    service.delete_sound_file.assert_called_once_with(
+        "/uploads/sounds/sound_to_delete.wav"
+    )
+    service.repository.delete_sound.assert_called_once_with(db, sound)
+
+    assert result is None
