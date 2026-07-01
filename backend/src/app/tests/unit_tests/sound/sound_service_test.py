@@ -223,3 +223,32 @@ def test_update_sound_with_new_file(service, db):
     service.save_sound_file.assert_called_once_with(file)
     service.delete_sound_file.assert_called_once_with("/uploads/sounds/old_sound.wav")
     service.repository.sound_update.assert_called_once_with(db, sound)
+
+
+def test_update_sound_file_missing_filename(service, db):
+    sound = SimpleNamespace(
+        id=1,
+        device_id=1,
+        sound_name="Old Sound Name",
+        sound_status="monitoring",
+        is_synced_to_device=True,
+        profile_version=1,
+        sound_file_url="/uploads/sounds/old_sound.wav",
+    )
+
+    sound_update = SoundUpdate(sound_name="New Sound Name")
+
+    file = UploadFile(
+        filename="",
+        file=BytesIO(b"fake audio data"),
+    )
+
+    service.repository.sound_update.return_value = sound
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.update_sound(db, sound, sound_update, file)
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "Sound file is required"
+
+    service.repository.sound_update.assert_not_called()
