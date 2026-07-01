@@ -2,7 +2,9 @@ import pytest
 from unittest.mock import Mock
 from fastapi import HTTPException, UploadFile
 from io import BytesIO
+from types import SimpleNamespace
 
+from app.schemas.sound import SoundUpdate
 from app.services.sound import SoundService
 
 
@@ -154,3 +156,34 @@ def test_create_sound_no_file_name(service, db):
     assert exc_info.value.detail == "Sound file is required"
 
     service.repository.create_sound.assert_not_called()
+
+
+# Update
+def test_update_sound_metada_only(service, db):
+    sound = SimpleNamespace(
+        id=1,
+        device_id=1,
+        sound_name="Old Sound Name",
+        sound_status="monitoring",
+        is_synced_to_device=True,
+        profile_version=1,
+        sound_file_url="/uploads/sounds/old_sound.wav",
+    )
+
+    sound_update = SoundUpdate(
+        sound_name="New Sound Name",
+        sound_status="detecting",
+        is_synced_to_device=False,
+    )
+
+    service.repository.sound_update.return_value = sound
+
+    result = service.update_sound(db, sound, sound_update, file=None)
+
+    assert result == sound
+    assert sound.sound_name == "New Sound Name"
+    assert sound.sound_status == "detecting"
+    assert sound.is_synced_to_device is False
+    assert sound.profile_version == 1
+    assert sound.sound_file_url == "/uploads/sounds/old_sound.wav"
+    service.repository.sound_update.assert_called_once_with(db, sound)

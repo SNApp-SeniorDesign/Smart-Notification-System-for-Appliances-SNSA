@@ -1,5 +1,6 @@
 from app.repository.sound import SoundRepository
 from app.models.sound import Sound
+from app.schemas.sound import SoundUpdate
 from app.exceptions.sound import sound_not_exist
 
 from pathlib import Path
@@ -76,18 +77,37 @@ class SoundService:
         return f"/uploads/sounds/{stored_filename}"
 
     # Update
-    # def update_sound(
-    #     self, db: Session, sound: Sound, sound_db: SoundUpdate
-    # ) -> Sound:
-    #     if sound_db.sound_name:
-    #         sound.sound_name = sound_db.sound_name
-    #     if sound_db.sound_status:
-    #         sound.sound_status = sound_db.sound_status
-    #     if sound_db.is_synced_to_device is not None:
-    #         sound.is_synced_to_device = sound_db.is_synced_to_device
-    #     if profile_version:
-    #         sound.profile_version = sound_db.profile_version
-    #     if sound_file_url:
-    #         sound.sound_file_url = sound_db.sound_file_url
+    def update_sound(
+        self, db: Session, sound: Sound, sound_db: SoundUpdate, file: UploadFile
+    ) -> Sound:
+        if sound_db.sound_name:
+            sound.sound_name = sound_db.sound_name
 
-    #     return sound
+        if sound_db.sound_status:
+            sound.sound_status = sound_db.sound_status
+
+        if sound_db.is_synced_to_device is not None:
+            sound.is_synced_to_device = sound_db.is_synced_to_device
+
+        if file is not None:
+            sound_file_url = self.save_sound_file(file)
+            self.delete_sound_file(sound.sound_file_url)
+            sound.sound_file_url = sound_file_url
+
+            sound.profile_version += 1
+            sound.is_synced_to_device = False
+
+        return self.repository.sound_update(db, sound)
+
+    # Delete
+
+    # Delete old sound file helper
+    def delete_sound_file(self, sound_file_url: str) -> None:
+        if not sound_file_url:
+            return
+
+        relative_path = sound_file_url.lstrip("/")
+        file_path = Path(relative_path)
+
+        if file_path.exists() and file_path.is_file():
+            file_path.unlink()  # Delete the file
