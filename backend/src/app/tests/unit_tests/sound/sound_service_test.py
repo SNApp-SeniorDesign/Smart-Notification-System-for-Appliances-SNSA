@@ -252,3 +252,30 @@ def test_update_sound_file_missing_filename(service, db):
     assert exc_info.value.detail == "Sound file is required"
 
     service.repository.sound_update.assert_not_called()
+
+
+def test_update_sound_no_changes(service, db):
+    sound = SimpleNamespace(
+        id=1,
+        device_id=1,
+        sound_name="Old Sound Name",
+        sound_status="monitoring",
+        is_synced_to_device=True,
+        profile_version=1,
+        sound_file_url="/uploads/sounds/old_sound.wav",
+    )
+
+    sound_update = SoundUpdate()
+
+    service.repository.sound_update.return_value = sound
+
+    result = service.update_sound(db, sound, sound_update, file=None)
+
+    assert result == sound
+    assert sound.sound_name == "Old Sound Name"
+    assert sound.sound_status == "monitoring"
+    assert sound.is_synced_to_device is True
+    assert sound.profile_version == 1
+    assert sound.sound_file_url == "/uploads/sounds/old_sound.wav"
+
+    service.repository.sound_update.assert_called_once_with(db, sound)
