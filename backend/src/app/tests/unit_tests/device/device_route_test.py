@@ -142,3 +142,12 @@ def test_get_device_by_id_success(client: TestClient, db, user):
     assert data["user_id"] == user.id
     assert data["is_paired"] is True
     assert data["device_status"] == "online"
+
+
+def test_get_device_by_id_fail(client: TestClient, db, user):
+    headers = get_auth_headers(client, user)
+
+    response = client.get("/device/9999", headers=headers)
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Device not found"}
