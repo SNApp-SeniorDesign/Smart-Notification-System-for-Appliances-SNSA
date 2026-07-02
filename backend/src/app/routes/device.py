@@ -25,3 +25,16 @@ def create_device(
     return device_service.register_device(
         db=db, device_db=data, user_id=current_user.id
     )
+
+
+# Get
+
+
+@api_router.get(
+    "/all", response_model=list[DeviceResponse], status_code=status.HTTP_200_OK
+)
+def get_all_devices(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_service.get_current_user),
+):
+    return device_service.get_all_device(db=db, user_id=current_user.id)

@@ -79,3 +79,29 @@ def test_register_device_unauthorized(client: TestClient):
         },
     )
     assert response.status_code in {401, 403}
+
+
+# Get
+
+
+def test_get_all_devices(client: TestClient, db, user):
+    headers = get_auth_headers(client, user)
+
+    client.post(
+        "/device/",
+        json={"device_name": "Test Device 1", "serial_number": "TestSerial123"},
+        headers=headers,
+    )
+    client.post(
+        "/device/",
+        json={"device_name": "Test Device 2", "serial_number": "TestSerial456"},
+        headers=headers,
+    )
+
+    response = client.get("/device/all", headers=headers)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 2
+    assert data[0]["device_name"] == "Test Device 1"
+    assert data[1]["device_name"] == "Test Device 2"
