@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from app.repository.user import UserRepository
 import pytest
 
-"Post"
+# Post
 
 payload = {
     "username": "testuser",
@@ -160,7 +160,7 @@ def test_login_wrong_email(client):
     assert response.json()["detail"] == "Incorrect Email or Passwords"
 
 
-"Get"
+# Get
 
 
 @pytest.fixture
@@ -195,7 +195,7 @@ def test_get_me_success(client, auth_headers):
     assert response.json()["email"] == "test@example.com"
 
 
-"Put"
+# Put
 
 
 def test_update_user_username(client, auth_headers):
@@ -206,7 +206,7 @@ def test_update_user_username(client, auth_headers):
     assert response.json()["username"] == "newusername"
 
 
-"Delete"
+# Delete
 
 
 def test_delete_user_success(client, db, authenticated_user):

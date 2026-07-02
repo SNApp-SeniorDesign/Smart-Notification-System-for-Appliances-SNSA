@@ -7,7 +7,9 @@ from datetime import datetime
 
 from app.core.settings import settings
 from app.core.database import create_db_tb
+
 from app.routes.user import api_router as user_router
+from app.routes.device import api_router as device_router
 
 NEXT_URL = settings.frontend_url
 
@@ -26,7 +28,7 @@ app = FastAPI(
 )
 
 app.include_router(user_router)
-
+app.include_router(device_router)
 
 app.add_middleware(
     CORSMiddleware,

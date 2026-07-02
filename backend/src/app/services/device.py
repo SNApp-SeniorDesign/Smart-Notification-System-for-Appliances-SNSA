@@ -83,3 +83,6 @@ class DeviceService:
 
     def delete_device(self, db: Session, db_device: Device) -> None:
         self.repository.delete_device(db, db_device)
+
+
+device_service = DeviceService()
