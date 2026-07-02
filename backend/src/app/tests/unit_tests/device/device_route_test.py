@@ -105,3 +105,13 @@ def test_get_all_devices(client: TestClient, db, user):
     assert len(data) == 2
     assert data[0]["device_name"] == "Test Device 1"
     assert data[1]["device_name"] == "Test Device 2"
+
+
+def test_get_all_devices_empty(client: TestClient, db, user):
+    headers = get_auth_headers(client, user)
+
+    response = client.get("/device/all", headers=headers)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data == []
