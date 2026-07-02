@@ -30,3 +30,22 @@ def test_register_device_success(client: TestClient, db, user):
     assert data["device_name"] == "Test Device"
     assert data["serial_number"] == "TestSerial123"
     assert data["user_id"] == user.id
+
+
+def test_register_device_duplicate_serial(client: TestClient, db, user):
+    headers = get_auth_headers(client, user)
+
+    payload = {
+        "device_name": "Test Device",
+        "serial_number": "TestSerial123",
+    }
+
+    client.post("/device/", json=payload, headers=headers)
+
+    response = client.post(
+        "/device/",
+        json={"device_name": "Another Device", "serial_number": "TestSerial123"},
+        headers=headers,
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Device serial number already registered"}
