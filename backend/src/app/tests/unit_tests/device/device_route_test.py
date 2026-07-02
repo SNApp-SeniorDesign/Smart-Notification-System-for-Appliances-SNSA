@@ -115,3 +115,8 @@ def test_get_all_devices_empty(client: TestClient, db, user):
     assert response.status_code == 200
     data = response.json()
     assert data == []
+
+
+def test_get_all_devices_unauthorized(client: TestClient):
+    response = client.get("/device/all")
+    assert response.status_code in (401, 403)
