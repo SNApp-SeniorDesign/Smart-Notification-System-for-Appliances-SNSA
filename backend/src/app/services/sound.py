@@ -9,13 +9,12 @@ import shutil
 from sqlalchemy.orm import Session
 from fastapi import status, HTTPException, UploadFile
 
-UPLOAD_DIR = Path("uploads/sounds")
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-
 
 class SoundService:
-    def __init__(self) -> None:
+    def __init__(self, upload_dir: Path | None = None) -> None:
         self.repository = SoundRepository
+        self.upload_dir = upload_dir or Path("uploads/sounds")
+        self.upload_dir.mkdir(parents=True, exist_ok=True)
 
     # Get
 
@@ -69,7 +68,7 @@ class SoundService:
 
         file_ext = Path(file.filename).suffix
         stored_filename = f"{uuid4()}{file_ext}"
-        file_path = UPLOAD_DIR / stored_filename
+        file_path = self.upload_dir / stored_filename
 
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -106,8 +105,8 @@ class SoundService:
         if not sound_file_url:
             return
 
-        relative_path = sound_file_url.lstrip("/")
-        file_path = Path(relative_path)
+        filename = Path(sound_file_url).name
+        file_path = self.upload_dir / filename
 
         if file_path.exists() and file_path.is_file():
             file_path.unlink()  # Delete the file

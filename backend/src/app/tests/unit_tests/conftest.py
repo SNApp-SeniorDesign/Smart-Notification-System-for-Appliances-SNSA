@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import Mock
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -13,6 +14,8 @@ from app.schemas.sound import SoundDB
 from app.repository.user import UserRepository
 from app.repository.device import DeviceRepository
 from app.repository.sound import SoundRepository
+
+from app.services.sound import SoundService
 
 TEST_DATABASE_URL = "postgresql+psycopg://rune:12345678@localhost:5432/snsa_test"
 
@@ -106,3 +109,11 @@ def sound(db, device):
         sound_file_url="test-audio-files/testSound.wav",
     )
     return SoundRepository.create_sound(db, sound)
+
+
+# fixture to create temporary directory for sound files
+@pytest.fixture
+def service(tmp_path):
+    services = SoundService(upload_dir=tmp_path / "sounds")
+    service.repository = Mock()
+    return services

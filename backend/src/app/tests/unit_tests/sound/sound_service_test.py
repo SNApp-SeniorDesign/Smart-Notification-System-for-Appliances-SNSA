@@ -113,7 +113,10 @@ def test_get_sound_by_id_fail(service, db):
 # Post
 
 
-def test_create_sound_success(service, db):
+def test_create_sound_success(service, db, tmp_path):
+    service.upload_dir = tmp_path / "sounds"
+    service.upload_dir.mkdir()
+
     fake_file = UploadFile(filename="test.wav", file=BytesIO(b"fake audio data"))
 
     fake_created_sound = Mock()
