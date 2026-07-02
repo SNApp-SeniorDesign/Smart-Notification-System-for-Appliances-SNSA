@@ -3,6 +3,7 @@ from app.models.device import Device
 from app.schemas.device import DeviceDB, DeviceCreate, DeviceUpdate
 from app.exceptions.device import device_not_exist
 
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -30,8 +31,10 @@ class DeviceService:
             device_not_exist()
         return user_device
 
-    def get_by_device_id(self, db: Session, device_id: int) -> Device | None:
-        user_device = self.repository.get_by_id(db, device_id)
+    def get_by_device_id(
+        self, db: Session, device_id: int, user_id: int
+    ) -> Device | None:
+        user_device = self.repository.get_by_id(db, device_id, user_id)
         if user_device is None:
             device_not_exist()
         return user_device

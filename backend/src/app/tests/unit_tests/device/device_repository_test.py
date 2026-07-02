@@ -19,6 +19,18 @@ def test_get_by_id(db: Session, user, device):
     assert device_response.device_status == "offline"
 
 
+def test_get_by_device_id(db: Session, device):
+    device_response = DeviceRepository.get_by_device_id(db, device.id)
+
+    assert device_response is not None
+    assert device_response.id == device.id
+    assert device_response.user_id == device.user_id
+    assert device_response.device_name == "testDevice"
+    assert device_response.serial_number == "testSerialNumber123"
+    assert device_response.is_paired is False
+    assert device_response.device_status == "offline"
+
+
 def test_get_by_device_name(db: Session, device):
     device_response = DeviceRepository.get_by_device_name(
         db, device.device_name, device.user_id

@@ -38,3 +38,16 @@ def get_all_devices(
     current_user: User = Depends(user_service.get_current_user),
 ):
     return device_service.get_all_device(db=db, user_id=current_user.id)
+
+
+@api_router.get(
+    "/{device_id}", response_model=DeviceResponse, status_code=status.HTTP_200_OK
+)
+def get_device_by_id(
+    device_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_service.get_current_user),
+):
+    return device_service.get_by_device_id(
+        db=db, user_id=current_user.id, device_id=device_id
+    )

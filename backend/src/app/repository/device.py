@@ -16,6 +16,10 @@ class DeviceRepository:
         )
 
     @staticmethod
+    def get_by_device_id(db: Session, device_id: int) -> Device | None:
+        return db.query(Device).filter(Device.id == device_id).first()
+
+    @staticmethod
     def get_by_device_name(
         db: Session, device_name: str, user_id: int
     ) -> Device | None:

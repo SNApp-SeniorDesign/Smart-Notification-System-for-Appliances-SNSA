@@ -120,3 +120,25 @@ def test_get_all_devices_empty(client: TestClient, db, user):
 def test_get_all_devices_unauthorized(client: TestClient):
     response = client.get("/device/all")
     assert response.status_code in (401, 403)
+
+
+def test_get_device_by_id_success(client: TestClient, db, user):
+    headers = get_auth_headers(client, user)
+
+    device_response = client.post(
+        "/device/",
+        json={"device_name": "Test Device", "serial_number": "TestSerial123"},
+        headers=headers,
+    )
+
+    device_id = device_response.json()["id"]
+    response = client.get(f"/device/{device_id}", headers=headers)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == device_id
+    assert data["device_name"] == "Test Device"
+    assert data["serial_number"] == "TestSerial123"
+    assert data["user_id"] == user.id
+    assert data["is_paired"] is True
+    assert data["device_status"] == "online"
