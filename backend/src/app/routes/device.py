@@ -5,7 +5,12 @@ from app.core.database import get_db
 from app.services.device import device_service
 from app.services.user import user_service
 
-from app.schemas.device import DeviceCreate, DeviceResponse, DeviceWithSounds
+from app.schemas.device import (
+    DeviceCreate,
+    DeviceResponse,
+    DeviceWithSounds,
+    DeviceUpdate,
+)
 
 from app.models.user import User
 
@@ -66,3 +71,19 @@ def get_device_with_sounds(
     return device_service.get_device_with_sounds(
         db=db, user_id=current_user.id, device_id=device_id
     )
+
+
+# Update
+@api_router.put(
+    "/{device_id}/update", response_model=DeviceResponse, status_code=status.HTTP_200_OK
+)
+def update_device(
+    device_id: int,
+    data: DeviceUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_service.get_current_user),
+):
+    db_device = device_service.get_by_device_id(
+        db=db, user_id=current_user.id, device_id=device_id
+    )
+    return device_service.update_device(db=db, db_device=db_device, device_db=data)
