@@ -1,6 +1,9 @@
 from fastapi.testclient import TestClient
 from app.core.auth import create_access_token
 
+from app.repository.sound import SoundRepository
+from app.models.sound import Sound
+
 
 def get_auth_headers(client: TestClient, user):
     token = create_access_token(
@@ -151,3 +154,54 @@ def test_get_device_by_id_fail(client: TestClient, db, user):
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Device not found"}
+
+
+def test_get_device_with_sounds_success(client: TestClient, db, user):
+    headers = get_auth_headers(client, user)
+
+    device_response = client.post(
+        "/device/",
+        json={
+            "device_name": "Test Device",
+            "serial_number": "TestSerial123",
+        },
+        headers=headers,
+    )
+
+    device_id = device_response.json()["id"]
+
+    expected_sounds = [
+        ("Microwave Beep", "/uplodas/sound/microwave.wave"),
+        ("Dryer Done", "/uploads/sound/dryer.wav"),
+        ("Washer Done", "/uploads/sound/washer.wav"),
+    ]
+
+    for sound_name, sound_file_url in expected_sounds:
+        SoundRepository.create_sound(
+            db,
+            Sound(
+                device_id=device_id,
+                sound_name=sound_name,
+                sound_file_url=sound_file_url,
+                sound_status="monitoring",
+                is_on=True,
+                is_synced_to_device=False,
+                profile_version=1,
+            ),
+        )
+    response = client.get(
+        f"/device/{device_id}/sounds",
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["id"] == device_id
+    assert data["device_name"] == "Test Device"
+
+    actual_sounds = [
+        (sound["sound_name"], sound["sound_file_url"]) for sound in data["sounds"]
+    ]
+
+    assert set(actual_sounds) == set(expected_sounds)

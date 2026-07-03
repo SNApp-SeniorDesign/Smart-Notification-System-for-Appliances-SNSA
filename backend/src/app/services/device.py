@@ -43,9 +43,11 @@ class DeviceService:
         user_devices = self.repository.get_all_by_user(db, user_id)
         return user_devices
 
-    def get_device_with_sounds(self, db: Session, device_id: int) -> Device | None:
-        device = self.get_by_device_id(db, device_id)
-        return self.repository.get_device_with_sounds(db, device.id, device.user_id)
+    def get_device_with_sounds(
+        self, db: Session, user_id: int, device_id: int
+    ) -> Device | None:
+        device = self.get_by_device_id(db, user_id, device_id)
+        return self.repository.get_device_with_sounds(db, device.user_id, device.id)
 
     # Post
     def register_device(

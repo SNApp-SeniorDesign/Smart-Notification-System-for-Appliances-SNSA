@@ -5,7 +5,7 @@ from app.core.database import get_db
 from app.services.device import device_service
 from app.services.user import user_service
 
-from app.schemas.device import DeviceCreate, DeviceResponse
+from app.schemas.device import DeviceCreate, DeviceResponse, DeviceWithSounds
 
 from app.models.user import User
 
@@ -49,5 +49,20 @@ def get_device_by_id(
     current_user: User = Depends(user_service.get_current_user),
 ):
     return device_service.get_by_device_id(
+        db=db, user_id=current_user.id, device_id=device_id
+    )
+
+
+@api_router.get(
+    "/{device_id}/sounds",
+    response_model=DeviceWithSounds,
+    status_code=status.HTTP_200_OK,
+)
+def get_device_with_sounds(
+    device_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(user_service.get_current_user),
+):
+    return device_service.get_device_with_sounds(
         db=db, user_id=current_user.id, device_id=device_id
     )

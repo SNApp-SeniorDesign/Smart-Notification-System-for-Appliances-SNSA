@@ -8,7 +8,7 @@ from app.repository.sound import SoundRepository
 
 
 def test_get_by_id(db: Session, user, device):
-    device_response = DeviceRepository.get_by_id(db, device.id, user.id)
+    device_response = DeviceRepository.get_by_id(db, user.id, device.id)
 
     assert device_response is not None
     assert device_response.id == device.id
