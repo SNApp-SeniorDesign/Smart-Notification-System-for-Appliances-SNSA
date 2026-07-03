@@ -205,3 +205,29 @@ def test_get_device_with_sounds_success(client: TestClient, db, user):
     ]
 
     assert set(actual_sounds) == set(expected_sounds)
+
+
+def test_get_device_with_sounds_empty(client: TestClient, db, user):
+    headers = get_auth_headers(client, user)
+
+    device_response = client.post(
+        "/device/",
+        json={
+            "device_name": "Test Device",
+            "serial_number": "TestSerial123",
+        },
+        headers=headers,
+    )
+
+    device_id = device_response.json()["id"]
+
+    response = client.get(
+        f"/device/{device_id}/sounds",
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == device_id
+    assert data["device_name"] == "Test Device"
+    assert data["sounds"] == []
