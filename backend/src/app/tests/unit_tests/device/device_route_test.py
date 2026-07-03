@@ -263,3 +263,25 @@ def test_update_device_success(client: TestClient, db, user):
     assert data["device_name"] == "Updated Device Name"
     assert data["device_status"] == "offline"
     assert data["is_paired"] is False
+
+
+# Delete
+
+
+def test_delete_device_success(client: TestClient, db, user):
+    headers = get_auth_headers(client, user)
+
+    device_response = client.post(
+        "/device/",
+        json={"device_name": "Test Device", "serial_number": "TestSerial123"},
+        headers=headers,
+    )
+
+    device_id = device_response.json()["id"]
+
+    response = client.delete(f"/device/{device_id}/delete", headers=headers)
+
+    assert response.status_code == 204
+
+    get_response = client.get(f"/device/{device_id}", headers=headers)
+    assert get_response.status_code == 404
