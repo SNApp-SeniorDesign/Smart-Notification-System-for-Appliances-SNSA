@@ -1,4 +1,5 @@
 from pydantic import Field, BaseModel
+from fastapi import Form
 from typing import Literal
 
 SoundStatus = Literal["monitoring", "detecting", "detected", "offline"]
@@ -9,7 +10,12 @@ class SoundBase(BaseModel):
 
 
 class SoundCreate(SoundBase):
-    pass
+    @classmethod
+    def as_form(
+        cls,
+        sound_name: str = Form(...),
+    ):
+        return cls(sound_name=sound_name)
 
 
 class SoundResponse(SoundBase):

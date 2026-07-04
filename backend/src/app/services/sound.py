@@ -114,3 +114,6 @@ class SoundService:
     def delete_sound(self, db: Session, db_sound: Sound) -> None:
         self.delete_sound_file(db_sound.sound_file_url)
         self.repository.delete_sound(db, db_sound)
+
+
+sound_service = SoundService()
