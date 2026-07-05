@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.main import app
 from app.core.database import Base, get_db
+from app.core.auth import create_access_token
 
 from app.schemas.user import UserDB
 from app.schemas.device import DeviceDB
@@ -117,3 +118,24 @@ def service(tmp_path):
     services = SoundService(upload_dir=tmp_path / "sounds")
     service.repository = Mock()
     return services
+
+
+@pytest.fixture(autouse=True)
+def temp_sound_upload_dir(tmp_path):
+    from app.services.sound import sound_service
+
+    old_upload_dir = sound_service.upload_dir
+
+    sound_service.upload_dir = tmp_path / "sounds"
+    sound_service.upload_dir.mkdir(parents=True, exist_ok=True)
+    yield
+    sound_service.upload_dir = old_upload_dir
+
+
+# fixture to create headers for authorization
+@pytest.fixture
+def headers(client: TestClient, user):
+    token = create_access_token(
+        data={"sub": str(user.id), "token_version": user.token_version}
+    )
+    return {"Authorization": f"Bearer {token}"}

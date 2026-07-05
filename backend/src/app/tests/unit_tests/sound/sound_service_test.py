@@ -114,12 +114,11 @@ def test_get_sound_by_id_fail(service, db):
 
 
 def test_create_sound_success(service, db, tmp_path):
-    service.upload_dir = tmp_path / "sounds"
-    service.upload_dir.mkdir()
 
     fake_file = UploadFile(filename="test.wav", file=BytesIO(b"fake audio data"))
 
     fake_created_sound = Mock()
+    service.repository.get_by_sound_name.return_value = None
     service.repository.create_sound.return_value = fake_created_sound
 
     result = service.create_sound(
@@ -149,7 +148,7 @@ def test_create_sound_no_file_name(service, db):
         filename="",
         file=BytesIO(b"fake audio data"),
     )
-
+    service.repository.get_by_sound_name.return_value = None
     with pytest.raises(HTTPException) as exc_info:
         service.create_sound(
             db=db, device_id=1, sound_name="Microwave Beep", file=fake_file

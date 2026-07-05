@@ -6,3 +6,10 @@ def sound_not_exist() -> None:
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Sound not found",
     )
+
+
+def sound_exist() -> None:
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Sound name already registered",
+    )

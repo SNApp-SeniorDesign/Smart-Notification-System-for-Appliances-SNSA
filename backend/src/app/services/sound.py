@@ -1,7 +1,7 @@
 from app.repository.sound import SoundRepository
 from app.models.sound import Sound
 from app.schemas.sound import SoundUpdate
-from app.exceptions.sound import sound_not_exist
+from app.exceptions.sound import sound_not_exist, sound_exist
 
 from pathlib import Path
 from uuid import uuid4
@@ -45,6 +45,8 @@ class SoundService:
     def create_sound(
         self, db: Session, device_id: int, sound_name: str, file: UploadFile
     ) -> Sound:
+        if self.is_sound_name_taken(db, sound_name, device_id):
+            sound_exist()
 
         sound_file_url = self.save_sound_file(file)
 
