@@ -36,3 +36,15 @@ def test_register_sound_duplicate_name(client: TestClient, headers, device):
 
     assert response.status_code == 409
     assert response.json() == {"detail": "Sound name already registered"}
+
+
+def test_register_sound_missing_file(client: TestClient, headers, device):
+    response = client.post(
+        "/sound/register",
+        headers=headers,
+        data={
+            "device_id": device.id,
+            "sound_name": "test_sound",
+        },
+    )
+    assert response.status_code == 422
