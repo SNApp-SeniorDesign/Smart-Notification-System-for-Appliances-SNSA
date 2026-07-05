@@ -59,3 +59,14 @@ def test_register_sound_missing_sound_name(client: TestClient, headers, device):
     )
 
     assert response.status_code == 422
+
+
+def test_register_sound_missing_device_id(client: TestClient, headers, device):
+    response = client.post(
+        "/sound/register",
+        headers=headers,
+        data={"sound_name": "test_sound"},
+        files={"file": ("test.wav", b"test sound content", "audio/wav")},
+    )
+
+    assert response.status_code == 422
