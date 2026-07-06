@@ -70,3 +70,13 @@ def test_register_sound_missing_device_id(client: TestClient, headers, device):
     )
 
     assert response.status_code == 422
+
+
+def test_register_sound_unauthorized(client: TestClient, device):
+    response = client.post(
+        "/sound/register",
+        data={"sound_name": "test_sound", "device_id": device.id},
+        files={"file": ("test.wav", b"test sound content", "audio/wav")},
+    )
+
+    assert response.status_code == 401

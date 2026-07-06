@@ -9,6 +9,8 @@ from fastapi import (
 from sqlalchemy.orm import Session
 from typing import Annotated
 
+from app.exceptions.device import device_not_exist
+
 from app.services.user import user_service
 from app.services.sound import sound_service
 from app.services.device import device_service
@@ -30,7 +32,12 @@ def get_current_device(
     db: Session = Depends(get_db),
     current_user: User = Depends(user_service.get_current_user),
 ) -> Device | None:
-    return device_service.get_by_device_id(db, device_id, current_user.id)
+    device = device_service.get_by_device_id(db, device_id, current_user.id)
+
+    if device is None:
+        device_not_exist()
+
+    return device
 
 
 # Post
