@@ -106,3 +106,9 @@ def test_sound_get_by_id_success(client: TestClient, headers, sound):
     assert data["sound_file_url"] == "test-audio-files/testSound.wav"
     assert data["sound_status"] == "monitoring"
     assert data["is_on"] is True
+
+
+def test_sound_get_by_id_fail(client: TestClient, headers, device):
+    sound_response = client.get(f"/sound/{device.id}/9999", headers=headers)
+    assert sound_response.status_code == 404
+    assert sound_response.json() == {"detail": "Sound not found"}
