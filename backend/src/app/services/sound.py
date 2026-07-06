@@ -63,6 +63,7 @@ class SoundService:
         return self.repository.create_sound(db, sound)
 
     def save_sound_file(self, file: UploadFile) -> str:
+
         if not file.filename:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Sound file is required"

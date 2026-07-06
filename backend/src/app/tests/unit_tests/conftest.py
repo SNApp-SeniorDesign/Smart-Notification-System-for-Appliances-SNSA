@@ -1,4 +1,5 @@
 import pytest
+import shutil
 from unittest.mock import Mock
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -104,32 +105,49 @@ def device(db, user):
 # fixture to create sound for repository
 @pytest.fixture
 def sound(db, device):
-    sound = SoundDB(
+    sound_data = SoundDB(
         sound_name="testSound",
         device_id=device.id,
         sound_file_url="test-audio-files/testSound.wav",
+        sound_status="monitoring",
+        is_on=True,
+        is_synced_to_device=False,
+        profile_version=1,
     )
-    return SoundRepository.create_sound(db, sound)
+
+    return SoundRepository.create_sound(db, sound_data)
 
 
 # fixture to create temporary directory for sound files
 @pytest.fixture
 def service(tmp_path):
-    services = SoundService(upload_dir=tmp_path / "sounds")
+    service = SoundService(upload_dir=tmp_path / "sounds")
     service.repository = Mock()
-    return services
+    service.repository.get_by_sound_name.return_value = None
+    return service
 
 
 @pytest.fixture(autouse=True)
 def temp_sound_upload_dir(tmp_path):
     from app.services.sound import sound_service
+    from app.routes import sound as sound_route
 
-    old_upload_dir = sound_service.upload_dir
+    old_service_dir = sound_service.upload_dir
+    old_route_dir = sound_route.sound_service.upload_dir
 
-    sound_service.upload_dir = tmp_path / "sounds"
-    sound_service.upload_dir.mkdir(parents=True, exist_ok=True)
+    test_upload_dir = tmp_path / "sounds"
+
+    sound_service.upload_dir = test_upload_dir
+    sound_route.sound_service.upload_dir = test_upload_dir
+    test_upload_dir.mkdir(parents=True, exist_ok=True)
+
     yield
-    sound_service.upload_dir = old_upload_dir
+
+    if test_upload_dir.exists():
+        shutil.rmtree(test_upload_dir)
+
+    sound_service.upload_dir = old_service_dir
+    sound_route.sound_service.upload_dir = old_route_dir
 
 
 # fixture to create headers for authorization

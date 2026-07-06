@@ -34,7 +34,7 @@ def test_get_by_id(db: Session, sound):
     assert sound_result.device_id == sound.device_id
     assert sound_result.is_synced_to_device is False
     assert sound_result.profile_version == 1
-    assert sound_result.sound_status == "offline"
+    assert sound_result.sound_status == "monitoring"
 
 
 def test_get_by_sound_name(db: Session, sound):
@@ -48,7 +48,7 @@ def test_get_by_sound_name(db: Session, sound):
     assert sound_result.device_id == sound.device_id
     assert sound_result.is_synced_to_device is False
     assert sound_result.profile_version == 1
-    assert sound_result.sound_status == "offline"
+    assert sound_result.sound_status == "monitoring"
 
 
 def test_get_by_id_fail(db: Session, sound):

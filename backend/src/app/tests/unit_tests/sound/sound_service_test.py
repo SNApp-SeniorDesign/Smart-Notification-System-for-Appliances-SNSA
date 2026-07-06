@@ -5,14 +5,6 @@ from io import BytesIO
 from types import SimpleNamespace
 
 from app.schemas.sound import SoundUpdate
-from app.services.sound import SoundService
-
-
-@pytest.fixture
-def service():
-    services = SoundService()
-    services.repository = Mock()
-    return services
 
 
 @pytest.fixture
@@ -24,7 +16,7 @@ def db():
 
 
 def test_is_sound_name_taken_success(service, db):
-    service.repository.is_sound_name_taken.return_value = object()
+    service.repository.get_by_sound_name.return_value = object()
     result = service.is_sound_name_taken(db, "testSound", 1)
     assert result is True
     service.repository.get_by_sound_name.assert_called_once_with(db, "testSound", 1)
@@ -113,7 +105,7 @@ def test_get_sound_by_id_fail(service, db):
 # Post
 
 
-def test_create_sound_success(service, db, tmp_path):
+def test_create_sound_success(service, db):
 
     fake_file = UploadFile(filename="test.wav", file=BytesIO(b"fake audio data"))
 
