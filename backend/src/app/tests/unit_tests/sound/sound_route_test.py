@@ -155,3 +155,8 @@ def test_get_all_sound_empty(client: TestClient, headers, device):
     assert response.status_code == 200
     data = response.json()
     assert data == []
+
+
+def test_get_all_sound_unauthorized(client: TestClient, device):
+    response = client.get(f"/sound/{device.id}/all")
+    assert response.status_code in (401, 403)
