@@ -86,6 +86,35 @@ def test_get_all_sound(db: Session, device):
     assert actual_sound == expected_sound
 
 
+def test_get_all_unsynced_sound(db: Session, device):
+    expected_sound = [
+        ("testsound", "test-audio-files/testSound.wav"),
+        ("Soundtest", "test-audio-files/Soundtest.wav"),
+        ("Testsound", "test-audio-files/Test123.wav"),
+    ]
+
+    for sound_name, sound_file_url in expected_sound:
+        SoundRepository.create_sound(
+            db,
+            SoundDB(
+                sound_name=sound_name,
+                device_id=device.id,
+                sound_file_url=sound_file_url,
+            ),
+        )
+
+    actual_sound_list = SoundRepository.get_all_unsynced_sound(db, device.id)
+
+    assert actual_sound_list is not None
+    assert len(actual_sound_list) == len(expected_sound)
+
+    actual_sound = [
+        (sound.sound_name, sound.sound_file_url) for sound in actual_sound_list
+    ]
+
+    assert actual_sound == expected_sound
+
+
 # Update
 def test_update_sound(db: Session, sound):
     sound.sound_name = "modifiedSound"
