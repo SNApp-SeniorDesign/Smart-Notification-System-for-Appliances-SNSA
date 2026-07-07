@@ -147,3 +147,11 @@ def test_get_all_sounds(client: TestClient, headers, device, db: Session):
     return_names = {sound["sound_name"] for sound in data}
 
     assert return_names == {"Doorbell", "Microwave", "Washing Machine"}
+
+
+def test_get_all_sound_empty(client: TestClient, headers, device):
+    response = client.get(f"/sound/{device.id}/all", headers=headers)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data == []
