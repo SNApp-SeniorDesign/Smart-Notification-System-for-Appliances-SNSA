@@ -25,6 +25,9 @@ class SoundResponse(SoundBase):
     sound_status: SoundStatus
     is_on: bool
 
+    is_synced_to_device: bool
+    profile_version: int
+
     model_config = {"from_attributes": True}
 
 
@@ -42,3 +45,16 @@ class SoundUpdate(BaseModel):
     is_synced_to_device: bool | None = None
     profile_version: int | None = None
     sound_file_url: str | None = None
+
+    @classmethod
+    def as_form(
+        cls,
+        sound_name: str | None = Form(None),
+        sound_status: SoundStatus | None = Form(None),
+        sound_file_url: str | None = Form(None),
+    ):
+        return cls(
+            sound_name=sound_name,
+            sound_status=sound_status,
+            sound_file_url=sound_file_url,
+        )

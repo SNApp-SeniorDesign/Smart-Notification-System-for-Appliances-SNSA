@@ -88,9 +88,6 @@ class SoundService:
         if sound_db.sound_status:
             sound.sound_status = sound_db.sound_status
 
-        if sound_db.is_synced_to_device is not None:
-            sound.is_synced_to_device = sound_db.is_synced_to_device
-
         if file is not None:
             sound_file_url = self.save_sound_file(file)
             self.delete_sound_file(sound.sound_file_url)

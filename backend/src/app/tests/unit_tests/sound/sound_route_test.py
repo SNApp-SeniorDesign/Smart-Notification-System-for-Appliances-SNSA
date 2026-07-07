@@ -13,6 +13,8 @@ def test_register_sound_success(client: TestClient, headers, device):
     assert response.status_code == 201
     response_data = response.json()
     assert response_data["sound_name"] == "test_sound"
+    assert response_data["sound_file_url"].startswith("/uploads/sounds/")
+    assert response_data["sound_file_url"].endswith(".wav")
 
 
 def test_register_sound_duplicate_name(client: TestClient, headers, device):
@@ -160,3 +162,30 @@ def test_get_all_sound_empty(client: TestClient, headers, device):
 def test_get_all_sound_unauthorized(client: TestClient, device):
     response = client.get(f"/sound/{device.id}/all")
     assert response.status_code in (401, 403)
+
+
+# Update
+
+
+def test_sound_update(client: TestClient, headers, sound):
+    response = client.put(
+        f"/sound/{sound.device_id}/{sound.id}/update",
+        headers=headers,
+        data={
+            "sound_name": "New Sound",
+            "sound_status": "offline",
+        },
+        files={"file": ("new.wav", b"new test sound content", "audio/wav")},
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["id"] == sound.id
+    assert data["sound_name"] == "New Sound"
+    assert data["sound_status"] == "offline"
+
+    assert data["is_synced_to_device"] is False
+    assert data["profile_version"] == 2
+    assert data["sound_file_url"].startswith("/uploads/sounds/")
+    assert data["sound_file_url"].endswith(".wav")

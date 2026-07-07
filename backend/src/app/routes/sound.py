@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from typing import Annotated
 
 from app.exceptions.device import device_not_exist
+from app.exceptions.sound import sound_not_exist
 
 from app.services.user import user_service
 from app.services.sound import sound_service
@@ -18,7 +19,7 @@ from app.services.device import device_service
 from app.models.device import Device
 from app.models.user import User
 
-from app.schemas.sound import SoundResponse, SoundCreate
+from app.schemas.sound import SoundResponse, SoundCreate, SoundUpdate
 
 from app.core.database import get_db
 
@@ -94,3 +95,24 @@ async def get_sound_by_id(
     device_current: Annotated[Device, Depends(get_current_device_from_query)],
 ) -> SoundResponse:
     return sound_service.get_sound_by_id(db, sound_id)
+
+
+# Update
+
+
+@api_router.put(
+    "/{device_id}/{sound_id}/update",
+    response_model=SoundResponse,
+    status_code=status.HTTP_200_OK,
+)
+def update_sound(
+    sound_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    device_current: Annotated[Device, Depends(get_current_device_from_query)],
+    data: Annotated[SoundUpdate, Depends(SoundUpdate.as_form)],
+    file: Annotated[UploadFile | None, File()] = None,
+) -> SoundResponse | None:
+    sound_db = sound_service.get_sound_by_id(db, sound_id)
+    if sound_db.device_id != device_current.id:
+        sound_not_exist()
+    return sound_service.update_sound(db, sound_db, data, file)
