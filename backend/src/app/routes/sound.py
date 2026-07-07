@@ -72,6 +72,18 @@ async def register_sound(
 
 
 @api_router.get(
+    "/{device_id}/all",
+    response_model=list[SoundResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_all_sound(
+    db: Annotated[Session, Depends(get_db)],
+    device_current: Annotated[Device, Depends(get_current_device_from_query)],
+) -> list[SoundResponse]:
+    return sound_service.get_all_sound(db, device_current.id)
+
+
+@api_router.get(
     "/{device_id}/{sound_id}",
     response_model=SoundResponse,
     status_code=status.HTTP_200_OK,

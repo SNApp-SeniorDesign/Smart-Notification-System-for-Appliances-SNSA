@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
-
-
+from app.schemas.sound import SoundDB
+from app.repository.sound import SoundRepository
+from sqlalchemy.orm import Session
 # Post
 
 
@@ -112,3 +113,37 @@ def test_sound_get_by_id_fail(client: TestClient, headers, device):
     sound_response = client.get(f"/sound/{device.id}/9999", headers=headers)
     assert sound_response.status_code == 404
     assert sound_response.json() == {"detail": "Sound not found"}
+
+
+def test_get_all_sounds(client: TestClient, headers, device, db: Session):
+    sound_names = [
+        "Doorbell",
+        "Microwave",
+        "Washing Machine",
+    ]
+
+    created = []
+
+    for name in sound_names:
+        sound = SoundDB(
+            sound_name=name,
+            device_id=device.id,
+            sound_file_url=f"/uploads/sounds/{name}.wav",
+            is_on=True,
+            is_synced_to_device=False,
+            profile_version=1,
+            sound_status="monitoring",
+        )
+
+        created.append(SoundRepository.create_sound(db, sound))
+
+    response = client.get(f"/sound/{device.id}/all", headers=headers)
+
+    assert response is not None
+    assert response.status_code == 200
+
+    data = response.json()
+    assert len(data) == len(created)
+    return_names = {sound["sound_name"] for sound in data}
+
+    assert return_names == {"Doorbell", "Microwave", "Washing Machine"}
