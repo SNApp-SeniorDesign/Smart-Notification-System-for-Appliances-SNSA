@@ -164,6 +164,52 @@ def test_get_all_sound_unauthorized(client: TestClient, device):
     assert response.status_code in (401, 403)
 
 
+def test_get_all_unsynced_sounds(client: TestClient, headers, device, db: Session):
+    sound_names = [
+        "Doorbell",
+        "Microwave",
+        "Washing Machine",
+    ]
+
+    created = []
+
+    for name in sound_names:
+        sound = SoundDB(
+            sound_name=name,
+            device_id=device.id,
+            sound_file_url=f"/uploads/sounds/{name}.wav",
+            is_on=True,
+            is_synced_to_device=False,
+            profile_version=1,
+            sound_status="monitoring",
+        )
+
+        created.append(SoundRepository.create_sound(db, sound))
+
+    sound_sync = SoundDB(
+        sound_name="SyncSound",
+        device_id=device.id,
+        sound_file_url="/uploads/sounds/SyncSound.wav",
+        is_on=True,
+        is_synced_to_device=True,
+        profile_version=1,
+        sound_status="monitoring",
+    )
+
+    SoundRepository.create_sound(db, sound_sync)
+
+    response = client.get(f"/sound/{device.id}/all/unsynced", headers=headers)
+
+    assert response is not None
+    assert response.status_code == 200
+
+    data = response.json()
+    assert len(data) == len(created)
+    return_names = {sound["sound_name"] for sound in data}
+
+    assert return_names == {"Doorbell", "Microwave", "Washing Machine"}
+
+
 # Update
 
 

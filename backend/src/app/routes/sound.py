@@ -97,6 +97,18 @@ async def get_sound_by_id(
     return sound_service.get_sound_by_id(db, sound_id)
 
 
+@api_router.get(
+    "/{device_id}/all/unsynced",
+    response_model=list[SoundResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_all_unsynced_sound(
+    db: Annotated[Session, Depends(get_db)],
+    device_current: Annotated[Device, Depends(get_current_device_from_query)],
+) -> list[SoundResponse]:
+    return sound_service.get_all_unsynced_sound(db, device_current.id)
+
+
 # Update
 
 
