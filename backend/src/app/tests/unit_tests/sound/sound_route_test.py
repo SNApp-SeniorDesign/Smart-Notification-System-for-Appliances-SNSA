@@ -235,3 +235,14 @@ def test_sound_update(client: TestClient, headers, sound):
     assert data["profile_version"] == 2
     assert data["sound_file_url"].startswith("/uploads/sounds/")
     assert data["sound_file_url"].endswith(".wav")
+
+
+# Delete
+def test_delete_sound_success(client: TestClient, db, sound, headers):
+    response = client.delete(
+        f"/sound/{sound.device_id}/{sound.id}/delete", headers=headers
+    )
+
+    assert response.status_code == 204
+    get_response = client.get(f"/sound/{sound.device_id}/{sound.id}", headers=headers)
+    assert get_response.status_code == 404

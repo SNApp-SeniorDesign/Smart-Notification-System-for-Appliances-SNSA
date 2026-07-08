@@ -85,6 +85,18 @@ async def get_all_sound(
 
 
 @api_router.get(
+    "/{device_id}/all/unsynced",
+    response_model=list[SoundResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_all_unsynced_sound(
+    db: Annotated[Session, Depends(get_db)],
+    device_current: Annotated[Device, Depends(get_current_device_from_query)],
+) -> list[SoundResponse]:
+    return sound_service.get_all_unsynced_sound(db, device_current.id)
+
+
+@api_router.get(
     "/{device_id}/{sound_id}",
     response_model=SoundResponse,
     status_code=status.HTTP_200_OK,
@@ -95,18 +107,6 @@ async def get_sound_by_id(
     device_current: Annotated[Device, Depends(get_current_device_from_query)],
 ) -> SoundResponse:
     return sound_service.get_sound_by_id(db, sound_id)
-
-
-@api_router.get(
-    "/{device_id}/all/unsynced",
-    response_model=list[SoundResponse],
-    status_code=status.HTTP_200_OK,
-)
-async def get_all_unsynced_sound(
-    db: Annotated[Session, Depends(get_db)],
-    device_current: Annotated[Device, Depends(get_current_device_from_query)],
-) -> list[SoundResponse]:
-    return sound_service.get_all_unsynced_sound(db, device_current.id)
 
 
 # Update
@@ -128,3 +128,19 @@ def update_sound(
     if sound_db.device_id != device_current.id:
         sound_not_exist()
     return sound_service.update_sound(db, sound_db, data, file)
+
+
+# Delete
+
+
+@api_router.delete(
+    "/{device_id}/{sound_id}/delete", status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_sound(
+    sound_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    device_current: Annotated[Device, Depends(get_current_device_from_query)],
+) -> None:
+    db_sound = sound_service.get_sound_by_id(db, sound_id)
+    sound_service.delete_sound(db, db_sound)
+    return None
