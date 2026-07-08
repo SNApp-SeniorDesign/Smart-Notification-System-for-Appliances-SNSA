@@ -47,7 +47,7 @@ class SoundRepository:
     def get_all_unsynced_sound(db: Session, device_id: int) -> list[Sound]:
         return (
             db.query(Sound)
-            .filter(Sound.device_id == device_id, Sound.is_synced_to_device is False)
+            .filter(Sound.device_id == device_id, Sound.is_synced_to_device.is_(False))
             .all()
         )
 

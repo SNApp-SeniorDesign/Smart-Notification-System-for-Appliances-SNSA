@@ -33,6 +33,10 @@ class SoundService:
         device_sound = self.repository.get_all_sound(db, device_id)
         return device_sound
 
+    def get_all_unsynced_sound(self, db: Session, device_id: int) -> list[Sound] | None:
+        device_sound = self.repository.get_all_unsynced_sound(db, device_id)
+        return device_sound
+
     def get_sound_by_id(self, db: Session, sound_id: int) -> Sound | None:
         device_sound = self.repository.get_by_id(db, sound_id)
         if device_sound is None:

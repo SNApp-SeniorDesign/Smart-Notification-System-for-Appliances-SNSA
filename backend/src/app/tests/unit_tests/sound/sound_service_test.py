@@ -71,6 +71,37 @@ def test_get_all_sound_success(service, db):
     assert len(result) == 3
 
 
+def test_get_all_unsynced_sound_success(service, db):
+    device_id = 1
+
+    fake_sounds = [
+        SimpleNamespace(
+            id=1,
+            sound_name="Doorbell",
+            is_synced_to_device=False,
+        ),
+        SimpleNamespace(
+            id=2,
+            sound_name="Microwave",
+            is_synced_to_device=False,
+        ),
+        SimpleNamespace(
+            id=3,
+            sound_name="Washing Machine",
+            is_synced_to_device=False,
+        ),
+    ]
+
+    service.repository.get_all_unsynced_sound.return_value = fake_sounds
+
+    result = service.get_all_unsynced_sound(db, device_id)
+
+    service.repository.get_all_unsynced_sound.assert_called_once_with(db, device_id)
+
+    assert result == fake_sounds
+    assert len(result) == 3
+
+
 def test_get_all_sound_empty(service, db):
     device_id = 1
 

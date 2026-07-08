@@ -88,20 +88,38 @@ def test_get_all_sound(db: Session, device):
 
 def test_get_all_unsynced_sound(db: Session, device):
     expected_sound = [
-        ("testsound", "test-audio-files/testSound.wav"),
-        ("Soundtest", "test-audio-files/Soundtest.wav"),
-        ("Testsound", "test-audio-files/Test123.wav"),
+        ("testsound", "test-audio-files/testSound.wav", False),
+        ("Soundtest", "test-audio-files/Soundtest.wav", False),
+        ("Testsound", "test-audio-files/Test123.wav", False),
     ]
 
-    for sound_name, sound_file_url in expected_sound:
+    for sound_name, sound_file_url, is_synced in expected_sound:
         SoundRepository.create_sound(
             db,
             SoundDB(
                 sound_name=sound_name,
                 device_id=device.id,
                 sound_file_url=sound_file_url,
+                is_synced_to_device=is_synced,
+                sound_status="monitoring",
+                is_on=True,
+                profile_version=1,
             ),
         )
+
+    SoundRepository.create_sound
+    (
+        db,
+        SoundDB(
+            sound_name="SyncedSound",
+            device_id=device.id,
+            sound_file_url="test-audio-files/SyncedSound.wav",
+            is_synced_to_device=True,
+            sound_status="monitoring",
+            is_on=True,
+            profile_version=1,
+        ),
+    )
 
     actual_sound_list = SoundRepository.get_all_unsynced_sound(db, device.id)
 
@@ -109,10 +127,15 @@ def test_get_all_unsynced_sound(db: Session, device):
     assert len(actual_sound_list) == len(expected_sound)
 
     actual_sound = [
-        (sound.sound_name, sound.sound_file_url) for sound in actual_sound_list
+        (
+            sound.sound_name,
+            sound.sound_file_url,
+            sound.is_synced_to_device,
+        )
+        for sound in actual_sound_list
     ]
 
-    assert actual_sound == expected_sound
+    assert set(actual_sound) == set(expected_sound)
 
 
 # Update
