@@ -27,7 +27,7 @@ def create_device(
     data: DeviceCreate,
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(user_service.get_current_user)],
-):
+) -> DeviceResponse:
     return device_service.register_device(
         db=db, device_db=data, user_id=current_user.id
     )
@@ -42,7 +42,7 @@ def create_device(
 def get_all_devices(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(user_service.get_current_user)],
-):
+) -> list[DeviceResponse]:
     return device_service.get_all_device(db=db, user_id=current_user.id)
 
 
@@ -53,7 +53,7 @@ def get_device_by_id(
     device_id: int,
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(user_service.get_current_user)],
-):
+) -> DeviceResponse:
     return device_service.get_by_device_id(
         db=db, user_id=current_user.id, device_id=device_id
     )
@@ -68,7 +68,7 @@ def get_device_with_sounds(
     device_id: int,
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(user_service.get_current_user)],
-):
+) -> DeviceWithSounds:
     return device_service.get_device_with_sounds(
         db=db, user_id=current_user.id, device_id=device_id
     )
@@ -83,7 +83,7 @@ def update_device(
     data: DeviceUpdate,
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(user_service.get_current_user)],
-):
+) -> DeviceResponse:
     db_device = device_service.get_by_device_id(
         db=db, user_id=current_user.id, device_id=device_id
     )
