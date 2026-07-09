@@ -3,26 +3,33 @@
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { SignForm } from "@/components/useComp/UseSignForm"
-import * as React from "react"
-import { useState } from "react"
 
+type DialogSigninProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
 
+  onRegisterSuccess?: () => void
 
-export function UseDialSign()
+  onAutoLoginSuccess? : () => void
+}
+
+export function UseDialSign({
+  open,
+  onOpenChange,
+  onRegisterSuccess,
+  onAutoLoginSuccess
+}: DialogSigninProps)
 {  
-  const [open, setOpen] = useState(false)
   return (
 //Dialog component are open
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogTrigger
           render={
             <Button>
@@ -32,12 +39,15 @@ export function UseDialSign()
         />
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create your Account</DialogTitle>
+            <DialogTitle>Create your SNSA Account</DialogTitle>
             <DialogDescription>
                 Enter your email, username, and password to create an account
             </DialogDescription>
           </DialogHeader>
-            <SignForm onSuccess={() => setOpen(false)} />
+            <SignForm
+              onRegisterSuccess={onRegisterSuccess}
+              onAutoLoginSuccess={onAutoLoginSuccess}
+            />
         </DialogContent>
     </Dialog>
   )
