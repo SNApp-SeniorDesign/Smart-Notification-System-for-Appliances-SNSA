@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { UseDialSign } from "@/components/useComp/UseDialSign";
-import {UseDeleteButton} from "@/components/useComp/UseDeleteButton"
-import {UseDialLog} from "@/components/useComp/UseDialLog"
+import { Header } from "@/components/useComp/UseHeader";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -37,9 +35,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}
-        < UseDialSign />
-        < UseDialLog />
-        < UseDeleteButton />
+        < Header />
         < Toaster />
       </body>
     </html>
