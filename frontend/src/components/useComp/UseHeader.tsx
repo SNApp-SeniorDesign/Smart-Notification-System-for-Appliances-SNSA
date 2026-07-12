@@ -82,7 +82,14 @@ export function Header(){
                         <UseDeleteButton/>
                     ): (
                         <>
-                            <UseDialLog/>
+                            <UseDialLog
+                                open={loginOpen}
+                                onOpenChange={setLoginOpen}
+                                onSwitchToSignup={() => {
+                                    setLoginOpen(false)
+                                    setRegisterOpen(true)
+                                }}
+                            />
                             <UseDialSign
                                 open={registerOpen}
                                 onOpenChange={setRegisterOpen}
