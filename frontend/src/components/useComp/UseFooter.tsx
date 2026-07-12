@@ -5,7 +5,7 @@ import Link from "next/link"
 export function Footer(){
     return(
         <footer>
-            <div className="flex items-center gap-4 w-full h-fit">
+            <div className="flex items-center gap-4 w-full h-auto">
                 <Link href="/">
                     Home
                 </Link>
