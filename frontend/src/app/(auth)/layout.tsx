@@ -3,6 +3,7 @@
 import {useState, useEffect} from "react"
 import {useRouter} from "next/navigation"
 import {getToken, clearToken} from "@/lib/auth"
+import {Footer} from "@/components/useComp/UseFooter"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -18,6 +19,7 @@ export default function AuthLayout({children}: {children: React.ReactNode}){
 
             if(!token){
                 router.replace("/")
+                setLoading(false)
                 return
             }
 
@@ -36,14 +38,16 @@ export default function AuthLayout({children}: {children: React.ReactNode}){
                     return
                 }
                 setIsAuthenticated(true)
-            } catch (error){
+            } catch {
                 clearToken()
                 router.replace("/")
             } finally{
                 setLoading(false)
             }
-            checkAuth()
+            
+
         } 
+        checkAuth()
     }, [router])
 
     if(loading){
@@ -54,5 +58,14 @@ export default function AuthLayout({children}: {children: React.ReactNode}){
         return null
     }
 
-    return <>(children)</>
+    return( 
+        <>
+            <div className="min-h-screen flex flex-col">
+                <main className="flex-1">
+                    {children}
+                </main>
+                <Footer/>
+            </div>
+        </>
+    )
 }
