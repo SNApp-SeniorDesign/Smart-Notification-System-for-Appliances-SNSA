@@ -6,7 +6,7 @@ export function Footer(){
     return(
         <footer>
             <div className="flex items-center gap-4 w-full h-auto">
-                <Link href="/">
+                <Link href="/dashboard">
                     Home
                 </Link>
                 <Link href="/setting">
