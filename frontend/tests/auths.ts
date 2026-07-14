@@ -28,6 +28,8 @@ export async function signUp(page: Page, user: ReturnType<typeof MakeUser>){
     await expect(page.getByText("Account created - welcome")).toBeVisible()
 
     await expect(page.getByRole("dialog")).not.toBeVisible()
+
+    await expect(page).toHaveURL(/\/dashboard/)
 }
 
 export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
@@ -73,5 +75,19 @@ export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
 
     await expect.poll(async () => {
         return await page.evaluate(() => localStorage.getItem("token"))
+    }).toBeNull()
+}
+
+export async function LogOut(page: Page, user: ReturnType<typeof MakeUser>){
+    
+    await expect(page).toHaveURL(/dashboard/)
+    await page.getByRole("button", { name: "Log-Out"}).first().click()
+    await expect(
+        page.getByText(/Log Out Successfully|Logged out/i)
+    ).toBeVisible()
+
+    await expect(page).toHaveURL(/\/$/)
+    await expect.poll(async () => {
+        return await page.evaluate(() => localStorage.getItem("token")) 
     }).toBeNull()
 }

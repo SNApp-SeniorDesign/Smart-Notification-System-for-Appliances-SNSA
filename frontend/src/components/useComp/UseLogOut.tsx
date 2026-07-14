@@ -33,7 +33,7 @@ async function handleLogOut() {
 
 export function LogOutButton(){
     return (
-        <Button variant="destructive" onClick={handleLogOut}>
+        <Button onClick={handleLogOut}>
             Log-Out
         </Button>
     )

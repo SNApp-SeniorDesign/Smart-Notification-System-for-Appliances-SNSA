@@ -7,7 +7,7 @@ test("user can delete their account", async ({ page }) => {
     const user = MakeUser();
 
     await signUp(page, user);
-    await expect(page).toHaveURL(/\/dashboard/)
+
     
     await page.getByRole("link", { name: "Setting"}).click()
     await expect(page).toHaveURL(/\/setting/)
