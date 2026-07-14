@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { MakeUser, signUp, Login } from "./auths";
+import { MakeUser, signUp} from "./auths";
 
 test("user can delete their account", async ({ page }) => {
   
@@ -7,7 +7,10 @@ test("user can delete their account", async ({ page }) => {
     const user = MakeUser();
 
     await signUp(page, user);
-    await Login(page, user);
+    await expect(page).toHaveURL(/\/dashboard/)
+    
+    await page.getByRole("link", { name: "Setting"}).click()
+    await expect(page).toHaveURL(/\/setting/)
 
     page.once("dialog", async (dialog) => {
         expect(dialog.message()).toContain(
@@ -22,4 +25,10 @@ test("user can delete their account", async ({ page }) => {
     await expect(
         page.getByText(/Account deleted successfully/i)
     ).toBeVisible();
+
+    await expect(page).toHaveURL(/\/$/)
+
+    await expect.poll(async () => {
+        return await page.evaluate(() => localStorage.getItem("token"))
+    }).toBeNull()
 });

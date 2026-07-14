@@ -13,20 +13,21 @@ export function MakeUser(){
 export async function signUp(page: Page, user: ReturnType<typeof MakeUser>){
 
     await page.getByRole("button", { name: "Sign Up"}).first().click()
-
+    
     await expect(
-      page.getByRole("heading", { name: "Create your Account" })
+      page.getByRole("heading", { name: "Create your SNSA Account" })
     ).toBeVisible();
 
-    await page.getByRole("button", { name: "Sign Up" }).first().click();
-    await page.locator("#email").fill(user.email);
-    await page.locator("#username").fill(user.username);
-    await page.locator("#password").fill(user.password);
-    await page.getByRole("button", { name: "Sign Up" }).last().click();
+    await page.getByLabel("Email").fill(user.email)
+    await page.getByLabel("Username").fill(user.username)
+    await page.getByLabel("Password", { exact: true }).fill(user.password)
+    await page.getByLabel("Confirm Password").fill(user.password)
+
+    await page.getByRole("button", {name: "Sign Up"}).click()
+
+    await expect(page.getByText("Account created - welcome")).toBeVisible()
 
     await expect(page.getByRole("dialog")).not.toBeVisible()
-    
-
 }
 
 export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
@@ -51,6 +52,9 @@ export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
 }
 
 export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
+    await page.getByRole("link", { name: "Setting"}).click()
+    await expect(page).toHaveURL(/\/setting/)
+
     page.once("dialog", async (dialog) => {
         expect(dialog.message()).toContain(
         "Are you sure you want to delete your account?"
@@ -60,4 +64,14 @@ export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
     });
 
     await page.getByRole("button", { name: "Delete Account" }).click();
+
+    await expect(
+        page.getByText(/Account deleted successfully/i)
+    ).toBeVisible();
+
+    await expect(page).toHaveURL(/\/$/)
+
+    await expect.poll(async () => {
+        return await page.evaluate(() => localStorage.getItem("token"))
+    }).toBeNull()
 }
