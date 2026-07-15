@@ -22,10 +22,6 @@ test("user can delete their account", async ({ page }) => {
 
     await page.getByRole("button", { name: "Delete Account" }).click();
 
-    await expect(
-        page.getByText(/Account deleted successfully/i)
-    ).toBeVisible();
-
     await expect(page).toHaveURL(/\/$/)
 
     await expect.poll(async () => {

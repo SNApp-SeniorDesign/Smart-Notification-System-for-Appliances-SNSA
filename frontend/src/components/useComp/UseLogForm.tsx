@@ -158,6 +158,7 @@ export function LogForm({
                   <input
                     id="rememberMe"
                     type="checkbox"
+                    checked={field.value}
                     onChange={(e) => field.onChange(e.target.checked)}
                     onBlur={field.onBlur}
                     ref={field.ref}

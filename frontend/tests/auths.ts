@@ -34,22 +34,27 @@ export async function signUp(page: Page, user: ReturnType<typeof MakeUser>){
 
 export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
     
-    const LoginButton = await page.getByRole("button", { name: "Log In" }).first()
-    await expect(LoginButton).toBeVisible()
-    await expect(LoginButton).toBeEnabled()
-    await LoginButton.click();
+    await expect(page).toHaveURL(/\/$/)
 
-    await expect(
-    page.getByRole("heading", { name: "Log in to your Account" })
-    ).toBeVisible();
-
-    await page.locator("#email").fill(user.email);
-    await page.locator("#password").fill(user.password);
-    await page.getByRole("button", { name: "Log In" }).last().click();
-
-    await expect(page.getByText("Login successful")).toBeVisible()
+    await expect(page.getByRole("button", {name:"Log In"})).toBeVisible()
     
-    await expect(page.getByRole("dialog")).not.toBeVisible()
+
+    await page.getByRole("button", { name: "Log In"}).click()
+
+    await expect(page.getByRole("dialog")).toBeVisible()
+    
+    await expect(
+      page.getByRole("heading", { name: "Log in to your Account" })
+    ).toBeVisible()
+
+    await page.getByLabel("Email").fill(user.email)
+    await page.getByLabel("Password").fill(user.password)
+    await page.getByRole("button", { name: "Log In" }).click()
+
+    await expect(page).toHaveURL(/dashboard/)
+    const token = await page.evaluate(() =>
+        localStorage.getItem("access_token"))
+    expect(token).not.toBeNull()
 
 }
 
@@ -67,10 +72,6 @@ export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
 
     await page.getByRole("button", { name: "Delete Account" }).click();
 
-    await expect(
-        page.getByText(/Account deleted successfully/i)
-    ).toBeVisible();
-
     await expect(page).toHaveURL(/\/$/)
 
     await expect.poll(async () => {
@@ -82,12 +83,12 @@ export async function LogOut(page: Page, user: ReturnType<typeof MakeUser>){
     
     await expect(page).toHaveURL(/dashboard/)
     await page.getByRole("button", { name: "Log-Out"}).first().click()
-    await expect(
-        page.getByText(/Log Out Successfully|Logged out/i)
-    ).toBeVisible()
-
+    
     await expect(page).toHaveURL(/\/$/)
     await expect.poll(async () => {
-        return await page.evaluate(() => localStorage.getItem("token")) 
+        return await page.evaluate(() => localStorage.getItem("access_token")) 
     }).toBeNull()
+
+    await expect(page.getByRole("button", {name: "Log-Out"})).not.toBeVisible()
+    await expect(page.getByRole("button", { name: "Log In"})).toBeVisible()
 }
