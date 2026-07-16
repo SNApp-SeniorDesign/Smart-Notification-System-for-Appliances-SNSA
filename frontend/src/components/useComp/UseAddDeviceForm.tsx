@@ -35,10 +35,14 @@ const formSchema = z.object({
                   .min(1,"Device Name is required")
 })
 
+type AddDeviceFormProps = {
+  onSuccess?: () => void
+}
 
-export function LogForm({
+export function AddDeviceForm({
+  onSuccess,
   ...props
-}) {
+}: AddDeviceFormProps) {
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -118,7 +122,7 @@ export function LogForm({
           position: "top-center",
         })
         form.reset()
-        
+        onSuccess?.()
       } catch (err) {
         console.error(err)
         toast.error("Failed to add device. Please try again", {
@@ -137,7 +141,7 @@ export function LogForm({
         <CardHeader>
         </CardHeader>
         <CardContent>
-          <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
+          <form id="Add-Device-form" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
                 name="device_name"
