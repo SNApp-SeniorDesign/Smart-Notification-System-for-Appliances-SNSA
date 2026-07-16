@@ -20,7 +20,12 @@ import {Controller, useForm} from "react-hook-form"
 import * as z from "zod"
 import { toast } from "sonner"
 import { getToken } from "@/lib/auth"
-
+import {
+  SNSA_SERVICE_UUID,
+  SERIAL_NUMBER_UUID,
+  IS_PAIRED_UUID
+} 
+from "@/lib/bluetooth"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -50,52 +55,77 @@ export function LogForm({
         })
         return
       }
+
+      let device: SNSABluetoothDevice | undefined;
+      
       try {
-        const device = await navigator.bluetooth.requestDevice({
+        device = await navigator.bluetooth.requestDevice({
             filters: [
-              { namePrefix: "SNSA"}
+              { services: [SNSA_SERVICE_UUID]},
             ]
         })
 
         const server = await device.gatt?.connect()
 
-        const serialNumber = "..."
+        if(!server){
+          throw new Error("Unable to connect SNSA device.")
+        }
 
-      
+        const service = await server.getPrimaryService(SNSA_SERVICE_UUID);
+
+        //Read Pairing status
+        const pairedChar = await service.getCharacteristic(IS_PAIRED_UUID)
+        const pairedValue = await pairedChar.readValue()
+        const is_paired = pairedValue.getUint8(0) === 1
+        
+        if(is_paired){
+          toast.error("Device already paired to another account",{
+            position:"top-center",
+          })
+          return
+        }
+        
+        //Read Serial Number
+        const serialChar = await service.getCharacteristic(SERIAL_NUMBER_UUID)
+        const serialValue = await serialChar.readValue()
+        const serialNumber = new TextDecoder().decode(serialValue)
+
         const res = await fetch(`${API_URL}/device/`,{
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
+                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            body: new URLSearchParams({
+            body: JSON.stringify({
               device_name: data.device_name,
               serial_number: serialNumber,
-            }).toString(),
+            }),
           })
 
         if(!res.ok){
           const errorData = await res.json()
-          toast.error(`Adding device failed: ${errorData?.message || "Unknown error"}`, {
+          toast.error(`Adding device failed: ${errorData?.detail || "Unknown error"}`, {
             position: "top-center",
           })
           return
         }
 
-        if(res.status !== 201){
-          toast.error("Unexpected response from server. Please try again later.",{
-              position: "top-center",
-          })
-        }
-    
+        await pairedChar.writeValue(
+          Uint8Array.of(1)
+        )
+
         toast.success("Device Add Successful", {
           position: "top-center",
         })
         form.reset()
-      } catch {
+        
+      } catch (err) {
+        console.error(err)
         toast.error("Failed to add device. Please try again", {
           position: "top-center",
         })
+      } finally {
+          device?.gatt?.disconnect()
       }
   
 }
