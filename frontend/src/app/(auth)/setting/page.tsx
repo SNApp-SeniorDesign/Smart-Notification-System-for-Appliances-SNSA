@@ -1,8 +1,8 @@
 "use client"
 
-import {Footer} from "@/components/useComp/UseFooter"
-import {UseDeleteButton} from "@/components/useComp/UseDeleteButton"
-import {LogOutButton} from "@/components/useComp/UseLogOut"
+import {Footer} from "@/components/useComp/general/UseFooter"
+import {UseDeleteButton} from "@/components/useComp/user/UseDeleteButton"
+import {LogOutButton} from "@/components/useComp/user/UseLogOut"
 
 
 export default function Setting(){

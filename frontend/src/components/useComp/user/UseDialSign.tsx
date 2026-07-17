@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { SignForm } from "@/components/useComp/UseSignForm"
+import { SignForm } from "@/components/useComp/user/UseSignForm"
 
 type DialogSigninProps = {
   open: boolean

@@ -2,10 +2,10 @@
 
 import Link from "next/link"
 import { usePathname} from 'next/navigation'
-import { UseDialSign } from "@/components/useComp/UseDialSign";
-import {UseDeleteButton} from "@/components/useComp/UseDeleteButton"
-import {UseDialLog} from "@/components/useComp/UseDialLog"
-import {LogOutButton} from "@/components/useComp/UseLogOut"
+import { UseDialSign } from "@/components/useComp/user/UseDialSign";
+import {UseDeleteButton} from "@/components/useComp/user/UseDeleteButton"
+import {UseDialLog} from "@/components/useComp/user/UseDialLog"
+import {LogOutButton} from "@/components/useComp/user/UseLogOut"
 import {getToken} from "@/lib/auth"
 import {Button} from "@/components/ui/button"
 import { cn } from "@/lib/utils"

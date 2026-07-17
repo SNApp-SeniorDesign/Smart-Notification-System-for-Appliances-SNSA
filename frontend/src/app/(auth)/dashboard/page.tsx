@@ -1,6 +1,6 @@
 "use client"
 
-import { CollapsibleDeviceMenu } from "@/components/useComp/UseDeviceMenu"
+import { CollapsibleDeviceMenu } from "@/components/useComp/device/UseDeviceMenu"
 
 
 export default function Dashboard(){
