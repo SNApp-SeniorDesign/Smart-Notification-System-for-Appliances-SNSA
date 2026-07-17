@@ -11,10 +11,21 @@ import {
 } from "@/components/ui/dialog"
 import { AddDeviceForm } from "@/components/useComp/UseAddDeviceForm"
 
+
+type Device = {
+  id: number
+  device_name: string
+  serial_number: string
+  user_id: number
+  device_status: string
+  is_paired: boolean
+}
+
 type DialDeviceProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   showTrigger?: boolean
+  onSuccess?: (device: Device) => void
 }
 
 
@@ -22,6 +33,7 @@ export function UseDialAddDevice({
   open,
   onOpenChange,
   showTrigger = true,
+  onSuccess,
 }: DialDeviceProps)
 {  
   return (
@@ -45,7 +57,10 @@ export function UseDialAddDevice({
             </DialogDescription>
           </DialogHeader>
             <AddDeviceForm
-              onSuccess={() => onOpenChange(false)}
+              onSuccess={(device) => {
+                onSuccess?.(device)
+                onOpenChange(false)
+              }}
             />
         </DialogContent>
     </Dialog>

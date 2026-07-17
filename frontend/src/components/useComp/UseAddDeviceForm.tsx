@@ -35,8 +35,18 @@ const formSchema = z.object({
                   .min(1,"Device Name is required")
 })
 
+
+type Device = {
+  id: number
+  device_name: string
+  serial_number: string
+  user_id: number
+  device_status: string
+  is_paired: boolean
+}
+
 type AddDeviceFormProps = {
-  onSuccess?: () => void
+  onSuccess?: (device: Device) => void
 }
 
 export function AddDeviceForm({
@@ -51,6 +61,7 @@ export function AddDeviceForm({
         }
     })
     async function onSubmit(data: z.infer<typeof formSchema>){
+      
       const token = getToken();  
       
       if (!("bluetooth" in navigator)) {
@@ -114,15 +125,19 @@ export function AddDeviceForm({
           return
         }
 
+        const newDevice: Device = await res.json()
+
         await pairedChar.writeValue(
           Uint8Array.of(1)
         )
+
+
 
         toast.success("Device Add Successful", {
           position: "top-center",
         })
         form.reset()
-        onSuccess?.()
+        onSuccess?.(newDevice)
       } catch (err) {
         console.error(err)
         toast.error("Failed to add device. Please try again", {

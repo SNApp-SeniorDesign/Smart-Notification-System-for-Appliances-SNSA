@@ -82,6 +82,11 @@ export function CollapsibleDeviceMenu() {
                 <UseDialAddDevice 
                     open={DeviceOpen}
                     onOpenChange = {SetDeviceOpen}
+                    onSuccess={(newDevice) => {
+                        setDevices((prev) => [...prev, newDevice])
+                        setSelectedDevice(newDevice)
+                        setIsOpen(false)
+                    }}
                 />
             </div>
       </CollapsibleContent>
