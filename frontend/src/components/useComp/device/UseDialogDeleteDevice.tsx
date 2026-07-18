@@ -21,7 +21,7 @@ type DeleteDeviceDialogProps = {
     deviceID: number
 }
 
-export function AlertDialogDemo({
+export function AlertDialogDeviceDelete({
     deviceID,
 }: DeleteDeviceDialogProps) {
 
@@ -60,7 +60,7 @@ export function AlertDialogDemo({
   return (
     <AlertDialog>
       <AlertDialogTrigger render={
-        <Button variant="destructive"> Delete Device </Button>
+        <Button type= "button" variant="destructive"> Delete Device </Button>
         } />
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -73,8 +73,11 @@ export function AlertDialogDemo({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
+            type="button"
             onClick={handleDeleteDevice}
-          >Delete Device</AlertDialogAction>
+            >
+                Delete Device
+            </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
