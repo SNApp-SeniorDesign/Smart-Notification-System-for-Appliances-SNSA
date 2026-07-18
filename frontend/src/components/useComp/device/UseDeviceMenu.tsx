@@ -11,7 +11,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 
-import { UseDialAddDevice } from "@/components/useComp/UseDialogAddDevice"
+import { UseDialAddDevice } from "@/components/useComp/device/UseDialogAddDevice"
 import { getToken } from "@/lib/auth"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL

@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { AddDeviceForm } from "@/components/useComp/UseAddDeviceForm"
+import { AddDeviceForm } from "@/components/useComp/device/UseAddDeviceForm"
 
 
 type Device = {
