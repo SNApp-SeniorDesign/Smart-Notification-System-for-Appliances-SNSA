@@ -13,6 +13,7 @@ import {
 
 import { UseDialAddDevice } from "@/components/useComp/device/UseDialogAddDevice"
 import { getToken } from "@/lib/auth"
+import {DialogDeviceForm} from "@/components/useComp/device/UseDialogDeviceForm"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
@@ -31,6 +32,11 @@ export function CollapsibleDeviceMenu() {
   const [devices, setDevices] = React.useState<Device[]>( [] )
   const [selectedDevice, setSelectedDevice] = React.useState<Device | null> (null)
 
+  const [deviceFormOpen, setDeviceFormOpen] = React.useState(false)
+  const [deviceForForm, setDeviceForForm] = React.useState<Device | null>(null)
+  const pressTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const longPressTriggered = React.useRef(false)
+
   async function fetchDevices() {
     const token = getToken()
 
@@ -46,6 +52,39 @@ export function CollapsibleDeviceMenu() {
     const data = await res.json()
     setDevices(data)    
   }
+
+  //function to run when user hold the device name
+  function handlePointerDown(device: Device){
+    longPressTriggered.current = false
+
+    pressTimer.current = setTimeout(() => {
+        longPressTriggered.current = true
+        setDeviceForForm(device)
+        setDeviceFormOpen(true)
+    }, 700)
+  }
+
+  //function when user let go the device name
+  function handlePointerUp(device: Device){
+    if (pressTimer.current) {
+        clearTimeout(pressTimer.current)
+        pressTimer.current = null
+    }
+
+    if(!longPressTriggered.current){
+        setSelectedDevice(device)
+        setIsOpen(false)
+    }
+  }
+
+  //function when user move away before timer finish
+  function cancelLongPress(){
+    if (pressTimer.current){
+        clearTimeout(pressTimer.current)
+        pressTimer.current = null
+    }
+  }
+
   React.useEffect(() => {
         if (isOpen) {
             fetchDevices()
@@ -70,14 +109,22 @@ export function CollapsibleDeviceMenu() {
                 <Button
                     key={device.id}
                     variant="ghost"
-                    onClick = { () => {
-                        setSelectedDevice(device)
-                        setIsOpen(false)
-                    }}
+                    onPointerDown={() => handlePointerDown(device)}
+                    onPointerUp={() => handlePointerUp(device)}
+                    onPointerLeave={cancelLongPress}
+                    onPointerCancel={cancelLongPress}
                 >
                     {device.device_name}
                 </Button>
             ))}
+            {deviceForForm && (
+                <DialogDeviceForm
+                    open={deviceFormOpen}
+                    onOpenChange={setDeviceFormOpen}
+                    deviceID={deviceForForm.id}
+                    device_name={deviceForForm.device_name}
+                />
+            )}
             <div className="rounded-md px-4 py-2 text-sm">
                 <UseDialAddDevice 
                     open={DeviceOpen}
