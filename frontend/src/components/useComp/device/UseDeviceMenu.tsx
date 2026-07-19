@@ -108,6 +108,7 @@ export function CollapsibleDeviceMenu() {
             {devices.map((device) => (
                 <Button
                     key={device.id}
+                    type="button"
                     variant="ghost"
                     onPointerDown={() => handlePointerDown(device)}
                     onPointerUp={() => handlePointerUp(device)}
@@ -120,9 +121,14 @@ export function CollapsibleDeviceMenu() {
             {deviceForForm && (
                 <DialogDeviceForm
                     open={deviceFormOpen}
-                    onOpenChange={setDeviceFormOpen}
+                    onOpenChange={(open) => {
+                        setDeviceFormOpen(open)
+
+                        if(!open){
+                            setDeviceForForm(null)
+                        }
+                    }}
                     deviceID={deviceForForm.id}
-                    device_name={deviceForForm.device_name}
                 />
             )}
             <div className="rounded-md px-4 py-2 text-sm">

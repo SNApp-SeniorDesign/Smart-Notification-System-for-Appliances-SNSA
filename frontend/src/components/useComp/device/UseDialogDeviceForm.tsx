@@ -2,22 +2,22 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { DeviceForm } from "./UseDeviceForm"
 
 type DialogFormProps = {
-    deviceID: number
-    device_name: string,
+    deviceID: number,
+    open: boolean,
+    onOpenChange: (open: boolean) => void
 }
 
 export function DialogDeviceForm({
     deviceID,
-    device_name
+    open,
+    onOpenChange,
 }: DialogFormProps) {
   return (
-    <Dialog>
-        <DialogTrigger render={<Button variant="outline">{device_name}</Button>} />
+    <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-sm">
           <DeviceForm deviceID = {deviceID}/>
         </DialogContent>
