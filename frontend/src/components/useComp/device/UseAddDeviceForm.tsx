@@ -163,7 +163,7 @@ export function AddDeviceForm({
                 control={form.control}
                 render={({field, fieldState}) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="email">Device Name</FieldLabel>
+                    <FieldLabel htmlFor="device_name">Device Name</FieldLabel>
                     <Input
                       {...field}
                       id="device_name"
