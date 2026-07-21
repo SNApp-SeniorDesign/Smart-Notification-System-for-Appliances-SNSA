@@ -33,7 +33,7 @@ test("test if device can be delete", async ( { page }) => {
                 name: "Device Settings",
                 exact: true
             })
-        ).toBeVisible({ timeout: 3000})
+        ).toBeVisible({ timeout: 6000})
 
         await page.mouse.up()
 

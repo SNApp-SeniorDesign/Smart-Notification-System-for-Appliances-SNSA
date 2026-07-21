@@ -32,7 +32,7 @@ export function DialogDeviceForm({
 
     const timeout = window.setTimeout(() => {
       ignoreNextClose.current = false
-    }, 300)
+    }, 600)
 
     return () => window.clearTimeout(timeout)
   }, [open])
