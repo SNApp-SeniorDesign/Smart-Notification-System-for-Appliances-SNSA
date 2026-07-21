@@ -41,8 +41,6 @@ test("test if device can be delete", async ( { page }) => {
             hasText : "Device Settings"
         })
 
-        await page.pause()
-
         await expect(settingsDialog).toBeVisible()
 
         await settingsDialog.getByRole("button", {
