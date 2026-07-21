@@ -401,7 +401,7 @@ def test_delete_device(service, db):
             db_device=db_device,
         )
 
-    mock_delete_all_sound_files.assert_called_once_with(db, fake_sounds)
+    mock_delete_all_sound_files.assert_called_once_with(fake_sounds)
 
     service.repository.delete_device.assert_called_once_with(db, db_device)
     assert result is None

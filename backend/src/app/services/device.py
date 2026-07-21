@@ -89,7 +89,7 @@ class DeviceService:
         return self.repository.update_device(db, db_device)
 
     def delete_device(self, db: Session, db_device: Device) -> None:
-        sound_service.delete_all_sound_files(db, db_device.sounds)
+        sound_service.delete_all_sound_files(db_device.sounds)
         self.repository.delete_device(db, db_device)
 
 
