@@ -2,7 +2,7 @@ from app.repository.device import DeviceRepository
 from app.models.device import Device
 from app.schemas.device import DeviceDB, DeviceCreate, DeviceUpdate
 from app.exceptions.device import device_not_exist
-
+from app.services.sound import sound_service
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
@@ -89,6 +89,7 @@ class DeviceService:
         return self.repository.update_device(db, db_device)
 
     def delete_device(self, db: Session, db_device: Device) -> None:
+        sound_service.delete_all_sound_files(db, db_device.sounds)
         self.repository.delete_device(db, db_device)
 
 

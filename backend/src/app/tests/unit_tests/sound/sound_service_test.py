@@ -359,8 +359,8 @@ def test_delete_sound_all(service, db):
     ]
 
     service.delete_sound_file = Mock()
-    service.repository.delete_all_sound.return_value = None
-    result = service.delete_all_sound(db, fake_sounds)
+    service.repository.delete_all_sound_files.return_value = None
+    result = service.delete_all_sound_files(db, fake_sounds)
 
     service.delete_sound_file.assert_has_calls(
         [

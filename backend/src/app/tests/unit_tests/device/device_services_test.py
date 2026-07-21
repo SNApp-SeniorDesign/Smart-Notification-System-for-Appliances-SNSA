@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from fastapi import HTTPException
 from types import SimpleNamespace
 
@@ -371,8 +371,37 @@ def test_update_device_device_status_only(service, db):
 
 
 def test_delete_device(service, db):
-    db_device = Mock()
-    service.repository.delete_device.return_value = None
-    device_delete = service.delete_device(db, db_device)
+    fake_sounds = [
+        SimpleNamespace(
+            id=1,
+            sound_name="Doorbell",
+            sound_file_url="/uploads/sounds/sound_to_deleteOne.wav",
+        ),
+        SimpleNamespace(
+            id=2,
+            sound_name="Microwave",
+            sound_file_url="/uploads/sounds/sound_to_deleteTwo.wav",
+        ),
+        SimpleNamespace(
+            id=3,
+            sound_name="Washing Machine",
+            sound_file_url="/uploads/sounds/sound_to_deleteThree.wav",
+        ),
+    ]
+
+    db_device = SimpleNamespace(id=1, sounds=fake_sounds)
+
+    service.repository.delete_device = Mock()
+
+    with patch(
+        "app.services.device.sound_service.delete_all_sound_files"
+    ) as mock_delete_all_sound_files:
+        result = service.delete_device(
+            db=db,
+            db_device=db_device,
+        )
+
+    mock_delete_all_sound_files.assert_called_once_with(db, fake_sounds)
+
     service.repository.delete_device.assert_called_once_with(db, db_device)
-    assert device_delete is None
+    assert result is None
