@@ -119,5 +119,9 @@ class SoundService:
         self.delete_sound_file(db_sound.sound_file_url)
         self.repository.delete_sound(db, db_sound)
 
+    def delete_all_sound(self, db: Session, sounds: list[Sound]) -> None:
+        for sound in sounds:
+            self.delete_sound_file(sound.sound_file_url)
+
 
 sound_service = SoundService()

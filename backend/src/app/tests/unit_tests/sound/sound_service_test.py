@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 from fastapi import HTTPException, UploadFile
 from io import BytesIO
 from types import SimpleNamespace
@@ -328,4 +328,46 @@ def test_delete_sound(service, db):
     )
     service.repository.delete_sound.assert_called_once_with(db, sound)
 
+    assert result is None
+
+
+def test_delete_sound_all(service, db):
+    device_id_fake = 1
+
+    fake_sounds = [
+        SimpleNamespace(
+            id=1,
+            sound_name="Doorbell",
+            is_synced_to_device=False,
+            sound_file_url="/uploads/sounds/sound_to_deleteOne.wav",
+            device_id=device_id_fake,
+        ),
+        SimpleNamespace(
+            id=2,
+            sound_name="Microwave",
+            is_synced_to_device=False,
+            sound_file_url="/uploads/sounds/sound_to_deleteTwo.wav",
+            device_id=device_id_fake,
+        ),
+        SimpleNamespace(
+            id=3,
+            sound_name="Washing Machine",
+            is_synced_to_device=False,
+            sound_file_url="/uploads/sounds/sound_to_deleteThree.wav",
+            device_id=device_id_fake,
+        ),
+    ]
+
+    service.delete_sound_file = Mock()
+    service.repository.delete_all_sound.return_value = None
+    result = service.delete_all_sound(db, fake_sounds)
+
+    service.delete_sound_file.assert_has_calls(
+        [
+            call("/uploads/sounds/sound_to_deleteOne.wav"),
+            call("/uploads/sounds/sound_to_deleteTwo.wav"),
+            call("/uploads/sounds/sound_to_deleteThree.wav"),
+        ]
+    )
+    assert service.delete_sound_file.call_count == 3
     assert result is None
