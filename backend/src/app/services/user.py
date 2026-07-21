@@ -9,7 +9,7 @@ from app.core.auth import (
     get_password_hash,
     verify_password,
 )
-
+from app.services.sound import sound_service
 from fastapi import HTTPException, status, Depends
 from typing import Annotated
 
@@ -112,6 +112,9 @@ class UserService:
 
     # Delete
     def delete_user(self, db: Session, db_user: User) -> None:
+        for device in db_user.devices:
+            sound_service.delete_all_sound_files(device.sounds)
+
         self.repository.delete_user(db, db_user)
 
 

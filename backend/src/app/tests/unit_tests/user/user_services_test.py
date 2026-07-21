@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, call
 from fastapi import HTTPException
 from types import SimpleNamespace
 
@@ -361,8 +361,57 @@ def test_update_user_password_only(service, db):
 
 
 def test_delete_user(service, db):
-    db_user = Mock()
-    service.repository.detele_user.return_value = None
-    user_delete = service.delete_user(db, db_user)
-    service.repository.delete_user.assert_called_once_with(db, db_user)
-    assert user_delete is None
+    device_one_sounds = [
+        SimpleNamespace(
+            id=1,
+            sound_file_url="/uploads/sounds/doorbell.wav",
+        ),
+        SimpleNamespace(
+            id=2,
+            sound_file_url="/uploads/sounds/microwave.wav",
+        ),
+    ]
+
+    device_two_sounds = [
+        SimpleNamespace(
+            id=3,
+            sound_file_url="/uploads/sounds/washing-machine.wav",
+        ),
+    ]
+
+    fake_devices = [
+        SimpleNamespace(
+            id=1,
+            sounds=device_one_sounds,
+        ),
+        SimpleNamespace(
+            id=2,
+            sounds=device_two_sounds,
+        ),
+    ]
+
+    db_user = SimpleNamespace(
+        id=1,
+        devices=fake_devices,
+    )
+    service.repository.delete_user = Mock()
+
+    with patch(
+        "app.services.user.sound_service.delete_all_sound_files"
+    ) as mock_delete_all_sound_files:
+        result = service.delete_user(db=db, db_user=db_user)
+
+    mock_delete_all_sound_files.assert_has_calls(
+        [
+            call(device_one_sounds),
+            call(device_two_sounds),
+        ]
+    )
+
+    assert mock_delete_all_sound_files.call_count == 2
+
+    service.repository.delete_user.assert_called_once_with(
+        db,
+        db_user,
+    )
+    assert result is None
