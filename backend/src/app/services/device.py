@@ -34,7 +34,9 @@ class DeviceService:
     def get_by_device_id(
         self, db: Session, device_id: int, user_id: int
     ) -> Device | None:
-        user_device = self.repository.get_by_id(db, device_id, user_id)
+        user_device = self.repository.get_by_id(
+            db=db, user_id=user_id, device_id=device_id
+        )
         if user_device is None:
             device_not_exist()
         return user_device

@@ -18,11 +18,13 @@ import { Button } from "@/components/ui/button"
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 type DeleteDeviceDialogProps = {
-    deviceID: number
+    deviceID: number,
+    onDeleteSuccess:() => void
 }
 
 export function AlertDialogDeviceDelete({
     deviceID,
+    onDeleteSuccess,
 }: DeleteDeviceDialogProps) {
 
     async function handleDeleteDevice() {
@@ -49,6 +51,8 @@ export function AlertDialogDeviceDelete({
       toast.success("Device deleted successfully", {
         position: "top-center",
       })
+
+      onDeleteSuccess()
 
     } catch {
       toast.error("Failed to delete device. Please try again later.", {

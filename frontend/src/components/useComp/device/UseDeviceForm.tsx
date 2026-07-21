@@ -18,10 +18,12 @@ import { AlertDialogDeviceDelete } from "./UseDialogDeleteDevice"
 
 type DeviceFormProps = {
     deviceID: number
+    onDeleteSuccess: () => void
 }
 
 export function DeviceForm({
     deviceID,
+    onDeleteSuccess,
 }: DeviceFormProps) {
     //function to handle form submission
 
@@ -74,6 +76,7 @@ export function DeviceForm({
 
                                 <AlertDialogDeviceDelete 
                                     deviceID={deviceID}
+                                    onDeleteSuccess={onDeleteSuccess}
                                 />
                             </div>
                         </div>

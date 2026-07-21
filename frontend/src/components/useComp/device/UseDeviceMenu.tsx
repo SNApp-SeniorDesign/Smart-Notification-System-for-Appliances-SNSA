@@ -140,6 +140,24 @@ export function CollapsibleDeviceMenu() {
                         }
                     }}
                     deviceID={deviceForForm.id}
+                    onDeleteSuccess={() => {
+                        const deletedDeviceID = deviceForForm.id
+
+                        setDevices((currentDevices) => 
+                            currentDevices.filter(
+                                (device) => device.id !==deletedDeviceID
+                            )
+                        )
+
+                        setSelectedDevice((currentSelectedDevice) =>
+                            currentSelectedDevice?.id === deletedDeviceID
+                            ? null
+                            : currentSelectedDevice
+                        )
+
+                        setDeviceFormOpen(false)
+                        setDeviceForForm(null)
+                    }}
                 />
             )}
             <div className="rounded-md px-4 py-2 text-sm">
