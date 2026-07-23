@@ -58,15 +58,20 @@ def get_current_device_from_query(
 
 
 @api_router.post(
-    "/register", response_model=SoundResponse, status_code=status.HTTP_201_CREATED
+    "/register",
+    response_model=SoundResponse,
+    status_code=status.HTTP_201_CREATED,
 )
-async def register_sound(
+def register_sound(
     db: Annotated[Session, Depends(get_db)],
     device_current: Annotated[Device, Depends(get_current_device)],
     data: Annotated[SoundCreate, Depends(SoundCreate.as_form)],
-    file: Annotated[UploadFile, File(...)],
 ) -> SoundResponse:
-    return sound_service.create_sound(db, device_current.id, data.sound_name, file)
+    return sound_service.create_sound(
+        db=db,
+        device_id=device_current.id,
+        sound_name=data.sound_name,
+    )
 
 
 # Get

@@ -6,90 +6,106 @@ from sqlalchemy.orm import Session
 
 
 def test_register_sound_success(client: TestClient, headers, device):
-    data = {"device_id": device.id, "sound_name": "test_sound"}
-    file_content = b"test sound content"
-    files = {"file": ("test_sound.wav", file_content, "audio/wav")}
-    response = client.post("/sound/register", headers=headers, data=data, files=files)
+    response = client.post(
+        "/sound/register",
+        headers=headers,
+        data={
+            "device_id": device.id,
+            "sound_name": "test_sound",
+        },
+    )
+
     assert response.status_code == 201
+
     response_data = response.json()
+
     assert response_data["sound_name"] == "test_sound"
-    assert response_data["sound_file_url"].startswith("/uploads/sounds/")
-    assert response_data["sound_file_url"].endswith(".wav")
+    assert response_data["sound_file_url"] is None
+    assert response_data["processing_status"] == "Recording"
 
 
 def test_register_sound_duplicate_name(client: TestClient, headers, device):
-    data = {"device_id": device.id, "sound_name": "test_sound"}
-    file_content = b"test sound content"
-    files = {"file": ("test_sound.wav", file_content, "audio/wav")}
+    data = {
+        "device_id": device.id,
+        "sound_name": "test_sound",
+    }
 
     first = client.post(
         "/sound/register",
         headers=headers,
-        data={
-            "sound_name": "test_sound",
-            "device_id": device.id,
-        },
-        files={"file": ("test_sound123.wav", b"test sound content", "audio/wav")},
+        data=data,
     )
 
     assert first.status_code == 201
 
-    response = client.post("/sound/register", headers=headers, data=data, files=files)
+    response = client.post(
+        "/sound/register",
+        headers=headers,
+        data=data,
+    )
 
     assert response.status_code == 409
     assert response.json() == {"detail": "Sound name already registered"}
 
 
-def test_register_sound_missing_file(client: TestClient, headers, device):
+def test_register_sound_missing_sound_name(
+    client: TestClient,
+    headers,
+    device,
+):
     response = client.post(
         "/sound/register",
         headers=headers,
         data={
             "device_id": device.id,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_register_sound_missing_device_id(
+    client: TestClient,
+    headers,
+    device,
+):
+    response = client.post(
+        "/sound/register",
+        headers=headers,
+        data={
             "sound_name": "test_sound",
         },
     )
-    assert response.status_code == 422
-
-
-def test_register_sound_missing_sound_name(client: TestClient, headers, device):
-    response = client.post(
-        "/sound/register",
-        headers=headers,
-        data={"device_id": device.id},
-        files={"file": ("test.wav", b"test sound content", "audio/wav")},
-    )
 
     assert response.status_code == 422
 
 
-def test_register_sound_missing_device_id(client: TestClient, headers, device):
+def test_register_sound_unauthorized(
+    client: TestClient,
+    device,
+):
     response = client.post(
         "/sound/register",
-        headers=headers,
-        data={"sound_name": "test_sound"},
-        files={"file": ("test.wav", b"test sound content", "audio/wav")},
-    )
-
-    assert response.status_code == 422
-
-
-def test_register_sound_unauthorized(client: TestClient, device):
-    response = client.post(
-        "/sound/register",
-        data={"sound_name": "test_sound", "device_id": device.id},
-        files={"file": ("test.wav", b"test sound content", "audio/wav")},
+        data={
+            "sound_name": "test_sound",
+            "device_id": device.id,
+        },
     )
 
     assert response.status_code == 401
 
 
-def test_register_sound_device_not_found(client: TestClient, headers):
+def test_register_sound_device_not_found(
+    client: TestClient,
+    headers,
+):
     response = client.post(
         "/sound/register",
         headers=headers,
-        data={"device_id": 99999, "sound_name": "test_sound"},
-        files={"file": ("test.wav", b"test sound content", "audio/wav")},
+        data={
+            "device_id": 99999,
+            "sound_name": "test_sound",
+        },
     )
 
     assert response.status_code == 404
@@ -222,16 +238,26 @@ def test_sound_update(client: TestClient, headers, sound):
             "sound_status": "offline",
             "processing_status": "Recording",
         },
-        files={"file": ("new.wav", b"new test sound content", "audio/wav")},
+        files={
+            "file": (
+                "new.wav",
+                b"new test sound content",
+                "audio/wav",
+            )
+        },
     )
 
     assert response.status_code == 200
 
     data = response.json()
+
     assert data["id"] == sound.id
     assert data["sound_name"] == "New Sound"
-    assert data["sound_status"] == "offline"
-    assert data["processing_status"] == "Recording"
+
+    # File upload completed successfully.
+    assert data["sound_status"] == "monitoring"
+    assert data["processing_status"] == "Ready"
+    assert data["is_on"] is True
 
     assert data["is_synced_to_device"] is False
     assert data["profile_version"] == 2

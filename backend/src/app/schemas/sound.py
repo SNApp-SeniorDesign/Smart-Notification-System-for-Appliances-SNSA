@@ -30,7 +30,7 @@ class SoundCreate(SoundBase):
 class SoundResponse(SoundBase):
     id: int
     device_id: int
-    sound_file_url: str
+    sound_file_url: str | None
     sound_status: SoundStatus
     is_on: bool
 
@@ -46,6 +46,7 @@ class SoundDB(SoundCreate):
     sound_file_url: str
     is_synced_to_device: bool = False
     sound_status: SoundStatus = "offline"
+    processing_status: str = "Ready"
     profile_version: int = 1
 
 

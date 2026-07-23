@@ -45,27 +45,29 @@ class SoundService:
 
     # Post
 
-    # FIXME: For now only work locally, need to fix so it work at launch
     def create_sound(
-        self, db: Session, device_id: int, sound_name: str, file: UploadFile
+        self,
+        db: Session,
+        device_id: int,
+        sound_name: str,
     ) -> Sound:
         if self.is_sound_name_taken(db, sound_name, device_id):
             sound_exist()
 
-        sound_file_url = self.save_sound_file(file)
-
         sound = Sound(
             device_id=device_id,
             sound_name=sound_name,
-            sound_file_url=sound_file_url,
-            sound_status="monitoring",
-            is_on=True,
+            sound_file_url=None,
+            sound_status="offline",
+            processing_status="Recording",
+            is_on=False,
             is_synced_to_device=False,
             profile_version=1,
         )
 
         return self.repository.create_sound(db, sound)
 
+    # FIXME: For now only work locally, need to fix so it work at launch
     def save_sound_file(self, file: UploadFile) -> str:
 
         if not file.filename:
@@ -83,8 +85,13 @@ class SoundService:
         return f"/uploads/sounds/{stored_filename}"
 
     # Update
+
     def update_sound(
-        self, db: Session, sound: Sound, sound_db: SoundUpdate, file: UploadFile
+        self,
+        db: Session,
+        sound: Sound,
+        sound_db: SoundUpdate,
+        file: UploadFile | None = None,
     ) -> Sound:
         if sound_db.sound_name is not None:
             sound.sound_name = sound_db.sound_name
@@ -96,12 +103,18 @@ class SoundService:
             sound.processing_status = sound_db.processing_status
 
         if file is not None:
-            sound_file_url = self.save_sound_file(file)
-            self.delete_sound_file(sound.sound_file_url)
-            sound.sound_file_url = sound_file_url
+            old_file_url = sound.sound_file_url
+            new_file_url = self.save_sound_file(file)
 
-            sound.profile_version += 1
+            sound.sound_file_url = new_file_url
+            sound.processing_status = "Ready"
+            sound.sound_status = "monitoring"
+            sound.is_on = True
             sound.is_synced_to_device = False
+            sound.profile_version += 1
+
+            if old_file_url:
+                self.delete_sound_file(old_file_url)
 
         return self.repository.sound_update(db, sound)
 

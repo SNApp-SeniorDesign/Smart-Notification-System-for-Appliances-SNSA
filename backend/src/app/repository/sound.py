@@ -20,6 +20,7 @@ class SoundRepository:
             sound_status=sound_data.sound_status,
             profile_version=sound_data.profile_version,
             sound_file_url=sound_data.sound_file_url,
+            processing_status=sound_data.processing_status,
         )
         db.add(db_sound)
         db.commit()
