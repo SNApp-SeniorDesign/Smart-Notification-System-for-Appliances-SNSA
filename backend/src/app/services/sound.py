@@ -86,11 +86,14 @@ class SoundService:
     def update_sound(
         self, db: Session, sound: Sound, sound_db: SoundUpdate, file: UploadFile
     ) -> Sound:
-        if sound_db.sound_name:
+        if sound_db.sound_name is not None:
             sound.sound_name = sound_db.sound_name
 
-        if sound_db.sound_status:
+        if sound_db.sound_status is not None:
             sound.sound_status = sound_db.sound_status
+
+        if sound_db.processing_status is not None:
+            sound.processing_status = sound_db.processing_status
 
         if file is not None:
             sound_file_url = self.save_sound_file(file)

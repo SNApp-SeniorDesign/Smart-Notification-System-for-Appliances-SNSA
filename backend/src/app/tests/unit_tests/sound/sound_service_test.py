@@ -193,11 +193,13 @@ def test_update_sound_metada_only(service, db):
         is_synced_to_device=True,
         profile_version=1,
         sound_file_url="/uploads/sounds/old_sound.wav",
+        processing_status="Ready",
     )
 
     sound_update = SoundUpdate(
         sound_name="New Sound Name",
         sound_status="detecting",
+        processing_status="Recording",
     )
 
     service.repository.sound_update.return_value = sound
@@ -210,6 +212,7 @@ def test_update_sound_metada_only(service, db):
     assert sound.is_synced_to_device is True
     assert sound.profile_version == 1
     assert sound.sound_file_url == "/uploads/sounds/old_sound.wav"
+    assert sound.processing_status == "Recording"
     service.repository.sound_update.assert_called_once_with(db, sound)
 
 

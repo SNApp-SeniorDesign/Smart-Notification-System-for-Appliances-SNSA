@@ -220,6 +220,7 @@ def test_sound_update(client: TestClient, headers, sound):
         data={
             "sound_name": "New Sound",
             "sound_status": "offline",
+            "processing_status": "Recording",
         },
         files={"file": ("new.wav", b"new test sound content", "audio/wav")},
     )
@@ -230,6 +231,7 @@ def test_sound_update(client: TestClient, headers, sound):
     assert data["id"] == sound.id
     assert data["sound_name"] == "New Sound"
     assert data["sound_status"] == "offline"
+    assert data["processing_status"] == "Recording"
 
     assert data["is_synced_to_device"] is False
     assert data["profile_version"] == 2

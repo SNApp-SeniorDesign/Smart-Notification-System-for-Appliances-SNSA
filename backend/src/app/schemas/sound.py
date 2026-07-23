@@ -3,6 +3,15 @@ from fastapi import Form
 from typing import Literal
 
 SoundStatus = Literal["monitoring", "detecting", "detected", "offline"]
+ProcessStatus = Literal[
+    "Ready",
+    "Recording",
+    "Processing",
+    "Uploading",
+    "Synnchronizing",
+    "Complete",
+    "Failed",
+]
 
 
 class SoundBase(BaseModel):
@@ -25,6 +34,7 @@ class SoundResponse(SoundBase):
     sound_status: SoundStatus
     is_on: bool
 
+    processing_status: str
     is_synced_to_device: bool
     profile_version: int
 
@@ -45,16 +55,19 @@ class SoundUpdate(BaseModel):
     is_synced_to_device: bool | None = None
     profile_version: int | None = None
     sound_file_url: str | None = None
+    processing_status: str | None = None
 
     @classmethod
     def as_form(
         cls,
         sound_name: str | None = Form(None),
         sound_status: SoundStatus | None = Form(None),
+        processing_status: ProcessStatus | None = Form(None),
         sound_file_url: str | None = Form(None),
     ):
         return cls(
             sound_name=sound_name,
             sound_status=sound_status,
             sound_file_url=sound_file_url,
+            processing_status=processing_status,
         )
