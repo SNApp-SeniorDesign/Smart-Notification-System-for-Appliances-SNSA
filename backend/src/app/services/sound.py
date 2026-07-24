@@ -105,21 +105,22 @@ class SoundService:
         if sound_db.processing_status is not None:
             sound.processing_status = sound_db.processing_status
 
+        old_file_url = sound.sound_file_url
+
         if file is not None:
-            old_file_url = sound.sound_file_url
-            new_file_url = self.save_sound_file(file)
-
-            sound.sound_file_url = new_file_url
-            sound.processing_status = "Ready"
-            sound.sound_status = "monitoring"
-            sound.is_on = True
-            sound.is_synced_to_device = False
+            sound.sound_file_url = self.save_sound_file(file)
             sound.profile_version += 1
+            sound.is_synced_to_device = False
 
-            if old_file_url:
-                self.delete_sound_file(old_file_url)
+        updated_sound = self.repository.sound_update(
+            db,
+            sound,
+        )
 
-        return self.repository.sound_update(db, sound)
+        if file is not None and old_file_url:
+            self.delete_sound_file(old_file_url)
+
+        return updated_sound
 
     # Delete
 

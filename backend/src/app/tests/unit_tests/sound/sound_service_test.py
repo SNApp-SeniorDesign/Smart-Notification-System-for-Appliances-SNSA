@@ -226,59 +226,13 @@ def test_update_sound_metada_only(service, db):
     service.repository.sound_update.assert_called_once_with(db, sound)
 
 
-def test_update_sound_with_file(service, db):
-    sound = SimpleNamespace(
-        id=1,
-        device_id=1,
-        sound_name="Microwave Beep",
-        sound_status="offline",
-        processing_status="Recording",
-        is_on=False,
-        is_synced_to_device=True,
-        profile_version=1,
-        sound_file_url=None,
-    )
-
-    sound_update = SoundUpdate()
-
-    fake_file = UploadFile(
-        filename="microwave.wav",
-        file=BytesIO(b"fake audio data"),
-    )
-
-    service.save_sound_file = Mock(return_value="/uploads/sounds/new-file.wav")
-    service.delete_sound_file = Mock()
-    service.repository.sound_update.return_value = sound
-
-    result = service.update_sound(
-        db=db,
-        sound=sound,
-        sound_db=sound_update,
-        file=fake_file,
-    )
-
-    assert result == sound
-    assert sound.sound_file_url == "/uploads/sounds/new-file.wav"
-    assert sound.processing_status == "Ready"
-    assert sound.sound_status == "monitoring"
-    assert sound.is_on is True
-    assert sound.is_synced_to_device is False
-    assert sound.profile_version == 2
-
-    service.save_sound_file.assert_called_once_with(fake_file)
-    service.delete_sound_file.assert_not_called()
-    service.repository.sound_update.assert_called_once_with(
-        db,
-        sound,
-    )
-
-
 def test_update_sound_with_new_file(service, db):
     sound = SimpleNamespace(
         id=1,
         device_id=1,
         sound_name="Old Sound Name",
         sound_status="monitoring",
+        processing_status="Ready",
         is_synced_to_device=True,
         profile_version=1,
         sound_file_url="/uploads/sounds/old_sound.wav",
@@ -316,6 +270,7 @@ def test_update_sound_file_missing_filename(service, db):
         sound_name="Old Sound Name",
         sound_status="monitoring",
         is_synced_to_device=True,
+        processing_status="Ready",
         profile_version=1,
         sound_file_url="/uploads/sounds/old_sound.wav",
     )
@@ -345,6 +300,7 @@ def test_update_sound_no_changes(service, db):
         sound_name="Old Sound Name",
         sound_status="monitoring",
         is_synced_to_device=True,
+        processing_status="Ready",
         profile_version=1,
         sound_file_url="/uploads/sounds/old_sound.wav",
     )
@@ -375,6 +331,7 @@ def test_delete_sound(service, db):
         sound_name="Sound to Delete",
         sound_status="monitoring",
         is_synced_to_device=True,
+        processing_status="Ready",
         profile_version=1,
         sound_file_url="/uploads/sounds/sound_to_delete.wav",
     )

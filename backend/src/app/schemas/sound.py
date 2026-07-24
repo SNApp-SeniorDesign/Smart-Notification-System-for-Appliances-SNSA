@@ -30,7 +30,7 @@ class SoundCreate(SoundBase):
 class SoundResponse(SoundBase):
     id: int
     device_id: int
-    sound_file_url: str | None
+    sound_file_url: str
     sound_status: SoundStatus
     is_on: bool
 
