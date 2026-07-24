@@ -32,7 +32,28 @@ def test_register_sound_success(client: TestClient, headers, device):
     assert data["processing_status"] == "Ready"
 
 
-def test_register_sound_duplicate_name(client: TestClient, headers, device):
+def test_register_sound_missing_file(
+    client: TestClient,
+    headers,
+    device,
+):
+    response = client.post(
+        "/sound/register",
+        headers=headers,
+        data={
+            "device_id": device.id,
+            "sound_name": "test_sound",
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_register_sound_duplicate_name(
+    client: TestClient,
+    headers,
+    device,
+):
     data = {
         "device_id": device.id,
         "sound_name": "test_sound",
@@ -42,6 +63,13 @@ def test_register_sound_duplicate_name(client: TestClient, headers, device):
         "/sound/register",
         headers=headers,
         data=data,
+        files={
+            "file": (
+                "first.wav",
+                b"first sound content",
+                "audio/wav",
+            )
+        },
     )
 
     assert first.status_code == 201
@@ -50,6 +78,13 @@ def test_register_sound_duplicate_name(client: TestClient, headers, device):
         "/sound/register",
         headers=headers,
         data=data,
+        files={
+            "file": (
+                "second.wav",
+                b"second sound content",
+                "audio/wav",
+            )
+        },
     )
 
     assert response.status_code == 409
@@ -67,6 +102,13 @@ def test_register_sound_missing_sound_name(
         data={
             "device_id": device.id,
         },
+        files={
+            "file": (
+                "test.wav",
+                b"test sound content",
+                "audio/wav",
+            )
+        },
     )
 
     assert response.status_code == 422
@@ -83,6 +125,13 @@ def test_register_sound_missing_device_id(
         data={
             "sound_name": "test_sound",
         },
+        files={
+            "file": (
+                "test.wav",
+                b"test sound content",
+                "audio/wav",
+            )
+        },
     )
 
     assert response.status_code == 422
@@ -97,6 +146,13 @@ def test_register_sound_unauthorized(
         data={
             "sound_name": "test_sound",
             "device_id": device.id,
+        },
+        files={
+            "file": (
+                "test.wav",
+                b"test sound content",
+                "audio/wav",
+            )
         },
     )
 
@@ -113,6 +169,13 @@ def test_register_sound_device_not_found(
         data={
             "device_id": 99999,
             "sound_name": "test_sound",
+        },
+        files={
+            "file": (
+                "test.wav",
+                b"test sound content",
+                "audio/wav",
+            )
         },
     )
 
