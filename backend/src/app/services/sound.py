@@ -50,17 +50,20 @@ class SoundService:
         db: Session,
         device_id: int,
         sound_name: str,
+        file: UploadFile,
     ) -> Sound:
         if self.is_sound_name_taken(db, sound_name, device_id):
             sound_exist()
 
+        sound_file_url = self.save_sound_file(file)
+
         sound = Sound(
             device_id=device_id,
             sound_name=sound_name,
-            sound_file_url=None,
-            sound_status="offline",
-            processing_status="Recording",
-            is_on=False,
+            sound_file_url=sound_file_url,
+            sound_status="monitoring",
+            processing_status="Ready",
+            is_on=True,
             is_synced_to_device=False,
             profile_version=1,
         )

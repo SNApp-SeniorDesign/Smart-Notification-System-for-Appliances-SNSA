@@ -43,7 +43,7 @@ type Sound = {
   is_on: boolean
 }
 
-type AddSoundStatus = | "idle" | 'creating' | "recording" | "processing" | "uploading" | "complete" | "failed"
+type AddSoundStatus = | "idle" | 'creating' | "ready"| "recording" | "processing" | "uploading" | "complete" | "failed"
 
 type AddSoundFormProps = {
     deviceID: number
@@ -59,6 +59,7 @@ export function AddSoundForm({
     const buttonText: Record<AddSoundStatus, string> = {
         idle: "Add Sound",
         creating: "Creating Sound...",
+        ready: "Ready Recording",
         recording: "Recording...",
         processing: "Processing...",
         uploading: "Uploading...",
@@ -66,6 +67,7 @@ export function AddSoundForm({
         failed: "Try Again",
     }
 
+    const [createdSound, setCreatedSound] = React.useState<Sound | null> (null)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -116,9 +118,9 @@ export function AddSoundForm({
             toast.success("Sound Add Successful", {
                 position: "top-center",
             })
-            
-            setStatus("recording")
 
+            setCreatedSound(newSound)
+            setStatus("ready")
             onSuccess?.(newSound)
 
         } catch (error) {
@@ -164,15 +166,9 @@ export function AddSoundForm({
               <Field>
                 <Button 
                     type="submit" 
-                    disabled={form.formState.isSubmitting ||
-                        status === "creating" ||
-                        status === "recording" ||
-                        status === "processing" ||
-                        status === "uploading" ||
-                        status === "complete"
-                    }
+                    disabled={form.formState.isSubmitting}
                 >
-                    {buttonText[status]}
+
                     
                 </Button>
               </Field>

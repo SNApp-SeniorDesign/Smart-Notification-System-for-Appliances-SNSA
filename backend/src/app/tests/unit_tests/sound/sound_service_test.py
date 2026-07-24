@@ -137,6 +137,11 @@ def test_get_sound_by_id_fail(service, db):
 
 
 def test_create_sound_success(service, db):
+    fake_file = UploadFile(
+        filename="test.wav",
+        file=BytesIO(b"fake audio data"),
+    )
+
     fake_created_sound = Mock()
 
     service.repository.get_by_sound_name.return_value = None
@@ -146,6 +151,7 @@ def test_create_sound_success(service, db):
         db=db,
         device_id=1,
         sound_name="Microwave Beep",
+        file=fake_file,
     )
 
     assert result == fake_created_sound
@@ -156,12 +162,35 @@ def test_create_sound_success(service, db):
 
     assert sound_arg.device_id == 1
     assert sound_arg.sound_name == "Microwave Beep"
-    assert sound_arg.sound_file_url is None
-    assert sound_arg.sound_status == "offline"
-    assert sound_arg.processing_status == "Recording"
-    assert sound_arg.is_on is False
+    assert sound_arg.sound_file_url.startswith("/uploads/sounds/")
+    assert sound_arg.sound_file_url.endswith(".wav")
+    assert sound_arg.sound_status == "monitoring"
+    assert sound_arg.processing_status == "Ready"
+    assert sound_arg.is_on is True
     assert sound_arg.is_synced_to_device is False
     assert sound_arg.profile_version == 1
+
+
+def test_create_sound_no_file_name(service, db):
+    fake_file = UploadFile(
+        filename="",
+        file=BytesIO(b"fake audio data"),
+    )
+
+    service.repository.get_by_sound_name.return_value = None
+
+    with pytest.raises(HTTPException) as exc_info:
+        service.create_sound(
+            db=db,
+            device_id=1,
+            sound_name="Microwave Beep",
+            file=fake_file,
+        )
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "Sound file is required"
+
+    service.repository.create_sound.assert_not_called()
 
 
 # Update
