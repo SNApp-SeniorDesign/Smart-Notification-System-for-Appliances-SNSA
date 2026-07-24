@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {Controller, useForm} from "react-hook-form"
 import * as z from "zod"
+import * as React from "react"
 import { toast } from "sonner"
 import { getToken } from "@/lib/auth"
 
@@ -42,6 +43,8 @@ type Sound = {
   is_on: boolean
 }
 
+type AddSoundStatus = | "idle" | 'creating' | "recording" | "processing" | "uploading" | "complete" | "failed"
+
 type AddSoundFormProps = {
     deviceID: number
     onSuccess?: (sound: Sound) => void
@@ -51,6 +54,18 @@ export function AddSoundForm({
   onSuccess,
   deviceID,
 }: AddSoundFormProps) {
+
+    const [status, setStatus] = React.useState<AddSoundStatus>("idle")
+    const buttonText: Record<AddSoundStatus, string> = {
+        idle: "Add Sound",
+        creating: "Creating Sound...",
+        recording: "Recording...",
+        processing: "Processing...",
+        uploading: "Uploading...",
+        complete: "Complete",
+        failed: "Try Again",
+    }
+
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -88,19 +103,22 @@ export function AddSoundForm({
             })
 
             if(!res.ok){
-            const errorData = await res.json()
-            toast.error(`Adding sound failed: ${errorData?.detail || "Unknown error"}`, {
-                position: "top-center",
-            })
-            return
+                const errorData = await res.json()
+                toast.error(`Adding sound failed: ${errorData?.detail || "Unknown error"}`, {
+                    position: "top-center",
+                })
+                setStatus("failed")
+                return
             }
 
             const newSound: Sound = await res.json()
 
             toast.success("Sound Add Successful", {
-            position: "top-center",
+                position: "top-center",
             })
-            form.reset()
+            
+            setStatus("recording")
+
             onSuccess?.(newSound)
 
         } catch (error) {
@@ -109,6 +127,8 @@ export function AddSoundForm({
             toast.error("Unable to connect to the server.", {
                 position: "top-center",
             })
+
+            setStatus("failed")
         }
 
 
@@ -144,9 +164,17 @@ export function AddSoundForm({
               <Field>
                 <Button 
                     type="submit" 
-                    disabled={form.formState.isSubmitting}
-                
-                >{form.formState.isSubmitting ? "Adding...": "Add Sound"} </Button>
+                    disabled={form.formState.isSubmitting ||
+                        status === "creating" ||
+                        status === "recording" ||
+                        status === "processing" ||
+                        status === "uploading" ||
+                        status === "complete"
+                    }
+                >
+                    {buttonText[status]}
+                    
+                </Button>
               </Field>
             </FieldGroup>
           </form>
