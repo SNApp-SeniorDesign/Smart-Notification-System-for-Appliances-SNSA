@@ -34,11 +34,12 @@ type Sound = {
   id: number
   device_id: number
   sound_name: string
-  sound_file_url: string
+  sound_file_url: string | null
   sound_status: string
-  is_synched_to_device: boolean
+  is_synced_to_device: boolean
   profile_version: number
   processing_status: string
+  is_on: boolean
 }
 
 type AddSoundFormProps = {
@@ -49,7 +50,6 @@ type AddSoundFormProps = {
 export function AddSoundForm({
   onSuccess,
   deviceID,
-  ...props
 }: AddSoundFormProps) {
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -58,41 +58,64 @@ export function AddSoundForm({
             sound_name:"",
         }
     })
-    async function onSubmit(data: z.infer<typeof formSchema>){
-      
-      const token = getToken();  
-      
-        const res = await fetch(`${API_URL}/sound/register`,{
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              sound_name: data.sound_name,
-              device_id: deviceID,
-            }),
-          })
 
-        if(!res.ok){
-          const errorData = await res.json()
-          toast.error(`Adding sound failed: ${errorData?.detail || "Unknown error"}`, {
-            position: "top-center",
-          })
-          return
+    async function onSubmit(data: z.infer<typeof formSchema>){
+        
+        
+        const token = getToken();  
+        
+        if(!token) {
+            toast.error("You are not authenticated", {
+                position: "top-center",
+            })
+            return
         }
 
-        const newSound: Sound = await res.json()
 
-        toast.success("Sound Add Successful", {
-          position: "top-center",
-        })
-        form.reset()
-        onSuccess?.(newSound)
+
+        const formData = new FormData()
+        formData.append("sound_name", data.sound_name)
+        formData.append("device_id", String(deviceID))
+
+        try {
+
+            const res = await fetch(`${API_URL}/sound/register`,{
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            })
+
+            if(!res.ok){
+            const errorData = await res.json()
+            toast.error(`Adding sound failed: ${errorData?.detail || "Unknown error"}`, {
+                position: "top-center",
+            })
+            return
+            }
+
+            const newSound: Sound = await res.json()
+
+            toast.success("Sound Add Successful", {
+            position: "top-center",
+            })
+            form.reset()
+            onSuccess?.(newSound)
+
+        } catch (error) {
+            console.error("Failed to add sound", error)
+
+            toast.error("Unable to connect to the server.", {
+                position: "top-center",
+            })
+        }
+
+
     } 
  
   return (
-    <div className={cn("flex flex-col gap-6")} {...props}>
+    <div className={cn("flex flex-col gap-6")}>
       <Card>
         <CardHeader>
         </CardHeader>
@@ -104,7 +127,7 @@ export function AddSoundForm({
                 control={form.control}
                 render={({field, fieldState}) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="device_name">Sound Name</FieldLabel>
+                    <FieldLabel htmlFor="sound_name">Sound Name</FieldLabel>
                     <Input
                       {...field}
                       id="sound_name"
@@ -119,7 +142,11 @@ export function AddSoundForm({
                 )}
               />              
               <Field>
-                <Button type="submit">Add Sound</Button>
+                <Button 
+                    type="submit" 
+                    disabled={form.formState.isSubmitting}
+                
+                >{form.formState.isSubmitting ? "Adding...": "Add Sound"} </Button>
               </Field>
             </FieldGroup>
           </form>
