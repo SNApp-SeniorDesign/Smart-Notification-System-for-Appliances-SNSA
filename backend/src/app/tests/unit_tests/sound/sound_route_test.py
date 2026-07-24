@@ -13,15 +13,23 @@ def test_register_sound_success(client: TestClient, headers, device):
             "device_id": device.id,
             "sound_name": "test_sound",
         },
+        files={
+            "file": (
+                "test_sound.wav",
+                b"test sound content",
+                "audio/wav",
+            )
+        },
     )
 
     assert response.status_code == 201
 
-    response_data = response.json()
+    data = response.json()
 
-    assert response_data["sound_name"] == "test_sound"
-    assert response_data["sound_file_url"] is None
-    assert response_data["processing_status"] == "Recording"
+    assert data["sound_name"] == "test_sound"
+    assert data["sound_file_url"].startswith("/uploads/sounds/")
+    assert data["sound_file_url"].endswith(".wav")
+    assert data["processing_status"] == "Ready"
 
 
 def test_register_sound_duplicate_name(client: TestClient, headers, device):

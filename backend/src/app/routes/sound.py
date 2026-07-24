@@ -66,11 +66,13 @@ def register_sound(
     db: Annotated[Session, Depends(get_db)],
     device_current: Annotated[Device, Depends(get_current_device)],
     data: Annotated[SoundCreate, Depends(SoundCreate.as_form)],
+    file: Annotated[UploadFile, File(...)],
 ) -> SoundResponse:
     return sound_service.create_sound(
         db=db,
         device_id=device_current.id,
         sound_name=data.sound_name,
+        file=file,
     )
 
 
