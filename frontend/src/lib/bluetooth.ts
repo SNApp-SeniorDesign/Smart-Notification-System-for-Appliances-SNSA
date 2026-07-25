@@ -81,3 +81,8 @@ export async function startSNSARecording():
 
   await characteristic.writeValueWithResponse(command)
 }
+
+export function disconnectSNSA(): void{
+  snsaDevice?.gatt.disconnect()
+  snsaDevice = null
+}

@@ -23,9 +23,10 @@ import { getToken } from "@/lib/auth"
 import {
   SNSA_SERVICE_UUID,
   SERIAL_NUMBER_UUID,
-  IS_PAIRED_UUID
-} 
-from "@/lib/bluetooth"
+  IS_PAIRED_UUID,
+  selectSNSADevice,
+  getSNSAService,
+} from "@/lib/bluetooth"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -71,22 +72,13 @@ export function AddDeviceForm({
         return
       }
 
-      let device: SNSABluetoothDevice | undefined;
-      
+      let device: SNSABluetoothDevice | undefined
+
       try {
-        device = await navigator.bluetooth.requestDevice({
-            filters: [
-              { services: [SNSA_SERVICE_UUID]},
-            ]
-        })
+        device = await selectSNSADevice()
 
-        const server = await device.gatt?.connect()
-
-        if(!server){
-          throw new Error("Unable to connect SNSA device.")
-        }
-
-        const service = await server.getPrimaryService(SNSA_SERVICE_UUID);
+        const service = await getSNSAService()
+      
 
         //Read Pairing status
         const pairedChar = await service.getCharacteristic(IS_PAIRED_UUID)
@@ -143,9 +135,7 @@ export function AddDeviceForm({
         toast.error("Failed to add device. Please try again", {
           position: "top-center",
         })
-      } finally {
-          device?.gatt?.disconnect()
-      }
+      } 
   
 }
 
