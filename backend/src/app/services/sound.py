@@ -1,5 +1,6 @@
 from app.repository.sound import SoundRepository
 from app.models.sound import Sound
+from app.moelds.device import Device
 from app.schemas.sound import SoundUpdate
 from app.exceptions.sound import sound_not_exist, sound_exist
 
@@ -86,6 +87,24 @@ class SoundService:
             shutil.copyfileobj(file.file, buffer)
 
         return f"/uploads/sounds/{stored_filename}"
+
+    def recording_sound(self, device: Device) -> dict[str, str | int]:
+        if not device.is_paired:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Device is not paired",
+            )
+
+        if device.device_status != "online":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="Device is offline"
+            )
+        command = {
+            "command": "START_RECORDING",
+            "device_id": device.id,
+        }
+
+        return command
 
     # Update
 
