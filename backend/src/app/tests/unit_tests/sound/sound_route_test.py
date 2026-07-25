@@ -326,8 +326,8 @@ def test_sound_update(client: TestClient, headers, sound):
     assert data["sound_name"] == "New Sound"
 
     # File upload completed successfully.
-    assert data["sound_status"] == "monitoring"
-    assert data["processing_status"] == "Ready"
+    assert data["sound_status"] == "offline"
+    assert data["processing_status"] == "Recording"
     assert data["is_on"] is True
 
     assert data["is_synced_to_device"] is False

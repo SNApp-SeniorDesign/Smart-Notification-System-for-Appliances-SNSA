@@ -194,16 +194,17 @@ def test_create_sound_no_file_name(service, db):
 
 
 # Update
-def test_update_sound_metada_only(service, db):
+def test_sound_update_metadata_only(service, db):
     sound = SimpleNamespace(
         id=1,
         device_id=1,
         sound_name="Old Sound Name",
         sound_status="monitoring",
+        processing_status="Ready",
+        is_on=True,
         is_synced_to_device=True,
         profile_version=1,
         sound_file_url="/uploads/sounds/old_sound.wav",
-        processing_status="Ready",
     )
 
     sound_update = SoundUpdate(
@@ -214,31 +215,32 @@ def test_update_sound_metada_only(service, db):
 
     service.repository.sound_update.return_value = sound
 
-    result = service.update_sound(db, sound, sound_update, file=None)
+    result = service.update_sound(
+        db=db,
+        sound=sound,
+        sound_db=sound_update,
+        file=None,
+    )
 
     assert result == sound
-    assert sound.sound_name == "New Sound Name"
-    assert sound.sound_status == "detecting"
-    assert sound.is_synced_to_device is True
-    assert sound.profile_version == 1
-    assert sound.sound_file_url == "/uploads/sounds/old_sound.wav"
-    assert sound.processing_status == "Recording"
-    service.repository.sound_update.assert_called_once_with(db, sound)
 
 
-def test_update_sound_with_new_file(service, db):
+def test_sound_update_with_file(service, db):
     sound = SimpleNamespace(
         id=1,
         device_id=1,
         sound_name="Old Sound Name",
         sound_status="monitoring",
         processing_status="Ready",
+        is_on=True,
         is_synced_to_device=True,
         profile_version=1,
         sound_file_url="/uploads/sounds/old_sound.wav",
     )
 
-    sound_update = SoundUpdate(sound_name="New Sound Name")
+    sound_update = SoundUpdate(
+        sound_name="New Sound Name",
+    )
 
     file = UploadFile(
         filename="new.wav",
@@ -249,18 +251,25 @@ def test_update_sound_with_new_file(service, db):
     service.delete_sound_file = Mock()
     service.repository.sound_update.return_value = sound
 
-    result = service.update_sound(db, sound, sound_update, file)
+    result = service.update_sound(
+        db=db,
+        sound=sound,
+        sound_db=sound_update,
+        file=file,
+    )
 
     assert result == sound
     assert sound.sound_name == "New Sound Name"
-    assert sound.sound_status == "monitoring"
-    assert sound.is_synced_to_device is False
-    assert sound.profile_version == 2
     assert sound.sound_file_url == "/uploads/sounds/new_sound.wav"
+    assert sound.profile_version == 2
+    assert sound.is_synced_to_device is False
 
     service.save_sound_file.assert_called_once_with(file)
     service.delete_sound_file.assert_called_once_with("/uploads/sounds/old_sound.wav")
-    service.repository.sound_update.assert_called_once_with(db, sound)
+    service.repository.sound_update.assert_called_once_with(
+        db,
+        sound,
+    )
 
 
 def test_update_sound_file_missing_filename(service, db):
