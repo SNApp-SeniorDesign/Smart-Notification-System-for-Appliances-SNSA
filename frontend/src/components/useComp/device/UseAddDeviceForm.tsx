@@ -21,11 +21,9 @@ import * as z from "zod"
 import { toast } from "sonner"
 import { getToken } from "@/lib/auth"
 import {
-  SNSA_SERVICE_UUID,
-  SERIAL_NUMBER_UUID,
-  IS_PAIRED_UUID,
   selectSNSADevice,
-  getSNSAService,
+  isSNSAPaired,
+  setSNSAPaired,
 } from "@/lib/bluetooth"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -72,31 +70,18 @@ export function AddDeviceForm({
         return
       }
 
-      let device: SNSABluetoothDevice | undefined
-
       try {
-        device = await selectSNSADevice()
+        const { serialNumber } = await selectSNSADevice()
 
-        const service = await getSNSAService()
-      
-
-        //Read Pairing status
-        const pairedChar = await service.getCharacteristic(IS_PAIRED_UUID)
-        const pairedValue = await pairedChar.readValue()
-        const is_paired = pairedValue.getUint8(0) === 1
+        const isPaired = await isSNSAPaired(serialNumber)
         
-        if(is_paired){
+        if(isPaired){
           toast.error("Device already paired to another account",{
             position:"top-center",
           })
           return
         }
         
-        //Read Serial Number
-        const serialChar = await service.getCharacteristic(SERIAL_NUMBER_UUID)
-        const serialValue = await serialChar.readValue()
-        const serialNumber = new TextDecoder().decode(serialValue)
-
         const res = await fetch(`${API_URL}/device/`,{
             method: "POST",
             headers: {
@@ -119,11 +104,7 @@ export function AddDeviceForm({
 
         const newDevice: Device = await res.json()
 
-        await pairedChar.writeValue(
-          Uint8Array.of(1)
-        )
-
-
+        await setSNSAPaired(serialNumber, true)
 
         toast.success("Device Add Successful", {
           position: "top-center",
@@ -132,7 +113,10 @@ export function AddDeviceForm({
         onSuccess?.(newDevice)
       } catch (err) {
         console.error(err)
-        toast.error("Failed to add device. Please try again", {
+        toast.error(
+          err instanceof Error
+          ? err.message
+          : "Failed to add device. Please try again", {
           position: "top-center",
         })
       } 
@@ -168,7 +152,12 @@ export function AddDeviceForm({
                 )}
               />              
               <Field>
-                <Button type="submit">Add Device</Button>
+                <Button 
+                  type="submit"
+                  disabled={form.formState.isSubmitting}
+                >
+                  Add Device
+                </Button>
               </Field>
             </FieldGroup>
           </form>

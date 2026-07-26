@@ -20,8 +20,13 @@ type SNSAGATTService = Awaited<
   ReturnType<SNSAGATTServer["getPrimaryService"]>
 >
 
+type SelectedSNSADevice = {
+  device: SNSABluetoothDevice
+  serialNumber: string
+}
+
 export async function selectSNSADevice():
-  Promise<SNSABluetoothDevice> {
+  Promise<SelectedSNSADevice> {
   const device = await navigator.bluetooth.requestDevice({
     filters: [
       {
@@ -36,7 +41,9 @@ export async function selectSNSADevice():
     throw new Error("The selected device does not support GATT")
   }
 
-  const server = await gatt.connect()
+  const server = gatt.connected
+    ? gatt
+    : await gatt.connect()
 
   const service = await server.getPrimaryService(
     SNSA_SERVICE_UUID
@@ -48,15 +55,19 @@ export async function selectSNSADevice():
 
   const serialValue = await serialChar.readValue()
 
-  const serialNumber = new TextDecoder().decode(serialValue)
+  const serialNumber = new TextDecoder().decode(serialValue).trim()
+
+  if (!serialNumber){
+    throw new Error("SNSA device has no serial number")
+  }
 
   snsaDevices.set(serialNumber, device)
 
-  return device
+  return {device, serialNumber,}
 }
 
-export async function restoreSNSADevice():
-  Promise<SNSABluetoothDevice | null> {
+export async function restoreSNSADevices():
+  Promise<void> {
   const devices = await navigator.bluetooth.getDevices()
 
   snsaDevices.clear()
@@ -84,21 +95,33 @@ export async function restoreSNSADevice():
       const serialValue = await serialChar.readValue()
 
       const serialNumber = 
-      new TextDecoder().decode(serialValue)
+      new TextDecoder().decode(serialValue).trim()
+
+      if(!serialNumber){
+        console.warn(
+          `Skipping SNSA device ${device.name ?? "unkown"}: missing serial number`
+        )
+        continue
+      }
 
       snsaDevices.set(serialNumber,device)
 
-    } catch {
-      //ignore unreachable device
+    } catch (error) {
+      console.warn(
+        `Unable to restore SNSA device ${device.name ?? "unkown"}`,
+        error
+      )
     }
 
 
   }
 }
 
-export function getSelectedSNSADevice():
+export function getSelectedSNSADevice(
+  serialNumber: string
+):
   SNSABluetoothDevice | null {
-  return snsaDevices
+  return snsaDevices.get(serialNumber) ?? null
 }
 
 export async function getSNSAService(
@@ -108,8 +131,10 @@ export async function getSNSAService(
   
     const device = snsaDevices.get(serialNumber)
   
-    if (device) {
-      throw new Error("No SNSA device has been selected")
+    if (!device) {
+      throw new Error(
+        `SNSA device #{serialNumber} has not been selected or restored`
+      )
     }
 
   const gatt = device.gatt
@@ -154,9 +179,40 @@ export function disconnectSNSA(
   snsaDevices.delete(serialNumber)
 }
 
-export function disconnectALLSNSA(): void {
+export function disconnectAllSNSA(): void {
   for(const device of snsaDevices.values()){
     device.gatt?.disconnect()
   }
   snsaDevices.clear()
+}
+
+export async function isSNSAPaired(
+  serialNumber: string
+): Promise<boolean>{
+  const service = await getSNSAService(serialNumber)
+
+  const characteristic =
+    await service.getCharacteristic(
+      IS_PAIRED_UUID
+    )
+
+    const value = await characteristic.readValue()
+
+    return value.getUint8(0) === 1
+}
+
+export async function setSNSAPaired(
+  serialNumber: string,
+  paired: boolean
+): Promise<void>{
+  const service = await getSNSAService(serialNumber)
+
+  const characteristic =
+    await service.getCharacteristic(
+      IS_PAIRED_UUID
+    )
+
+    await characteristic.writeValueWithResponse(
+      Uint8Array.of(paired ? 1 : 0)
+    )
 }
