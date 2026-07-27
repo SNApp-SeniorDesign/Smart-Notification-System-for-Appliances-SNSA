@@ -28,3 +28,17 @@ def test_start_recording_device_not_paired():
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.detail == "Device is not paired"
+
+
+def test_start_recording_device_offline():
+    device = SimpleNamespace(
+        id=1,
+        is_paired=True,
+        device_status="offline",
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        recording_service.start_recording(device)
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.detail == "Device is offline"
