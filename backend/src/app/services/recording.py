@@ -29,7 +29,7 @@ class RecordingService:
         self.transport.start_recording(device.serial_number)
 
         return {
-            "status": "Recording started",
+            "status": "accepted",
             "device_id": device.id,
         }
 

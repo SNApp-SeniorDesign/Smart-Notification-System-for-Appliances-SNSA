@@ -21,7 +21,7 @@ def test_start_recording_success():
     transport.start_recording.assert_called_once_with("SNSA-001")
 
     assert result == {
-        "status": "Recording started",
+        "status": "accepted",
         "device_id": 1,
     }
 
