@@ -83,3 +83,26 @@ def test_start_recording_offline_device(
 
     assert response.status_code == 409
     assert response.json()["detail"] == "Device is offline"
+
+
+def test_start_recording_not_paired_device(
+    client: TestClient,
+    db,
+    user,
+    device,
+):
+    device.is_paired = False
+    device.device_status = "online"
+
+    db.commit()
+    db.refresh(device)
+
+    headers = get_auth_headers(client, user)
+
+    response = client.post(
+        f"/recording/{device.id}/start",
+        headers=headers,
+    )
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "Device is not paired"
