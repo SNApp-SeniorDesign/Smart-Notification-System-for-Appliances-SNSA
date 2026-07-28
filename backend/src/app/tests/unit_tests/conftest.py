@@ -93,6 +93,18 @@ def user(db):
     return UserRepository.create_user(db, user)
 
 
+# fixture to create for user number 2
+@pytest.fixture
+def another_user(db):
+    another_user = UserDB(
+        username="Another user",
+        email="Anothertest@example.com",
+        hashed_password="Anotherhashedpassword",
+    )
+
+    return UserRepository.create_user(db, another_user)
+
+
 # fixture to create device for repository
 @pytest.fixture
 def device(db, user):
@@ -104,6 +116,19 @@ def device(db, user):
         device_status="online",
     )
     return DeviceRepository.create_device(db, device)
+
+
+# fixture for another device number 2 of user number 2
+@pytest.fixture
+def another_device(db, another_user):
+    another_device = DeviceDB(
+        device_name="Other SNSA",
+        serial_number="SNSA-OTHER-001",
+        user_id=another_user.id,
+        is_paired=True,
+        device_status="online",
+    )
+    return DeviceRepository.create_device(db, another_device)
 
 
 # fixture to create sound for repository

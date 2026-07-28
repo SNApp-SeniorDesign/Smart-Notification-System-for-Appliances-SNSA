@@ -106,3 +106,20 @@ def test_start_recording_not_paired_device(
 
     assert response.status_code == 409
     assert response.json()["detail"] == "Device is not paired"
+
+
+def test_start_recording_device_belongs_to_another_user(
+    client: TestClient,
+    db,
+    user,
+    another_user,
+    another_device,
+):
+    headers = get_auth_headers(client, user)
+
+    response = client.post(
+        f"/recording/{another_device.id}/start",
+        headers=headers,
+    )
+
+    assert response.status_code == 404
