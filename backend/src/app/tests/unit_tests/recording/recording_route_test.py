@@ -60,3 +60,26 @@ def test_start_recording_invalid_device_id(
     )
 
     assert response.status_code == 422
+
+
+def test_start_recording_offline_device(
+    client: TestClient,
+    db,
+    user,
+    device,
+):
+    device.is_paired = True
+    device.device_status = "offline"
+
+    db.commit()
+    db.refresh(device)
+
+    headers = get_auth_headers(client, user)
+
+    response = client.post(
+        f"/recording/{device.id}/start",
+        headers=headers,
+    )
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "Device is offline"
