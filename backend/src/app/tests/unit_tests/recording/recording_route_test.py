@@ -46,3 +46,17 @@ def test_start_recording_device_not_found(
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Device not found"
+
+
+def test_start_recording_invalid_device_id(
+    client: TestClient,
+    user,
+):
+    headers = get_auth_headers(client, user)
+
+    response = client.post(
+        "/recording/not-an-integer/start",
+        headers=headers,
+    )
+
+    assert response.status_code == 422
