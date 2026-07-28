@@ -23,3 +23,11 @@ def test_start_recording_success(client: TestClient, user, device):
 
     assert data["status"] == "accepted"
     assert data["device_id"] == device.id
+
+
+def test_start_recording_unauthorized(client: TestClient, device):
+    response = client.post(
+        f"/recording/{device.id}/start",
+    )
+
+    assert response.status_code == 401
