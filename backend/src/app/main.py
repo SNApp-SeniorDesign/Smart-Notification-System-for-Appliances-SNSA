@@ -11,6 +11,7 @@ from app.core.database import create_db_tb
 from app.routes.user import api_router as user_router
 from app.routes.device import api_router as device_router
 from app.routes.sound import api_router as sound_router
+from app.routes.recording import api_router as recording_router
 
 NEXT_URL = settings.frontend_url
 
@@ -31,6 +32,7 @@ app = FastAPI(
 app.include_router(user_router)
 app.include_router(device_router)
 app.include_router(sound_router)
+app.include_router(recording_router)
 
 app.add_middleware(
     CORSMiddleware,

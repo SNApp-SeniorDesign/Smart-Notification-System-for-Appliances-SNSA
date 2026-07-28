@@ -97,7 +97,11 @@ def user(db):
 @pytest.fixture
 def device(db, user):
     device = DeviceDB(
-        device_name="testDevice", serial_number="testSerialNumber123", user_id=user.id
+        device_name="testDevice",
+        serial_number="testSerialNumber123",
+        user_id=user.id,
+        is_paired=True,
+        device_status="online",
     )
     return DeviceRepository.create_device(db, device)
 

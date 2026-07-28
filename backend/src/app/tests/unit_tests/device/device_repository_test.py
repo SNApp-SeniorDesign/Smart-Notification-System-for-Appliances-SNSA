@@ -15,8 +15,8 @@ def test_get_by_id(db: Session, user, device):
     assert device_response.user_id == user.id
     assert device_response.device_name == "testDevice"
     assert device_response.serial_number == "testSerialNumber123"
-    assert device_response.is_paired is False
-    assert device_response.device_status == "offline"
+    assert device_response.is_paired is True
+    assert device_response.device_status == "online"
 
 
 def test_get_by_device_id(db: Session, device):
@@ -27,8 +27,8 @@ def test_get_by_device_id(db: Session, device):
     assert device_response.user_id == device.user_id
     assert device_response.device_name == "testDevice"
     assert device_response.serial_number == "testSerialNumber123"
-    assert device_response.is_paired is False
-    assert device_response.device_status == "offline"
+    assert device_response.is_paired is True
+    assert device_response.device_status == "online"
 
 
 def test_get_by_device_name(db: Session, device):
@@ -41,8 +41,8 @@ def test_get_by_device_name(db: Session, device):
     assert device_response.user_id == device.user_id
     assert device_response.device_name == "testDevice"
     assert device_response.serial_number == "testSerialNumber123"
-    assert device_response.is_paired is False
-    assert device_response.device_status == "offline"
+    assert device_response.is_paired is True
+    assert device_response.device_status == "online"
 
 
 def test_get_by_serial_number(db: Session, device):
@@ -53,8 +53,8 @@ def test_get_by_serial_number(db: Session, device):
     assert device_response.user_id == device.user_id
     assert device_response.device_name == "testDevice"
     assert device_response.serial_number == "testSerialNumber123"
-    assert device_response.is_paired is False
-    assert device_response.device_status == "offline"
+    assert device_response.is_paired is True
+    assert device_response.device_status == "online"
 
 
 def test_get_device_with_sound(db: Session, user, device, sound):
