@@ -43,7 +43,15 @@ type Sound = {
   is_on: boolean
 }
 
-type AddSoundStatus = | "idle" | 'creating' | "ready"| "recording" | "processing" | "uploading" | "complete" | "failed"
+type AddSoundStatus = 
+  | "idle" 
+  | 'starting' 
+  | "recording" 
+  | "processing" 
+  | "naming"
+  | "uploading" 
+  | "complete" 
+  | "failed"
 
 type AddSoundFormProps = {
     deviceID: number
@@ -58,16 +66,14 @@ export function AddSoundForm({
     const [status, setStatus] = React.useState<AddSoundStatus>("idle")
     const buttonText: Record<AddSoundStatus, string> = {
         idle: "Add Sound",
-        creating: "Creating Sound...",
-        ready: "Ready Recording",
+        starting: "Starting...",
         recording: "Recording...",
         processing: "Processing...",
-        uploading: "Uploading...",
+        naming: "Save Sound",
+        uploading: "Saving...",
         complete: "Complete",
         failed: "Try Again",
     }
-
-    const [createdSound, setCreatedSound] = React.useState<Sound | null> (null)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
