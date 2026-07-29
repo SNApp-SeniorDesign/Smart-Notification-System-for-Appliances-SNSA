@@ -83,9 +83,54 @@ export function AddSoundForm({
     })
 
     async function onSubmit(data: z.infer<typeof formSchema>){
+      
+      const token = getToken();  
         
+      if(!token) {
+          toast.error("You are not authenticated", {
+              position: "top-center",
+          })
+          return
+        }
+
       if(status==="idle" || status === "failed"){
         setStatus("starting")
+
+        try {
+          const response = await fetch(
+            `${API_URL}/recording/${deviceID}/start`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+
+          if(!response.ok){
+            let detail = "Unable to start recording"
+            try {
+              const errorData = await response.json()
+              detail = errorData?.detail ?? detail
+            } catch {
+              detail = response.statusText || detail
+            }
+            throw new Error(detail)
+          }
+          setStatus("recording")
+        } catch (error) {
+          console.error("Failed to start recording", error)
+          toast.error(
+            error instanceof Error
+            ? error.message
+            : "Unable to start recording",
+            {
+              position: "top-center"
+            }
+          )
+          setStatus("failed")
+        }
+
         return
       }
 
@@ -93,14 +138,7 @@ export function AddSoundForm({
         return
       }
         
-        const token = getToken();  
         
-        if(!token) {
-            toast.error("You are not authenticated", {
-                position: "top-center",
-            })
-            return
-        }
 
 
 
