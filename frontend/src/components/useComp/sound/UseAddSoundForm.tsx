@@ -84,6 +84,14 @@ export function AddSoundForm({
 
     async function onSubmit(data: z.infer<typeof formSchema>){
         
+      if(status==="idle" || status === "failed"){
+        setStatus("starting")
+        return
+      }
+
+      if(status !== "naming"){
+        return
+      }
         
         const token = getToken();  
         
@@ -172,9 +180,16 @@ export function AddSoundForm({
               <Field>
                 <Button 
                     type="submit" 
-                    disabled={form.formState.isSubmitting}
+                    disabled={
+                      form.formState.isSubmitting ||
+                      status === "starting" ||
+                      status === "recording" ||
+                      status === "processing" ||
+                      status === "uploading" ||
+                      status === "complete"
+                    }
                 >
-
+                  {buttonText[status]}
                     
                 </Button>
               </Field>
