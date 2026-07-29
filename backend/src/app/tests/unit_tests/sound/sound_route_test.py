@@ -29,7 +29,6 @@ def test_register_sound_success(client: TestClient, headers, device):
     assert data["sound_name"] == "test_sound"
     assert data["sound_file_url"].startswith("/uploads/sounds/")
     assert data["sound_file_url"].endswith(".wav")
-    assert data["processing_status"] == "Ready"
 
 
 def test_register_sound_missing_file(
@@ -307,7 +306,6 @@ def test_sound_update(client: TestClient, headers, sound):
         data={
             "sound_name": "New Sound",
             "sound_status": "offline",
-            "processing_status": "Recording",
         },
         files={
             "file": (
@@ -327,7 +325,6 @@ def test_sound_update(client: TestClient, headers, sound):
 
     # File upload completed successfully.
     assert data["sound_status"] == "offline"
-    assert data["processing_status"] == "Recording"
     assert data["is_on"] is True
 
     assert data["is_synced_to_device"] is False

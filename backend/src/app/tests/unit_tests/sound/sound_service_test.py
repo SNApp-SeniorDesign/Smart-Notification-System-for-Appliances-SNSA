@@ -165,7 +165,6 @@ def test_create_sound_success(service, db):
     assert sound_arg.sound_file_url.startswith("/uploads/sounds/")
     assert sound_arg.sound_file_url.endswith(".wav")
     assert sound_arg.sound_status == "monitoring"
-    assert sound_arg.processing_status == "Ready"
     assert sound_arg.is_on is True
     assert sound_arg.is_synced_to_device is False
     assert sound_arg.profile_version == 1
@@ -200,7 +199,6 @@ def test_sound_update_metadata_only(service, db):
         device_id=1,
         sound_name="Old Sound Name",
         sound_status="monitoring",
-        processing_status="Ready",
         is_on=True,
         is_synced_to_device=True,
         profile_version=1,
@@ -210,7 +208,6 @@ def test_sound_update_metadata_only(service, db):
     sound_update = SoundUpdate(
         sound_name="New Sound Name",
         sound_status="detecting",
-        processing_status="Recording",
     )
 
     service.repository.sound_update.return_value = sound
@@ -231,7 +228,6 @@ def test_sound_update_with_file(service, db):
         device_id=1,
         sound_name="Old Sound Name",
         sound_status="monitoring",
-        processing_status="Ready",
         is_on=True,
         is_synced_to_device=True,
         profile_version=1,
@@ -279,7 +275,6 @@ def test_update_sound_file_missing_filename(service, db):
         sound_name="Old Sound Name",
         sound_status="monitoring",
         is_synced_to_device=True,
-        processing_status="Ready",
         profile_version=1,
         sound_file_url="/uploads/sounds/old_sound.wav",
     )
@@ -309,7 +304,6 @@ def test_update_sound_no_changes(service, db):
         sound_name="Old Sound Name",
         sound_status="monitoring",
         is_synced_to_device=True,
-        processing_status="Ready",
         profile_version=1,
         sound_file_url="/uploads/sounds/old_sound.wav",
     )
@@ -340,7 +334,6 @@ def test_delete_sound(service, db):
         sound_name="Sound to Delete",
         sound_status="monitoring",
         is_synced_to_device=True,
-        processing_status="Ready",
         profile_version=1,
         sound_file_url="/uploads/sounds/sound_to_delete.wav",
     )

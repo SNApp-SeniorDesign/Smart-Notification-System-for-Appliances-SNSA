@@ -23,7 +23,6 @@ class Sound(Base):
 
     last_detected = Column(DateTime(timezone=True))
     sound_status = Column(String, default="monitoring", nullable=False)
-    processing_status = Column(String, default="Ready", nullable=False)
 
     is_on = Column(Boolean, default=True, nullable=False)
 

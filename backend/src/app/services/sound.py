@@ -62,7 +62,6 @@ class SoundService:
             sound_name=sound_name,
             sound_file_url=sound_file_url,
             sound_status="monitoring",
-            processing_status="Ready",
             is_on=True,
             is_synced_to_device=False,
             profile_version=1,
@@ -101,9 +100,6 @@ class SoundService:
 
         if sound_db.sound_status is not None:
             sound.sound_status = sound_db.sound_status
-
-        if sound_db.processing_status is not None:
-            sound.processing_status = sound_db.processing_status
 
         old_file_url = sound.sound_file_url
 

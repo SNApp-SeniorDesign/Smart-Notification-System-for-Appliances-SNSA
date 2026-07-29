@@ -142,7 +142,6 @@ def sound(db, device):
         is_on=True,
         is_synced_to_device=False,
         profile_version=1,
-        processing_status="Ready",
     )
 
     return SoundRepository.create_sound(db, sound_data)
