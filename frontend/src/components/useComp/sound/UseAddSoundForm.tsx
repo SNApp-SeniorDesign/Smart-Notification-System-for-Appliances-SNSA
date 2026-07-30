@@ -21,6 +21,8 @@ import * as z from "zod"
 import * as React from "react"
 import { toast } from "sonner"
 import { getToken } from "@/lib/auth"
+import { startSNSARecording } from "@/lib/bluetooth"
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -35,11 +37,10 @@ type Sound = {
   id: number
   device_id: number
   sound_name: string
-  sound_file_url: string | null
+  sound_file_url: string
   sound_status: string
   is_synced_to_device: boolean
   profile_version: number
-  processing_status: string
   is_on: boolean
 }
 
@@ -56,16 +57,18 @@ type AddSoundStatus =
 type AddSoundFormProps = {
     deviceID: number
     onSuccess?: (sound: Sound) => void
+    deviceSerialNumber: string
 }
 
 export function AddSoundForm({
   onSuccess,
   deviceID,
+  deviceSerialNumber,
 }: AddSoundFormProps) {
 
     const [status, setStatus] = React.useState<AddSoundStatus>("idle")
     const buttonText: Record<AddSoundStatus, string> = {
-        idle: "Add Sound",
+        idle: "Start Recording",
         starting: "Starting...",
         recording: "Recording...",
         processing: "Processing...",
@@ -117,6 +120,7 @@ export function AddSoundForm({
             }
             throw new Error(detail)
           }
+          await startSNSARecording(deviceSerialNumber)
           setStatus("recording")
         } catch (error) {
           console.error("Failed to start recording", error)
@@ -138,10 +142,6 @@ export function AddSoundForm({
         return
       }
         
-        
-
-
-
         const formData = new FormData()
         formData.append("sound_name", data.sound_name)
         formData.append("device_id", String(deviceID))
@@ -171,8 +171,8 @@ export function AddSoundForm({
                 position: "top-center",
             })
 
-            setCreatedSound(newSound)
-            setStatus("ready")
+            setStatus("complete")
+            form.reset()
             onSuccess?.(newSound)
 
         } catch (error) {
@@ -196,25 +196,27 @@ export function AddSoundForm({
         <CardContent>
           <form id="Add-Sound-form" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
-              <Controller
-                name="sound_name"
-                control={form.control}
-                render={({field, fieldState}) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="sound_name">Sound Name</FieldLabel>
-                    <Input
-                      {...field}
-                      id="sound_name"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Laundry"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />              
+              {status === "naming" && (
+                <Controller
+                  name="sound_name"
+                  control={form.control}
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="sound_name">Sound Name</FieldLabel>
+                      <Input
+                        {...field}
+                        id="sound_name"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Laundry"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />              
+              )}
               <Field>
                 <Button 
                     type="submit" 
