@@ -10,6 +10,8 @@ export const IS_PAIRED_UUID =
 export const RECORD_COMMAND_UUID =
   "55A7DC43-48C1-4AD8-BC31-F3D6F08A5803"
 
+export const RECORDING_STATUS_UUID =
+"55A7DC43-48C1-4AD8-BC31-F3D6F08A5804"
 
 const snsaDevices = new Map<string, SNSABluetoothDevice>
 
@@ -215,4 +217,68 @@ export async function setSNSAPaired(
     await characteristic.writeValueWithResponse(
       Uint8Array.of(paired ? 1 : 0)
     )
+}
+
+export type SNSARecordingStatus =
+  | "recording"
+  | "processing"
+  | "completed"
+  | "failed"
+
+export async function subribeToRecordingStatus(
+  serialNumber: string,
+  onStatus: (status: SNSARecordingStatus) => void
+): Promise<() => Promise<void>>{
+  const service = await getSNSAService(serialNumber)
+
+  const characteristic =
+    await service.getCharacteristic(RECORDING_STATUS_UUID)
+
+  const handleStatusChange = (event: Event) => {
+    const target = event.target as typeof characteristic
+    const value = target.value
+
+    if (!value || value.byteLenght === 0){
+      return
+    }
+
+    const statusCode = value.getUint8(0)
+
+    switch (statusCode){
+      case 1:
+        onStatus("recording")
+        break
+      case 2:
+        onStatus("processing")
+        break
+      case 3:
+        onStatus("completed")
+        break
+      case 4:
+        onStatus("failed")
+        break
+      default:
+        console.warn(
+          "Unkown SNSA recording status:",
+          statusCode
+        )
+    }
+  }
+
+  characteristic.addEventListener(
+    "characteristicvaluechanged",
+    handleStatusChange
+  )
+
+  await characteristic.startNotification()
+
+  return async() => {
+    characteristic.removeEventListener(
+      "characteristicvaluechanged",
+      handleStatusChange
+    )
+    if (characteristic.isNotifying){
+      await characteristic.stopNotifications()
+    }
+  }
 }
