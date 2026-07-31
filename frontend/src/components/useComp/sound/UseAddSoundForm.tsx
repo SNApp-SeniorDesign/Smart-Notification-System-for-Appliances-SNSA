@@ -23,7 +23,7 @@ import { toast } from "sonner"
 import { getToken } from "@/lib/auth"
 import { 
   startSNSARecording,
-  
+  waitForRecordingCompletion,
 } from "@/lib/bluetooth"
 
 
@@ -63,6 +63,8 @@ type AddSoundFormProps = {
     deviceSerialNumber: string
 }
 
+//FIXME: The AddSoundForm are running two service to tell SNSA Device recording sound
+//Make sure to chose one either bluetooth or the one in backend 
 export function AddSoundForm({
   onSuccess,
   deviceID,
@@ -124,7 +126,22 @@ export function AddSoundForm({
             throw new Error(detail)
           }
           await startSNSARecording(deviceSerialNumber)
-          setStatus("recording")
+
+          await waitForRecordingCompletion(
+            deviceSerialNumber,
+            () => startSNSARecording(deviceSerialNumber),
+            (recordingStatus) => {
+              switch (recordingStatus) {
+                case "recording":
+                  setStatus("recording")
+                  break
+                case "processing":
+                  setStatus("processing")
+                  break
+              }
+            }
+          )
+          setStatus("naming")
         } catch (error) {
           console.error("Failed to start recording", error)
           toast.error(

@@ -225,60 +225,115 @@ export type SNSARecordingStatus =
   | "completed"
   | "failed"
 
-export async function subribeToRecordingStatus(
+export async function waitForRecordingCompletion(
   serialNumber: string,
-  onStatus: (status: SNSARecordingStatus) => void
-): Promise<() => Promise<void>>{
+  startRecording: () => Promise<void>,
+  onStatus: (status: SNSARecordingStatus) => void,
+  timeoutMs = 60_000
+): Promise<void> {
   const service = await getSNSAService(serialNumber)
 
   const characteristic =
-    await service.getCharacteristic(RECORDING_STATUS_UUID)
-
-  const handleStatusChange = (event: Event) => {
-    const target = event.target as typeof characteristic
-    const value = target.value
-
-    if (!value || value.byteLenght === 0){
-      return
-    }
-
-    const statusCode = value.getUint8(0)
-
-    switch (statusCode){
-      case 1:
-        onStatus("recording")
-        break
-      case 2:
-        onStatus("processing")
-        break
-      case 3:
-        onStatus("completed")
-        break
-      case 4:
-        onStatus("failed")
-        break
-      default:
-        console.warn(
-          "Unkown SNSA recording status:",
-          statusCode
-        )
-    }
-  }
-
-  characteristic.addEventListener(
-    "characteristicvaluechanged",
-    handleStatusChange
-  )
-
-  await characteristic.startNotification()
-
-  return async() => {
-    characteristic.removeEventListener(
-      "characteristicvaluechanged",
-      handleStatusChange
+    await service.getCharacteristic(
+      RECORDING_STATUS_UUID
     )
-    if (characteristic.isNotifying){
-      await characteristic.stopNotifications()
+
+  return new Promise<void>(
+    async (resolve, reject) => {
+      let timeoutID: ReturnType<typeof setTimeout> | undefined
+
+      const cleanup = async () => {
+        if(timeoutID !== undefined){
+          clearTimeout(timeoutID)
+        }
+
+        characteristic.removeEventListener(
+          "characteristicvaluechanged",
+          handleStatusChange
+        )
+
+        if (characteristic.isNotifying) {
+          try {
+            await characteristic.stopNotifications()
+          } catch (error) {
+            console.warn(
+              "Unable to stop recording notifications",
+              error
+            )
+          }
+        }
+      }
+
+      const handleStatusChange = async (
+        event: Event
+      ) => {
+        const target =
+          event.target as typeof characteristic
+
+        const value = target.value
+
+        if (!value || value.byteLength === 0) {
+          return
+        }
+
+        const statusCode = value.getUint8(0)
+
+        switch (statusCode) {
+          case 1:
+            onStatus("recording")
+            break
+
+          case 2:
+            onStatus("processing")
+            break
+
+          case 3:
+            onStatus("completed")
+            await cleanup()
+            resolve()
+            break
+
+          case 4:
+            onStatus("failed")
+            await cleanup()
+            reject(
+              new Error(
+                "The SNSA failed to record the sound"
+              )
+            )
+            break
+
+          default:
+            console.warn(
+              "Unknown recording status code:",
+              statusCode
+            )
+        }
+      }
+
+      characteristic.addEventListener(
+        "characteristicvaluechanged",
+        handleStatusChange
+      )
+
+      try {
+        await characteristic.startNotifications()
+        await startRecording()
+      } catch (error) {
+        await cleanup()
+        reject(error)
+        return
+      }
+
+      timeoutID = setTimeout(() => {
+        void cleanup()
+
+        reject(
+          new Error(
+            "Recording timed out. Please try again."
+          )
+        )
+      }, timeoutMs)
     }
-  }
+  )
 }
