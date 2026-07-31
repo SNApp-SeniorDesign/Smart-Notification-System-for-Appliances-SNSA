@@ -319,15 +319,6 @@ export async function waitForRecordingCompletion(
         handleStatusChange
       )
 
-      try {
-        await characteristic.startNotifications()
-        await startRecording()
-      } catch (error) {
-        await cleanup()
-        reject(error)
-        return
-      }
-
       timeoutID = setTimeout(() => {
         void cleanup()
 
@@ -337,6 +328,15 @@ export async function waitForRecordingCompletion(
           )
         )
       }, timeoutMs)
+
+      try {
+        await characteristic.startNotifications()
+        await startRecording()
+      } catch (error) {
+        await cleanup()
+        reject(error)
+        return
+      }
     }
   )
 }
