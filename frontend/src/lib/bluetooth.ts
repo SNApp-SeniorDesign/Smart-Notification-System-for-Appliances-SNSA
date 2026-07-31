@@ -244,6 +244,7 @@ export async function waitForRecordingCompletion(
   return new Promise<void>(
     (resolve, reject) => {
       let timeoutID: ReturnType<typeof setTimeout> | undefined
+      let settled = false
 
       const cleanup = async () => {
         if(timeoutID !== undefined){
@@ -270,6 +271,10 @@ export async function waitForRecordingCompletion(
       const handleStatusChange = async (
         event: Event
       ) => {
+        if (settled){
+          return
+        }
+        
         const target =
           event.target as typeof characteristic
 
@@ -291,12 +296,14 @@ export async function waitForRecordingCompletion(
             break
 
           case 3:
+            settled = true
             onStatus("completed")
             await cleanup()
             resolve()
             break
 
           case 4:
+            settled = true
             onStatus("failed")
             await cleanup()
             reject(
@@ -320,6 +327,12 @@ export async function waitForRecordingCompletion(
       )
 
       timeoutID = setTimeout(() => {
+        if (settled) {
+          return
+        }
+
+        settled = true
+        
         void cleanup()
 
         reject(
