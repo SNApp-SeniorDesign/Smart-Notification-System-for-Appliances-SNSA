@@ -24,6 +24,7 @@ import { getToken } from "@/lib/auth"
 import { 
   startSNSARecording,
   waitForRecordingCompletion,
+  readSNSARecordingResult,
 } from "@/lib/bluetooth"
 
 
@@ -82,6 +83,8 @@ export function AddSoundForm({
         complete: "Complete",
         failed: "Try Again",
     }
+    const [recordingFile, setRecordingFile] =
+      React.useState<File | null > (null)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -141,6 +144,13 @@ export function AddSoundForm({
               }
             }
           )
+
+          const file = await readSNSARecordingResult(
+            deviceSerialNumber
+          )
+
+          setRecordingFile(file)
+
           setStatus("naming")
         } catch (error) {
           console.error("Failed to start recording", error)
