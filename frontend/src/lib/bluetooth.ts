@@ -342,6 +342,7 @@ export async function waitForRecordingCompletion(
 }
 
 //FIXME: The function assuming the sound file is within the limit of wav file
+//as well as SNSA will provide a full wav file instead of truncated it
 //if not have to fix it
 export async function readSNSARecordingResult(
   serialNumber: string

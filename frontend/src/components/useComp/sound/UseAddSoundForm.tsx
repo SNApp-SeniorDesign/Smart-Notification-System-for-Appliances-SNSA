@@ -103,8 +103,15 @@ export function AddSoundForm({
           })
           return
         }
-
+      
+      if(!API_URL) {
+        toast.error("API URL is not configured", {
+          position: "top-center",
+        })
+        return
+      }
       if(status==="idle" || status === "failed"){
+        setRecordingFile(null)
         setStatus("starting")
 
         try {
@@ -203,7 +210,7 @@ export function AddSoundForm({
                 toast.error(`Adding sound failed: ${errorData?.detail || "Unknown error"}`, {
                     position: "top-center",
                 })
-                setStatus("failed")
+                setStatus("naming")
                 return
             }
 
@@ -224,7 +231,7 @@ export function AddSoundForm({
                 position: "top-center",
             })
 
-            setStatus("failed")
+            setStatus("naming")
         }
 
 
