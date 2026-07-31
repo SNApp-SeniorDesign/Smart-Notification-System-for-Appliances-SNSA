@@ -148,6 +148,16 @@ export function AddSoundForm({
       return
     }
 
+    if(!("bluetooth" in navigator)){
+      toast.error(
+        "Bluetooth is not supported in this browser",
+        {
+          position: "top-center"
+        }
+      )
+      return
+    }
+
     const requestRequirements =
       getRequestRequirements()
 
