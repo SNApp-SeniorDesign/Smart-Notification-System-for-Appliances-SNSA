@@ -76,6 +76,14 @@ export function AddSoundForm({
   const [recordingFile, setRecordingFile] =
     React.useState<File | null>(null)
 
+  const isMountedRef = React.useRef(true)
+
+  React.useEffect(() => {
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
   const buttonText: Record<AddSoundStatus, string> = {
     idle: "Start Recording",
     starting: "Starting...",
@@ -93,6 +101,22 @@ export function AddSoundForm({
       sound_name: "",
     },
   })
+
+  async function transitionStatus(
+    currentStatus: AddSoundStatus,
+    delayMs = 750,
+    nextStatus?: AddSoundStatus
+  ): Promise<void> {
+    setStatus(currentStatus)
+
+    await new Promise<void>((resolve) => {
+      window.setTimeout(resolve, delayMs)
+    })
+
+    if (nextStatus && isMountedRef.current) {
+      setStatus(nextStatus)
+    }
+  }
 
   function getRequestRequirements() {
     const token = getToken()
@@ -124,7 +148,8 @@ export function AddSoundForm({
       return
     }
 
-    const requestRequirements = getRequestRequirements()
+    const requestRequirements =
+      getRequestRequirements()
 
     if (!requestRequirements) {
       return
@@ -162,7 +187,8 @@ export function AddSoundForm({
 
       await waitForRecordingCompletion(
         deviceSerialNumber,
-        () => startSNSARecording(deviceSerialNumber),
+        () =>
+          startSNSARecording(deviceSerialNumber),
         (recordingStatus) => {
           switch (recordingStatus) {
             case "recording":
@@ -187,7 +213,10 @@ export function AddSoundForm({
       setRecordingFile(file)
       setStatus("naming")
     } catch (error) {
-      console.error("Failed to start recording", error)
+      console.error(
+        "Failed to start recording",
+        error
+      )
 
       toast.error(
         error instanceof Error
@@ -210,7 +239,8 @@ export function AddSoundForm({
       return
     }
 
-    const requestRequirements = getRequestRequirements()
+    const requestRequirements =
+      getRequestRequirements()
 
     if (!requestRequirements) {
       return
@@ -219,9 +249,12 @@ export function AddSoundForm({
     const { token, apiURL } = requestRequirements
 
     if (!recordingFile) {
-      toast.error("No completed recording is available", {
-        position: "top-center",
-      })
+      toast.error(
+        "No completed recording is available",
+        {
+          position: "top-center",
+        }
+      )
 
       setStatus("failed")
       return
@@ -257,31 +290,43 @@ export function AddSoundForm({
           detail = response.statusText || detail
         }
 
-        toast.error(`Adding sound failed: ${detail}`, {
-          position: "top-center",
-        })
+        toast.error(
+          `Adding sound failed: ${detail}`,
+          {
+            position: "top-center",
+          }
+        )
 
         setStatus("naming")
         return
       }
 
-      const newSound: Sound = await response.json()
+      const newSound: Sound =
+        await response.json()
 
       toast.success("Sound added successfully", {
         position: "top-center",
       })
 
       setRecordingFile(null)
-      setStatus("complete")
       form.reset()
+
+      await transitionStatus(
+        "complete",
+        750,
+        "idle"
+      )
 
       onSuccess?.(newSound)
     } catch (error) {
       console.error("Failed to add sound", error)
 
-      toast.error("Unable to connect to the server.", {
-        position: "top-center",
-      })
+      toast.error(
+        "Unable to connect to the server.",
+        {
+          position: "top-center",
+        }
+      )
 
       setStatus("naming")
     }
@@ -307,9 +352,14 @@ export function AddSoundForm({
                 <Controller
                   name="sound_name"
                   control={form.control}
-                  render={({ field, fieldState }) => (
+                  render={({
+                    field,
+                    fieldState,
+                  }) => (
                     <Field
-                      data-invalid={fieldState.invalid}
+                      data-invalid={
+                        fieldState.invalid
+                      }
                     >
                       <FieldLabel htmlFor="sound_name">
                         Sound Name
@@ -318,7 +368,9 @@ export function AddSoundForm({
                       <Input
                         {...field}
                         id="sound_name"
-                        aria-invalid={fieldState.invalid}
+                        aria-invalid={
+                          fieldState.invalid
+                        }
                         placeholder="Laundry"
                         autoComplete="off"
                         autoFocus
@@ -326,7 +378,9 @@ export function AddSoundForm({
 
                       {fieldState.invalid && (
                         <FieldError
-                          errors={[fieldState.error]}
+                          errors={[
+                            fieldState.error,
+                          ]}
                         />
                       )}
                     </Field>
@@ -339,7 +393,9 @@ export function AddSoundForm({
                 status === "failed" ? (
                   <Button
                     type="button"
-                    onClick={handleStartRecording}
+                    onClick={
+                      handleStartRecording
+                    }
                   >
                     {buttonText[status]}
                   </Button>
@@ -347,7 +403,8 @@ export function AddSoundForm({
                   <Button
                     type="submit"
                     disabled={
-                      form.formState.isSubmitting ||
+                      form.formState
+                        .isSubmitting ||
                       recordingIsInProgress ||
                       status === "uploading" ||
                       status === "complete"
