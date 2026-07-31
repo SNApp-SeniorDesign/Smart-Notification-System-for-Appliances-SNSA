@@ -383,15 +383,8 @@ export async function readSNSARecordingResult(
     value.byteLength
   )
 
-  const blob = new Blob(
-    [bytes],
-    {
-      type: "audio/wav",
-    }
-  )
-
   return new File(
-    [blob],
+    [bytes],
     `snsa-${serialNumber}.wav`,
     {
       type: "audio/wav"
