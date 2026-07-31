@@ -341,6 +341,8 @@ export async function waitForRecordingCompletion(
   )
 }
 
+//FIXME: The function assuming the sound file is within the limit of wav file
+//if not have to fix it
 export async function readSNSARecordingResult(
   serialNumber: string
 ): Promise<File> {
@@ -368,7 +370,7 @@ export async function readSNSARecordingResult(
   const blob = new Blob(
     [bytes],
     {
-      type: "application/octet-stream",
+      type: "audio/wav",
     }
   )
 
@@ -376,7 +378,7 @@ export async function readSNSARecordingResult(
     [blob],
     `snsa-${serialNumber}.bin`,
     {
-      type: blob.type
+      type: "audio/wav"
     }
   )
 }
