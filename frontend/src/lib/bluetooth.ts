@@ -242,7 +242,7 @@ export async function waitForRecordingCompletion(
     )
 
   return new Promise<void>(
-    async (resolve, reject) => {
+    (resolve, reject) => {
       let timeoutID: ReturnType<typeof setTimeout> | undefined
 
       const cleanup = async () => {
@@ -328,15 +328,17 @@ export async function waitForRecordingCompletion(
           )
         )
       }, timeoutMs)
-
-      try {
-        await characteristic.startNotifications()
-        await startRecording()
-      } catch (error) {
-        await cleanup()
-        reject(error)
-        return
+      async function setupRecording() {
+        try {
+          await characteristic.startNotifications()
+          await startRecording()
+        } catch (error) {
+          await cleanup()
+          reject(error)
+          return
+        }
       }
+      void setupRecording()
     }
   )
 }
