@@ -151,6 +151,8 @@ export function AddSoundForm({
 
           setRecordingFile(file)
 
+          
+
           setStatus("naming")
         } catch (error) {
           console.error("Failed to start recording", error)
@@ -171,10 +173,20 @@ export function AddSoundForm({
       if(status !== "naming"){
         return
       }
-        
+        if(!recordingFile){
+          toast.error("No completed recording is available", {
+            position: "top-center",
+          })
+
+          setStatus("failed")
+          return
+        }  
+
+        setStatus("uploading")
         const formData = new FormData()
         formData.append("sound_name", data.sound_name)
         formData.append("device_id", String(deviceID))
+        formData.append("file", recordingFile)
 
         try {
 
@@ -200,7 +212,7 @@ export function AddSoundForm({
             toast.success("Sound Add Successful", {
                 position: "top-center",
             })
-
+            setRecordingFile(null)
             setStatus("complete")
             form.reset()
             onSuccess?.(newSound)
