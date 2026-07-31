@@ -160,8 +160,6 @@ export function AddSoundForm({
         throw new Error(detail)
       }
 
-      await startSNSARecording(deviceSerialNumber)
-
       await waitForRecordingCompletion(
         deviceSerialNumber,
         () => startSNSARecording(deviceSerialNumber),
