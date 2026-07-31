@@ -383,6 +383,19 @@ export async function readSNSARecordingResult(
     value.byteLength
   )
 
+  const header = new TextDecoder("ascii")
+
+  const isWav =
+    bytes.byteLength >= 12 &&
+    header.decode(bytes.subarray(0, 4)) === "RIFF" &&
+    header.decode(bytes.subarray(8, 12)) === "WAVE"
+
+  if (!isWav) {
+    throw new Error (
+      "The SNSA returned an invalid WAV recording"
+    )
+  }
+
   return new File(
     [bytes],
     `snsa-${serialNumber}.wav`,
