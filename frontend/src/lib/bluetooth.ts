@@ -46,6 +46,10 @@ export async function selectSNSADevice():
     throw new Error("The selected device does not support GATT")
   }
 
+  device.addEventListener("gattservedisconnected", () => {
+    snsaDevices.delete(serialNumber)
+  })
+
   const server = gatt.connected
     ? gatt
     : await gatt.connect()
@@ -65,6 +69,15 @@ export async function selectSNSADevice():
   if (!serialNumber){
     throw new Error("SNSA device has no serial number")
   }
+
+  device.addEventListener(
+    "gattserverdisconnected",
+    () => {
+      console.warn(
+        `SNSA device ${serialNumber} disconnected`
+      )
+    }
+  )
 
   snsaDevices.set(serialNumber, device)
 
