@@ -377,7 +377,7 @@ export async function readSNSARecordingResult(
 
   return new File(
     [blob],
-    `snsa-${serialNumber}.bin`,
+    `snsa-${serialNumber}.wav`,
     {
       type: "audio/wav"
     }

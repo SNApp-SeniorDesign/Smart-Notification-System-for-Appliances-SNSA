@@ -1,6 +1,20 @@
 "use client"
 
+import * as React from "react"
+import * as z from "zod"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
+
 import { cn } from "@/lib/utils"
+import { getToken } from "@/lib/auth"
+import {
+  startSNSARecording,
+  waitForRecordingCompletion,
+  readSNSARecordingResult,
+} from "@/lib/bluetooth"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -9,33 +23,20 @@ import {
 } from "@/components/ui/card"
 import {
   Field,
+  FieldError,
   FieldGroup,
   FieldLabel,
-  FieldError,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
-import * as z from "zod"
-import * as React from "react"
-import { toast } from "sonner"
-import { getToken } from "@/lib/auth"
-import {
-  startSNSARecording,
-  waitForRecordingCompletion,
-  readSNSARecordingResult,
-} from "@/lib/bluetooth"
-
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 const formSchema = z.object({
-  sound_name: z.string()
+  sound_name: z
+    .string()
     .trim()
-    .min(1, "Sound Name is required")
+    .min(1, "Sound Name is required"),
 })
-
 
 type Sound = {
   id: number
@@ -50,7 +51,7 @@ type Sound = {
 
 type AddSoundStatus =
   | "idle"
-  | 'starting'
+  | "starting"
   | "recording"
   | "processing"
   | "naming"
@@ -60,19 +61,21 @@ type AddSoundStatus =
 
 type AddSoundFormProps = {
   deviceID: number
-  onSuccess?: (sound: Sound) => void
   deviceSerialNumber: string
+  onSuccess?: (sound: Sound) => void
 }
 
-//FIXME: The AddSoundForm are running two service to tell SNSA Device recording sound
-//Make sure to chose one either bluetooth or the one in backend 
 export function AddSoundForm({
   onSuccess,
   deviceID,
   deviceSerialNumber,
 }: AddSoundFormProps) {
+  const [status, setStatus] =
+    React.useState<AddSoundStatus>("idle")
 
-  const [status, setStatus] = React.useState<AddSoundStatus>("idle")
+  const [recordingFile, setRecordingFile] =
+    React.useState<File | null>(null)
+
   const buttonText: Record<AddSoundStatus, string> = {
     idle: "Start Recording",
     starting: "Starting...",
@@ -83,103 +86,140 @@ export function AddSoundForm({
     complete: "Complete",
     failed: "Try Again",
   }
-  const [recordingFile, setRecordingFile] =
-    React.useState<File | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       sound_name: "",
-    }
+    },
   })
 
-  async function onSubmit(data: z.infer<typeof formSchema>) {
-
-    const token = getToken();
+  function getRequestRequirements() {
+    const token = getToken()
 
     if (!token) {
       toast.error("You are not authenticated", {
         position: "top-center",
       })
-      return
+
+      return null
     }
 
     if (!API_URL) {
       toast.error("API URL is not configured", {
         position: "top-center",
       })
+
+      return null
+    }
+
+    return {
+      token,
+      apiURL: API_URL,
+    }
+  }
+
+  async function handleStartRecording() {
+    if (status !== "idle" && status !== "failed") {
       return
     }
-    if (status === "idle" || status === "failed") {
-      setRecordingFile(null)
-      setStatus("starting")
 
-      try {
-        const response = await fetch(
-          `${API_URL}/recording/${deviceID}/start`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
+    const requestRequirements = getRequestRequirements()
 
-        if (!response.ok) {
-          let detail = "Unable to start recording"
-          try {
-            const errorData = await response.json()
-            detail = errorData?.detail ?? detail
-          } catch {
-            detail = response.statusText || detail
-          }
-          throw new Error(detail)
+    if (!requestRequirements) {
+      return
+    }
+
+    const { token, apiURL } = requestRequirements
+
+    setRecordingFile(null)
+    form.reset()
+    setStatus("starting")
+
+    try {
+      const response = await fetch(
+        `${apiURL}/recording/${deviceID}/start`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-        await startSNSARecording(deviceSerialNumber)
+      )
 
-        await waitForRecordingCompletion(
-          deviceSerialNumber,
-          () => startSNSARecording(deviceSerialNumber),
-          (recordingStatus) => {
-            switch (recordingStatus) {
-              case "recording":
-                setStatus("recording")
-                break
-              case "processing":
-                setStatus("processing")
-                break
-            }
-          }
-        )
+      if (!response.ok) {
+        let detail = "Unable to start recording"
 
-        const file = await readSNSARecordingResult(
-          deviceSerialNumber
-        )
+        try {
+          const errorData = await response.json()
+          detail = errorData?.detail ?? detail
+        } catch {
+          detail = response.statusText || detail
+        }
 
-        setRecordingFile(file)
-
-
-
-        setStatus("naming")
-      } catch (error) {
-        console.error("Failed to start recording", error)
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Unable to start recording",
-          {
-            position: "top-center"
-          }
-        )
-        setStatus("failed")
+        throw new Error(detail)
       }
 
-      return
-    }
+      await startSNSARecording(deviceSerialNumber)
 
+      await waitForRecordingCompletion(
+        deviceSerialNumber,
+        () => startSNSARecording(deviceSerialNumber),
+        (recordingStatus) => {
+          switch (recordingStatus) {
+            case "recording":
+              setStatus("recording")
+              break
+
+            case "processing":
+              setStatus("processing")
+              break
+
+            case "completed":
+            case "failed":
+              break
+          }
+        }
+      )
+
+      const file = await readSNSARecordingResult(
+        deviceSerialNumber
+      )
+
+      setRecordingFile(file)
+      setStatus("naming")
+    } catch (error) {
+      console.error("Failed to start recording", error)
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to start recording",
+        {
+          position: "top-center",
+        }
+      )
+
+      setRecordingFile(null)
+      setStatus("failed")
+    }
+  }
+
+  async function onSubmit(
+    data: z.infer<typeof formSchema>
+  ) {
     if (status !== "naming") {
       return
     }
+
+    const requestRequirements = getRequestRequirements()
+
+    if (!requestRequirements) {
+      return
+    }
+
+    const { token, apiURL } = requestRequirements
+
     if (!recordingFile) {
       toast.error("No completed recording is available", {
         position: "top-center",
@@ -190,40 +230,54 @@ export function AddSoundForm({
     }
 
     setStatus("uploading")
+
     const formData = new FormData()
+
     formData.append("sound_name", data.sound_name)
     formData.append("device_id", String(deviceID))
     formData.append("file", recordingFile)
 
     try {
+      const response = await fetch(
+        `${apiURL}/sound/register`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      )
 
-      const res = await fetch(`${API_URL}/sound/register`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      })
+      if (!response.ok) {
+        let detail = "Unknown error"
 
-      if (!res.ok) {
-        const errorData = await res.json()
-        toast.error(`Adding sound failed: ${errorData?.detail || "Unknown error"}`, {
+        try {
+          const errorData = await response.json()
+          detail = errorData?.detail ?? detail
+        } catch {
+          detail = response.statusText || detail
+        }
+
+        toast.error(`Adding sound failed: ${detail}`, {
           position: "top-center",
         })
+
         setStatus("naming")
         return
       }
 
-      const newSound: Sound = await res.json()
+      const newSound: Sound = await response.json()
 
-      toast.success("Sound Add Successful", {
+      toast.success("Sound added successfully", {
         position: "top-center",
       })
+
       setRecordingFile(null)
       setStatus("complete")
       form.reset()
-      onSuccess?.(newSound)
 
+      onSuccess?.(newSound)
     } catch (error) {
       console.error("Failed to add sound", error)
 
@@ -233,54 +287,77 @@ export function AddSoundForm({
 
       setStatus("naming")
     }
-
-
   }
+
+  const recordingIsInProgress =
+    status === "starting" ||
+    status === "recording" ||
+    status === "processing"
 
   return (
     <div className={cn("flex flex-col gap-6")}>
       <Card>
-        <CardHeader>
-        </CardHeader>
+        <CardHeader />
+
         <CardContent>
-          <form id="Add-Sound-form" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            id="Add-Sound-form"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <FieldGroup>
               {status === "naming" && (
                 <Controller
                   name="sound_name"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="sound_name">Sound Name</FieldLabel>
+                    <Field
+                      data-invalid={fieldState.invalid}
+                    >
+                      <FieldLabel htmlFor="sound_name">
+                        Sound Name
+                      </FieldLabel>
+
                       <Input
                         {...field}
                         id="sound_name"
                         aria-invalid={fieldState.invalid}
                         placeholder="Laundry"
                         autoComplete="off"
+                        autoFocus
                       />
+
                       {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
+                        <FieldError
+                          errors={[fieldState.error]}
+                        />
                       )}
                     </Field>
                   )}
                 />
               )}
-              <Field>
-                <Button
-                  type="submit"
-                  disabled={
-                    form.formState.isSubmitting ||
-                    status === "starting" ||
-                    status === "recording" ||
-                    status === "processing" ||
-                    status === "uploading" ||
-                    status === "complete"
-                  }
-                >
-                  {buttonText[status]}
 
-                </Button>
+              <Field>
+                {status === "idle" ||
+                status === "failed" ? (
+                  <Button
+                    type="button"
+                    onClick={handleStartRecording}
+                  >
+                    {buttonText[status]}
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    disabled={
+                      form.formState.isSubmitting ||
+                      recordingIsInProgress ||
+                      status === "uploading" ||
+                      status === "complete"
+                    }
+                  >
+                    {buttonText[status]}
+                  </Button>
+                )}
               </Field>
             </FieldGroup>
           </form>
