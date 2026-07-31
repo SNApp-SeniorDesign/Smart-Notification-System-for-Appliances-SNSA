@@ -13,6 +13,9 @@ export const RECORD_COMMAND_UUID =
 export const RECORDING_STATUS_UUID =
 "55A7DC43-48C1-4AD8-BC31-F3D6F08A5804"
 
+export const RECORDING_RESULT_UUID =
+"55A7DC43-48C1-4AD8-BC31-F3D6F08A5805"
+
 const snsaDevices = new Map<string, SNSABluetoothDevice>
 
 type SNSAGATTServer =
@@ -334,6 +337,46 @@ export async function waitForRecordingCompletion(
           )
         )
       }, timeoutMs)
+    }
+  )
+}
+
+export async function readSNSARecordingResult(
+  serialNumber: string
+): Promise<File> {
+  const service = await getSNSAService(serialNumber)
+
+  const characteristic = 
+  await service.getCharacteristic(
+    RECORDING_RESULT_UUID
+  )
+
+  const value = await characteristic.readValue()
+
+  if(value.byteLength === 0){
+    throw new Error (
+      "The SNSA did not return a recording result"
+    )
+  }
+
+  const bytes = new Uint8Array(
+    value.buffer,
+    value.byteOffset,
+    value.byteLength
+  )
+
+  const blob = new Blob(
+    [bytes],
+    {
+      type: "application/octet-stream",
+    }
+  )
+
+  return new File(
+    [blob],
+    `snsa-${serialNumber}.bin`,
+    {
+      type: blob.type
     }
   )
 }
