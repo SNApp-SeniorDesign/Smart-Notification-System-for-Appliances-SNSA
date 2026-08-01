@@ -40,6 +40,13 @@ function handleSNSADeviceDisconnected(
   )
 }
 
+export function isSNSAConnected(
+  serialNumber: string
+): boolean {
+  const device = snsaDevices.get(serialNumber)
+  return device?.gatt?.connected ?? false
+}
+
 export async function selectSNSADevice():
   Promise<SelectedSNSADevice> {
   const device = await navigator.bluetooth.requestDevice({
