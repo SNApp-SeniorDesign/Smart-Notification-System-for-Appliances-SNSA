@@ -28,6 +28,10 @@ export function UseDialogAddSound({
   deviceSerialNumber,
 }: DialoginProps)
 {  
+
+    function handleSoundAdded(){
+        onOpenChange(false)
+    }
   return (
 //Dialog component are open
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -51,6 +55,7 @@ export function UseDialogAddSound({
             <AddSoundForm
               deviceID={deviceID}
               deviceSerialNumber={deviceSerialNumber}
+              onSuccess={handleSoundAdded}
             />
         </DialogContent>
     </Dialog>
