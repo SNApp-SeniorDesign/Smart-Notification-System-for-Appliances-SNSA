@@ -59,7 +59,7 @@ export function Footer() {
           <UseDialogAddSound
             deviceID={selectedDevice.id}
             deviceSerialNumber={
-              selectedDevice.serialNumber
+              selectedDevice.serial_number
             }
             open={addSoundDialogOpen}
             onOpenChange={setAddSoundDialogOpen}
