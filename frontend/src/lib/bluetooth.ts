@@ -122,6 +122,15 @@ export async function restoreSNSADevices():
         continue
       }
 
+      device.addEventListener(
+        "gattserverdisconnected",
+        () => {
+          console.warn(
+            `SNSA device ${serialNumber} disconnected`
+          )
+        }
+      )
+
       snsaDevices.set(serialNumber,device)
 
     } catch (error) {
