@@ -5,6 +5,7 @@ import {useRouter} from "next/navigation"
 import {getToken, clearToken} from "@/lib/auth"
 import { Header } from "@/components/useComp/general/UseHeader";
 import {Footer} from "@/components/useComp/general/UseFooter"
+import { DashboardProvider } from "@/components/useComp/general/DashboardContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -61,13 +62,16 @@ export default function AuthLayout({children}: {children: React.ReactNode}){
 
     return( 
         <>
-            <div className="min-h-screen flex flex-col">
-                <Header />
-                <main className="flex-1">
-                    {children}
-                </main>
-                <Footer/>
-            </div>
+            <DashboardProvider>
+                <div className="min-h-screen flex flex-col">
+                    <Header />
+                    <main className="flex-1">
+                        {children}
+                    </main>
+                    {/* <Footer/> */}
+                
+                </div>
+            </DashboardProvider>
         </>
     )
 }
