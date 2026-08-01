@@ -4,17 +4,28 @@ import { CollapsibleDeviceMenu } from "@/components/useComp/device/UseDeviceMenu
 import { SoundList } from "@/components/useComp/sound/UseSoundList"
 import {type Sound} from "@/components/useComp/sound/UseSoundCard"
 import {useDashboardContext} from "@/components/useComp/general/DashboardContext"
-
+import { DialogSoundForm } from "@/components/useComp/sound/UseDialogSoundMenu"
 
 export default function Dashboard(){
     const {selectedDevice} = useDashboardContext()
     const [selectedSound, setSelectedSound] = React.useState<Sound | null>(null)
+    const [soundDialogOpen, setSoundDialogOpen] = React.useState(false)
     function handleSoundClick(sound: Sound){
         setSelectedSound(sound)
+        setSoundDialogOpen(true)
     }
     return(
         <div>
             <CollapsibleDeviceMenu />
+            <DialogSoundForm 
+                open={soundDialogOpen}
+                onOpenChange={(open) => {setSoundDialogOpen(open)
+                    if(!open){
+                        setSelectedSound(null)
+                    }
+                }}
+                sound={selectedSound}
+            />
                 {selectedDevice ? (
                     <SoundList
                         deviceID={selectedDevice.id}
