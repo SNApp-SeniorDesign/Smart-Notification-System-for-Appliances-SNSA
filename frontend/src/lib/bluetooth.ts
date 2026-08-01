@@ -234,6 +234,12 @@ export async function isSNSAPaired(
 
     const value = await characteristic.readValue()
 
+    if(value.byteLength === 0){
+      throw new Error(
+        "The SNSA did not return a paired status"
+      )
+    }
+
     return value.getUint8(0) === 1
 }
 
