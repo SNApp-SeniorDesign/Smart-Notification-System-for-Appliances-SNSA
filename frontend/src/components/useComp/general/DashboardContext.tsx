@@ -4,7 +4,11 @@ import * as React from "react"
 
 type SelectedDevice = {
   id: number
-  serialNumber: string
+  device_name: string
+  serial_number: string
+  user_id: number
+  device_status: string
+  is_paired: boolean
 }
 
 type DashboardContextValue = {

@@ -14,6 +14,7 @@ import {
 import { UseDialAddDevice } from "@/components/useComp/device/UseDialogAddDevice"
 import { getToken } from "@/lib/auth"
 import {DialogDeviceForm} from "@/components/useComp/device/UseDialogDeviceForm"
+import { useDashboardContext } from "@/components/useComp/general/DashboardContext"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
@@ -30,7 +31,7 @@ export function CollapsibleDeviceMenu() {
   const [isOpen, setIsOpen] = React.useState(false)
   const [DeviceOpen, SetDeviceOpen] = React.useState(false)
   const [devices, setDevices] = React.useState<Device[]>( [] )
-  const [selectedDevice, setSelectedDevice] = React.useState<Device | null> (null)
+  const { selectedDevice, setSelectedDevice } = useDashboardContext()
 
   const [deviceFormOpen, setDeviceFormOpen] = React.useState(false)
   const [deviceForForm, setDeviceForForm] = React.useState<Device | null>(null)
