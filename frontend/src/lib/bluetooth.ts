@@ -30,6 +30,16 @@ type SelectedSNSADevice = {
   serialNumber: string
 }
 
+function handleSNSADeviceDisconnected(
+  event: Event
+): void {
+  const device = event.target as SNSABluetoothDevice
+
+  console.warn(
+    `SNSA device ${device.name ?? "unkown"} disconnected`
+  )
+}
+
 export async function selectSNSADevice():
   Promise<SelectedSNSADevice> {
   const device = await navigator.bluetooth.requestDevice({
@@ -72,11 +82,7 @@ export async function selectSNSADevice():
 
   device.addEventListener(
     "gattserverdisconnected",
-    () => {
-      console.warn(
-        `SNSA device ${serialNumber} disconnected`
-      )
-    }
+    handleSNSADeviceDisconnected
   )
 
   snsaDevices.set(serialNumber, device)
@@ -124,11 +130,7 @@ export async function restoreSNSADevices():
 
       device.addEventListener(
         "gattserverdisconnected",
-        () => {
-          console.warn(
-            `SNSA device ${serialNumber} disconnected`
-          )
-        }
+        handleSNSADeviceDisconnected
       )
 
       snsaDevices.set(serialNumber,device)
