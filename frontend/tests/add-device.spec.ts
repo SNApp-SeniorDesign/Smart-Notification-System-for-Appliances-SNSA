@@ -1,63 +1,9 @@
 import { test, expect } from "@playwright/test"
-import { MakeUser, Delete, signUp} from "./auths"
+import { MakeUser, Delete, signUp, mockBluetooth} from "./auths"
 
 test("test if device can be add via bluetooth", async({page}) => {
     //make a fake bluetooth connection
-    await page.addInitScript(() => {
-  const IS_PAIRED_UUID = "55a7dc43-48c1-4ad8-bc31-f3d6f08a58a02"
-  const SERIAL_NUMBER_UUID = "55a7dc43-48c1-4ad8-bc31-f3d6f08a58a01"
-
-  Object.defineProperty(navigator, "bluetooth", {
-    configurable: true,
-    value: {
-      requestDevice: async () => {
-        return {
-          gatt: {
-            connect: async () => {
-              return {
-                getPrimaryService: async () => {
-                  return {
-                    getCharacteristic: async (uuid: string) => {
-                      const normalizedUUID = uuid.toLowerCase()
-
-                      if (normalizedUUID === IS_PAIRED_UUID) {
-                        return {
-                          readValue: async () =>
-                            new DataView(Uint8Array.from([0]).buffer),
-
-                          writeValue: async () => {},
-                        }
-                      }
-
-                      if (normalizedUUID === SERIAL_NUMBER_UUID) {
-                        const bytes = new TextEncoder().encode(
-                          "SNSA-TEST-001"
-                        )
-
-                        return {
-                          readValue: async () =>
-                            new DataView(bytes.buffer),
-
-                          writeValue: async () => {},
-                        }
-                      }
-
-                      throw new Error(
-                        `Unknown characteristic: ${uuid}`
-                      )
-                    },
-                  }
-                },
-              }
-            },
-
-            disconnect: () => {},
-          },
-        }
-      },
-    },
-  })
-})
+    await mockBluetooth(page)
     
     //real test begin
     await page.goto("/")

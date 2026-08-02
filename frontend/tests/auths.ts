@@ -1,8 +1,8 @@
 import {Page, expect } from "@playwright/test"
 
 
-const IS_PAIRED_UUID = "55a7dc43-48c1-4ad8-bc31-f3d6f08a58a02"
-const SERIAL_NUMBER_UUID = "55a7dc43-48c1-4ad8-bc31-f3d6f08a58a01"
+const IS_PAIRED_UUID = "55A7DC43-48C1-4AD8-BC31-F3D6F08A5802"
+const SERIAL_NUMBER_UUID = "55A7DC43-48C1-4AD8-BC31-F3D6F08A5801"
 
 export function MakeUser(){
     const id = Date.now() + Math.floor(Math.random() * 10000);
@@ -98,58 +98,109 @@ export async function LogOut(page: Page, user: ReturnType<typeof MakeUser>){
 }
 
 export async function mockBluetooth(
-    page: Page,
-    serialNumber = "SNSA-TEST-001",
-    isPaired = false
-){
-    await page.addInitScript(
+  page: Page,
+  serialNumber = "SNSA-TEST-001",
+  isPaired = false
+): Promise<void> {
+  await page.addInitScript(
     ({ pairedUUID, serialUUID, serial, paired }) => {
+      const pairedCharacteristic = {
+        readValue: async () =>
+          new DataView(
+            Uint8Array.from([paired ? 1 : 0]).buffer
+          ),
+
+        writeValue: async () => {},
+        writeValueWithResponse: async () => {},
+      }
+
+      const serialCharacteristic = {
+        readValue: async () => {
+          const bytes = new TextEncoder().encode(serial)
+
+          return new DataView(
+            bytes.buffer,
+            bytes.byteOffset,
+            bytes.byteLength
+          )
+        },
+
+        writeValue: async () => {},
+        writeValueWithResponse: async () => {},
+      }
+
+      const service = {
+        getCharacteristic: async (uuid: string) => {
+          const normalizedUUID = uuid.toLowerCase()
+
+          if (normalizedUUID === pairedUUID.toLowerCase()) {
+            return {
+              readValue: async () =>
+                new DataView(
+                  Uint8Array.from([paired ? 1 : 0]).buffer
+                ),
+              writeValue: async () => {},
+              writeValueWithResponse: async () => {},
+            }
+          }
+
+          if (normalizedUUID === serialUUID.toLowerCase()) {
+            const bytes = new TextEncoder().encode(serial)
+            return {
+              readValue: async () =>
+                new DataView(
+                  bytes.buffer,
+                  bytes.byteOffset,
+                  bytes.byteLength
+                ),
+                writeValue: async () => {},
+                writeValueWithResponse: async () => {},
+            }
+          }
+
+          throw new Error(
+            `Unknown characteristic: ${uuid}`
+          )
+        },
+      }
+
+      class MockBluetoothDevice extends EventTarget {
+        readonly id = "mock-snsa-device"
+        readonly name = "Mock SNSA Device"
+
+        readonly gatt = {
+          connected: false,
+
+          connect: async () => {
+            this.gatt.connected = true
+            return this.gatt
+          },
+
+          disconnect: () => {
+            if (!this.gatt.connected) {
+              return
+            }
+
+            this.gatt.connected = false
+
+            this.dispatchEvent(
+              new Event("gattserverdisconnected")
+            )
+          },
+
+          getPrimaryService: async (_uuid: string) => {
+            return service
+          },
+        }
+      }
+
+      const device = new MockBluetoothDevice()
+
       Object.defineProperty(navigator, "bluetooth", {
         configurable: true,
         value: {
-          requestDevice: async () => {
-            return {
-              gatt: {
-                connect: async () => {
-                  return {
-                    getPrimaryService: async () => {
-                      return {
-                        getCharacteristic: async (uuid: string) => {
-                          const normalizedUUID = uuid.toLowerCase()
-
-                          if (normalizedUUID === pairedUUID) {
-                            return {
-                              readValue: async () =>
-                                new DataView(
-                                  Uint8Array.from([paired ? 1 : 0]).buffer
-                                ),
-                              writeValue: async () => {},
-                            }
-                          }
-
-                          if (normalizedUUID === serialUUID) {
-                            const bytes = new TextEncoder().encode(serial)
-
-                            return {
-                              readValue: async () =>
-                                new DataView(bytes.buffer),
-                              writeValue: async () => {},
-                            }
-                          }
-
-                          throw new Error(
-                            `Unknown characteristic: ${uuid}`
-                          )
-                        },
-                      }
-                    },
-                  }
-                },
-
-                disconnect: () => {},
-              },
-            }
-          },
+          requestDevice: async () => device,
+          getDevices: async () => [device],
         },
       })
     },

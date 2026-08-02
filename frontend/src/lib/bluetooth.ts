@@ -63,7 +63,7 @@ export async function selectSNSADevice():
     throw new Error("The selected device does not support GATT")
   }
 
-  device.addEventListener("gattservedisconnected", () => {
+  device.addEventListener("gattserverdisconnected", () => {
     snsaDevices.delete(serialNumber)
   })
 
