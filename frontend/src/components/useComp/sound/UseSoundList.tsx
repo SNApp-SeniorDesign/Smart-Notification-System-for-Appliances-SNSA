@@ -28,6 +28,8 @@ export function SoundList({
 
     React.useEffect(() => {
         async function fetchSound(){
+
+            setLoading(true)
             const token = getToken()
             if (!token) {
                 toast.error("No token found")
