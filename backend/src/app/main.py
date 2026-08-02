@@ -36,10 +36,7 @@ app.include_router(recording_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        NEXT_URL,
-    ],
+    allow_origins=["http://localhost:3000", NEXT_URL, "http://192.168.0.187:3000"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
