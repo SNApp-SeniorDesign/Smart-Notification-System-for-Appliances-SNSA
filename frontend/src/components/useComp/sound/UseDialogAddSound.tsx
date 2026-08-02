@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import {AddSoundForm} from "./UseAddSoundForm"
+import { useDashboardContext } from "../general/DashboardContext"
 
 type DialoginProps = {
   open: boolean
@@ -28,12 +29,12 @@ export function UseDialogAddSound({
   deviceSerialNumber,
 }: DialoginProps)
 {  
-
-    function handleSoundAdded(){
-        onOpenChange(false)
-    }
+  const { refreshSounds } = useDashboardContext()
+  function handleSoundAdded(){
+    onOpenChange(false)
+    refreshSounds()
+  }
   return (
-//Dialog component are open
     <Dialog open={open} onOpenChange={onOpenChange}>
         {showTrigger && (
           <DialogTrigger
