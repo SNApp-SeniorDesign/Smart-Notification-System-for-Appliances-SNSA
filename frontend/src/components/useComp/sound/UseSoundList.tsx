@@ -15,11 +15,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
 type SoundListProps = {
     deviceID: number
     onSoundClick: (sound: Sound) => void
+    refreshKey: number
 }
 
 export function SoundList({
     deviceID,
     onSoundClick,
+    refreshKey,
 }: SoundListProps){
     const [sounds, setSounds] = React.useState<Sound[]>([])
     const [loading, setLoading] = React.useState(true)
@@ -64,7 +66,7 @@ export function SoundList({
             }
         }
         void fetchSound()
-    }, [deviceID])
+    }, [deviceID, refreshKey])
 
     if(loading) {
         return <p>Loading sounds...</p>
