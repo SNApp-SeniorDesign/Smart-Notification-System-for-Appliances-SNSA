@@ -7,10 +7,9 @@ import {useDashboardContext} from "@/components/useComp/general/DashboardContext
 import { DialogSoundForm } from "@/components/useComp/sound/UseDialogSoundMenu"
 
 export default function Dashboard(){
-    const {selectedDevice} = useDashboardContext()
     const [selectedSound, setSelectedSound] = React.useState<Sound | null>(null)
     const [soundDialogOpen, setSoundDialogOpen] = React.useState(false)
-    const [soundRefreshKey, setSoundRefreshKey] = React.useState(0)
+    const { selectedDevice, soundRefreshKey, refreshSounds } = useDashboardContext()
     function handleSoundClick(sound: Sound){
         setSelectedSound(sound)
         setSoundDialogOpen(true)
@@ -27,7 +26,7 @@ export default function Dashboard(){
                 }}
                 sound={selectedSound}
                 onDeleteSuccess={() => {
-                    setSoundRefreshKey((current) => current + 1)
+                    refreshSounds()
                     setSelectedSound(null)
                 }}
             />
