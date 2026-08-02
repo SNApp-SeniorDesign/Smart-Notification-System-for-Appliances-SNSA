@@ -20,6 +20,8 @@ type DashboardContextValue = {
   setAddSoundDialogOpen: React.Dispatch<
     React.SetStateAction<boolean>
   >
+  soundRefreshKey: number
+  refreshSounds: () => void
 }
 
 const DashboardContext =
@@ -35,6 +37,13 @@ export function DashboardProvider({
 
   const [addSoundDialogOpen, setAddSoundDialogOpen] =
     React.useState(false)
+  
+  const [soundRefreshKey, setSoundRefreshKey] = 
+    React.useState(0)
+  
+  function refreshSounds() {
+    setSoundRefreshKey((current) => current + 1)
+  }
 
   return (
     <DashboardContext.Provider
@@ -43,6 +52,8 @@ export function DashboardProvider({
         setSelectedDevice,
         addSoundDialogOpen,
         setAddSoundDialogOpen,
+        soundRefreshKey,
+        refreshSounds,
       }}
     >
       {children}
