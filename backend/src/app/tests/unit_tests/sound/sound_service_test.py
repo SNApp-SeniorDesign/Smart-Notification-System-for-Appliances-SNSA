@@ -405,3 +405,11 @@ def test_delete_sound_file(tmp_path: Path):
     service.delete_sound_file("/uploads.sounds/doorbell.wav")
 
     assert not sound_file.exists()
+
+
+def test_delete_sound_file_missing_file_does_not_raise(
+    tmp_path: Path,
+):
+    service = SoundService(upload_dir=tmp_path)
+
+    service.delete_sound_file("/uploads/sounds/not-founs.wav")
