@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import Mock, patch, call
 from fastapi import HTTPException
 from types import SimpleNamespace
+from pathlib import Path
 
 from app.services.user import UserService
 from app.schemas.user import UserCreate, UserUpdate
@@ -415,3 +416,64 @@ def test_delete_user(service, db):
         db_user,
     )
     assert result is None
+
+
+def test_delete_user_sound_files(service, db, tmp_path: Path):
+    sound_one = tmp_path / "doorbell.wav"
+    sound_two = tmp_path / "microwave.wav"
+    sound_three = tmp_path / "washing-machine.wav"
+
+    sound_one.write_bytes(b"fake wav data")
+    sound_two.write_bytes(b"fake wav data")
+    sound_three.write_bytes(b"fake wav data")
+
+    assert sound_one.exists()
+    assert sound_two.exists()
+    assert sound_three.exists()
+
+    device_one_sounds = [
+        SimpleNamespace(
+            id=1,
+            sound_file_url="/uploads/sounds/doorbell.wav",
+        ),
+        SimpleNamespace(
+            id=2,
+            sound_file_url="/uploads/sounds/microwave.wav",
+        ),
+    ]
+
+    device_two_sounds = [
+        SimpleNamespace(
+            id=3,
+            sound_file_url="/uploads.sounds/washing-machine.wav",
+        ),
+    ]
+
+    db_user = SimpleNamespace(
+        id=1,
+        devices=[
+            SimpleNamespace(
+                id=1,
+                sounds=device_one_sounds,
+            ),
+            SimpleNamespace(
+                id=2,
+                sounds=device_two_sounds,
+            ),
+        ],
+    )
+
+    with patch(
+        "app.services.user.sound_service.upload_dir",
+        tmp_path,
+    ):
+        service.delete_user(db, db_user)
+
+    assert not sound_one.exists()
+    assert not sound_two.exists()
+    assert not sound_three.exists()
+
+    service.repository.delete_user.assert_called_once_with(
+        db,
+        db_user,
+    )
