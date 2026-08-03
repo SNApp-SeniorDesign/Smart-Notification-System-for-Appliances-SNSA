@@ -20,6 +20,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  CardTitle,
 } from "@/components/ui/card"
 import {
   Field,
@@ -351,7 +352,7 @@ export function AddSoundForm({
     <div className={cn("flex flex-col gap-6")}>
       <Card>
         <CardHeader />
-
+        <CardTitle> Recording & Save Sound</CardTitle>
         <CardContent>
           <form
             id="Add-Sound-form"
