@@ -3,6 +3,8 @@ from unittest.mock import Mock, call
 from fastapi import HTTPException, UploadFile
 from io import BytesIO
 from types import SimpleNamespace
+from pathlib import Path
+from app.services.sound import SoundService
 
 from app.schemas.sound import SoundUpdate
 
@@ -390,3 +392,16 @@ def test_delete_sound_all(service):
     )
     assert service.delete_sound_file.call_count == 3
     assert result is None
+
+
+def test_delete_sound_file(tmp_path: Path):
+    service = SoundService(upload_dir=tmp_path)
+
+    sound_file = tmp_path / "doorbell.wav"
+    sound_file.write_bytes(b"fake wav data")
+
+    assert sound_file.exists()
+
+    service.delete_sound_file("/uploads.sounds/doorbell.wav")
+
+    assert not sound_file.exists()
