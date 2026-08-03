@@ -24,7 +24,7 @@ test("a sound can be added", async ({ page }) => {
 
     await expect(
       page.getByRole("heading", {
-        name: "Recording & Save Sound",
+        name: "Record and Save your Sound",
       })
     ).toBeVisible()
 

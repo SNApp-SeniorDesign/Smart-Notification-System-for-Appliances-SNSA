@@ -352,7 +352,6 @@ export function AddSoundForm({
     <div className={cn("flex flex-col gap-6")}>
       <Card>
         <CardHeader />
-        <CardTitle> Recording & Save Sound</CardTitle>
         <CardContent>
           <form
             id="Add-Sound-form"
