@@ -114,6 +114,8 @@ class UserService:
     def delete_user(self, db: Session, db_user: User) -> None:
         for device in db_user.devices:
             sound_service.delete_all_sound_files(device.sounds)
+            for sound in list(device.sounds):
+                sound_service.delete_sound(db, sound)
 
         self.repository.delete_user(db, db_user)
 
