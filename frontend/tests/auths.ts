@@ -1,8 +1,13 @@
 import {Page, expect } from "@playwright/test"
 
-
-const IS_PAIRED_UUID = "55A7DC43-48C1-4AD8-BC31-F3D6F08A5802"
-const SERIAL_NUMBER_UUID = "55A7DC43-48C1-4AD8-BC31-F3D6F08A5801"
+import {
+  IS_PAIRED_UUID,
+  RECORD_COMMAND_UUID,
+  RECORDING_RESULT_UUID,
+  RECORDING_STATUS_UUID,
+  SERIAL_NUMBER_UUID,
+  SNSA_SERVICE_UUID,
+} from "@/lib/bluetooth"
 
 export function MakeUser(){
     const id = Date.now() + Math.floor(Math.random() * 10000);
@@ -103,19 +108,119 @@ export async function mockBluetooth(
   isPaired = false
 ): Promise<void> {
   await page.addInitScript(
-    ({ pairedUUID, serialUUID, serial, paired }) => {
-      const pairedCharacteristic = {
-        readValue: async () =>
-          new DataView(
-            Uint8Array.from([paired ? 1 : 0]).buffer
-          ),
+    ({
+      serviceUUID,
+      pairedUUID,
+      serialUUID,
+      recordCommandUUID,
+      recordingStatusUUID,
+      recordingResultUUID,
+      serial,
+      paired,
+    }) => {
+      const normalize = (uuid: string) => uuid.toLowerCase()
 
-        writeValue: async () => {},
-        writeValueWithResponse: async () => {},
+      const createWavBytes = (): Uint8Array => {
+        // Minimal valid WAV header with no audio data.
+        const buffer = new ArrayBuffer(44)
+        const view = new DataView(buffer)
+        const encoder = new TextEncoder()
+
+        const writeString = (
+          offset: number,
+          value: string
+        ): void => {
+          const bytes = encoder.encode(value)
+
+          for (let index = 0; index < bytes.length; index++) {
+            view.setUint8(offset + index, bytes[index])
+          }
+        }
+
+        writeString(0, "RIFF")
+        view.setUint32(4, 36, true)
+        writeString(8, "WAVE")
+        writeString(12, "fmt ")
+        view.setUint32(16, 16, true)
+        view.setUint16(20, 1, true)
+        view.setUint16(22, 1, true)
+        view.setUint32(24, 16000, true)
+        view.setUint32(28, 32000, true)
+        view.setUint16(32, 2, true)
+        view.setUint16(34, 16, true)
+        writeString(36, "data")
+        view.setUint32(40, 0, true)
+
+        return new Uint8Array(buffer)
       }
 
-      const serialCharacteristic = {
-        readValue: async () => {
+      class MockCharacteristic extends EventTarget {
+        value: DataView | null = null
+        isNotifying = false
+
+        constructor(
+          private readonly readValueFactory:
+            () => Promise<DataView>,
+          private readonly onWrite?: (
+            value: BufferSource
+          ) => Promise<void>
+        ) {
+          super()
+        }
+
+        async readValue(): Promise<DataView> {
+          this.value = await this.readValueFactory()
+          return this.value
+        }
+
+        async writeValueWithResponse(
+          value: BufferSource
+        ): Promise<void> {
+          await this.onWrite?.(value)
+        }
+
+        async writeValue(
+          value: BufferSource
+        ): Promise<void> {
+          await this.onWrite?.(value)
+        }
+
+        async startNotifications(): Promise<this> {
+          this.isNotifying = true
+          return this
+        }
+
+        async stopNotifications(): Promise<this> {
+          this.isNotifying = false
+          return this
+        }
+
+        emitValue(bytes: Uint8Array): void {
+          this.value = new DataView(
+            bytes.buffer,
+            bytes.byteOffset,
+            bytes.byteLength
+          )
+
+          this.dispatchEvent(
+            new Event("characteristicvaluechanged")
+          )
+        }
+      }
+
+      const statusCharacteristic = new MockCharacteristic(
+        async () =>
+          new DataView(Uint8Array.from([0]).buffer)
+      )
+
+      const characteristics = new Map<
+        string,
+        MockCharacteristic
+      >()
+
+      characteristics.set(
+        normalize(serialUUID),
+        new MockCharacteristic(async () => {
           const bytes = new TextEncoder().encode(serial)
 
           return new DataView(
@@ -123,44 +228,78 @@ export async function mockBluetooth(
             bytes.byteOffset,
             bytes.byteLength
           )
-        },
+        })
+      )
 
-        writeValue: async () => {},
-        writeValueWithResponse: async () => {},
-      }
+      characteristics.set(
+        normalize(pairedUUID),
+        new MockCharacteristic(async () => {
+          return new DataView(
+            Uint8Array.from([paired ? 1 : 0]).buffer
+          )
+        })
+      )
+
+      characteristics.set(
+        normalize(recordingStatusUUID),
+        statusCharacteristic
+      )
+
+      characteristics.set(
+        normalize(recordingResultUUID),
+        new MockCharacteristic(async () => {
+          const bytes = createWavBytes()
+
+          return new DataView(
+            bytes.buffer,
+            bytes.byteOffset,
+            bytes.byteLength
+          )
+        })
+      )
+
+      characteristics.set(
+        normalize(recordCommandUUID),
+        new MockCharacteristic(
+          async () => new DataView(new ArrayBuffer(0)),
+          async () => {
+            // Give the app time to update each UI state.
+            setTimeout(() => {
+              statusCharacteristic.emitValue(
+                Uint8Array.from([1])
+              )
+            }, 50)
+
+            setTimeout(() => {
+              statusCharacteristic.emitValue(
+                Uint8Array.from([2])
+              )
+            }, 150)
+
+            setTimeout(() => {
+              statusCharacteristic.emitValue(
+                Uint8Array.from([3])
+              )
+            }, 250)
+          }
+        )
+      )
 
       const service = {
+        uuid: serviceUUID,
+
         getCharacteristic: async (uuid: string) => {
-          const normalizedUUID = uuid.toLowerCase()
-
-          if (normalizedUUID === pairedUUID.toLowerCase()) {
-            return {
-              readValue: async () =>
-                new DataView(
-                  Uint8Array.from([paired ? 1 : 0]).buffer
-                ),
-              writeValue: async () => {},
-              writeValueWithResponse: async () => {},
-            }
-          }
-
-          if (normalizedUUID === serialUUID.toLowerCase()) {
-            const bytes = new TextEncoder().encode(serial)
-            return {
-              readValue: async () =>
-                new DataView(
-                  bytes.buffer,
-                  bytes.byteOffset,
-                  bytes.byteLength
-                ),
-                writeValue: async () => {},
-                writeValueWithResponse: async () => {},
-            }
-          }
-
-          throw new Error(
-            `Unknown characteristic: ${uuid}`
+          const characteristic = characteristics.get(
+            normalize(uuid)
           )
+
+          if (!characteristic) {
+            throw new Error(
+              `Unknown characteristic: ${uuid}`
+            )
+          }
+
+          return characteristic
         },
       }
 
@@ -188,7 +327,13 @@ export async function mockBluetooth(
             )
           },
 
-          getPrimaryService: async (_uuid: string) => {
+          getPrimaryService: async (uuid: string) => {
+            if (normalize(uuid) !== normalize(serviceUUID)) {
+              throw new Error(
+                `Unknown service: ${uuid}`
+              )
+            }
+
             return service
           },
         }
@@ -205,8 +350,12 @@ export async function mockBluetooth(
       })
     },
     {
+      serviceUUID: SNSA_SERVICE_UUID,
       pairedUUID: IS_PAIRED_UUID,
       serialUUID: SERIAL_NUMBER_UUID,
+      recordCommandUUID: RECORD_COMMAND_UUID,
+      recordingStatusUUID: RECORDING_STATUS_UUID,
+      recordingResultUUID: RECORDING_RESULT_UUID,
       serial: serialNumber,
       paired: isPaired,
     }
