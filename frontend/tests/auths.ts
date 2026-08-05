@@ -67,25 +67,50 @@ export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
 
 }
 
-export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
-    await page.getByRole("link", { name: "Setting"}).click()
-    await expect(page).toHaveURL(/\/setting/)
+export async function Delete(
+  page: Page,
+  user: ReturnType<typeof MakeUser>
+): Promise<void> {
+  await page.getByRole("link", { name: "Setting" }).click()
+  await expect(page).toHaveURL(/\/setting/)
 
-    page.once("dialog", async (dialog) => {
-        expect(dialog.message()).toContain(
-        "Are you sure you want to delete your account?"
-        );
+  page.once("dialog", async dialog => {
+    expect(dialog.message()).toContain(
+      "Are you sure you want to delete your account?"
+    )
 
-        await dialog.accept();
-    });
+    await dialog.accept()
+  })
 
-    await page.getByRole("button", { name: "Delete Account" }).click();
+  const [deleteResponse] = await Promise.all([
+    page.waitForResponse(response => {
+      const url = new URL(response.url())
 
-    await expect(page).toHaveURL(/\/$/)
+      return (
+        response.request().method() === "DELETE" &&
+        url.pathname === "/users/me"
+      )
+    }),
 
-    await expect.poll(async () => {
-        return await page.evaluate(() => localStorage.getItem("token"))
-    }).toBeNull()
+    page
+      .getByRole("button", { name: "Delete Account" })
+      .click(),
+  ])
+
+  expect(
+    deleteResponse.status(),
+    "Delete endpoint should return 204"
+  ).toBe(204)
+
+  await expect(page).toHaveURL(/\/$/)
+
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        localStorage.getItem("access_token")
+      )
+    )
+    .toBeNull()
 }
 
 export async function LogOut(page: Page, user: ReturnType<typeof MakeUser>){
