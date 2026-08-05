@@ -67,10 +67,7 @@ export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
 
 }
 
-export async function Delete(
-  page: Page,
-  user: ReturnType<typeof MakeUser>
-): Promise<void> {
+export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
   await page.getByRole("link", { name: "Setting" }).click()
   await expect(page).toHaveURL(/\/setting/)
 
@@ -414,4 +411,61 @@ export async function addDevice(page: Page, deviceName: string){
     await expect(
         page.getByTestId("selected-device")
     ).toHaveText(deviceName)
+}
+
+export async function addSound(page: Page, soundName:string){
+
+  await page
+      .getByRole("button", { name: "Add Sound" })
+      .click()
+
+    await expect(
+      page.getByRole("heading", {
+        name: "Record and Save your Sound",
+      })
+    ).toBeVisible()
+
+    await page
+      .getByRole("button", { name: "Start Recording" })
+      .click()
+
+    await expect(
+      page.getByText("Starting...")
+    ).toBeVisible()
+
+    await expect(
+      page.getByText("Recording...")
+    ).toBeVisible()
+
+    await expect(
+      page.getByText("Processing...")
+    ).toBeVisible()
+
+    await expect(
+      page.getByRole("button", { name: "Save Sound" })
+    ).toBeVisible()
+
+    await page
+      .getByLabel("Sound Name")
+      .fill(soundName)
+
+    await page
+      .getByRole("button", { name: "Save Sound" })
+      .click()
+
+    await expect(
+      page.getByText("Saving")
+    ).toBeVisible()
+
+    await expect(
+      page.getByText("Complete")
+    ).toBeVisible()
+
+    await expect(
+      page.getByText("Sound Added Successfully")
+    ).toBeVisible()
+
+    await expect(
+      page.getByText(soundName)
+    ).toBeVisible()  
 }
