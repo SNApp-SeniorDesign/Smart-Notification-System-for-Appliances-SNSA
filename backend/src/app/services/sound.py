@@ -122,6 +122,7 @@ class SoundService:
 
     # Delete old sound file helper
     def delete_sound_file(self, sound_file_url: str) -> None:
+
         if not sound_file_url:
             return
 
