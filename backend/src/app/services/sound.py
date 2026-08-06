@@ -18,6 +18,10 @@ class SoundService:
         self.upload_dir = upload_dir or Path("uploads/sounds")
         self.upload_dir.mkdir(parents=True, exist_ok=True)
 
+    #helper to know storage sound file locally or in soundflare
+    def is_using_r2(self) -> bool:
+        return os.getenv("STORAGE_BACKEND", "local").lower() == "r2"
+
     # Get
 
     def is_sound_name_taken(self, db: Session, sound_name: str, device_id: int) -> bool:
@@ -81,6 +85,13 @@ class SoundService:
 
         file_ext = Path(file.filename).suffix
         stored_filename = f"{uuid4()}{file_ext}"
+
+        #Soundflare storage
+        if self.is_using_r2():
+            return self.save_sound_file_to_r2(file, stored_file_name)
+
+
+        #Local Storage
         file_path = self.upload_dir / stored_filename
 
         with file_path.open("wb") as buffer:
