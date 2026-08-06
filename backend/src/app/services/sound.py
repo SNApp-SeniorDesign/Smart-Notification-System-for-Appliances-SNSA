@@ -9,6 +9,8 @@ import shutil
 from sqlalchemy.orm import Session
 from fastapi import status, HTTPException, UploadFile
 
+import os
+import boto3
 
 class SoundService:
     def __init__(self, upload_dir: Path | None = None) -> None:
