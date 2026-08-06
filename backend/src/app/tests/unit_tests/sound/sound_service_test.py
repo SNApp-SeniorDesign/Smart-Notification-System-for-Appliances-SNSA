@@ -138,7 +138,9 @@ def test_get_sound_by_id_fail(service, db):
 # Post
 
 
-def test_create_sound_success(service, db):
+def test_create_sound_success(service, db, monkeypatch):
+    monkeypatch.setenv("STORAGE_BACKEND", "local")
+    
     fake_file = UploadFile(
         filename="test.wav",
         file=BytesIO(b"fake audio data"),

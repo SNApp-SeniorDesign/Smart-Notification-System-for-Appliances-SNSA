@@ -75,7 +75,57 @@ class SoundService:
 
         return self.repository.create_sound(db, sound)
 
-    # FIXME: For now only work locally, need to fix so it work at launch
+    
+    #function helper to save sound file to cloudflare
+    def save_sound_file_to_r2(
+        self,
+        file: UploadFile,
+        stored_filename: str
+    ) -> str:
+        account_id = os.getenv("R2_ACCOUNT_ID")
+        access_key_id = os.getenv("R2_ACCESS_KEY_ID")
+        bucket_name = os.getenv("R2_BUCKET_NAME")
+
+        if not all (
+            [
+                account_id,
+                access_key_id,
+                secret_access_key,
+                bucket_name,
+            ]
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="R2 storage is not configured correctly",
+            )
+        r2_client = boto3.client(
+            "s3",
+            endpoint_url(
+                f"https:/{account_id}.r2.cloudflarestorage.com"
+            ),
+            aws_access_key_id=access_key_id,
+            aws_secret_access=secret_access_key,
+            region_name="auto"
+        )
+
+        object_key = f"sounds/{stored_filename}"
+
+        file.file.seek(0)
+
+        r2_client.upload_fileobj(
+            file.file,
+            bucket_name,
+            object_key,
+            ExtraArgs={
+                "Contenttype": (
+                    file.content_type
+                    or "application/octet-stream"
+                )
+            },
+        )
+
+        return object_key
+
     def save_sound_file(self, file: UploadFile) -> str:
 
         if not file.filename:
