@@ -1,5 +1,4 @@
 services:
-
   db:
     image: postgres:16-alpine
     environment:
@@ -7,42 +6,59 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_123}
       POSTGRES_DB: ${POSTGRES_DB:-snsa}
     ports:
-    - "5432:5432"
+      - "5432:5432"
     volumes:
-    - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rune} -d ${POSTGRES_DB:-snsa}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-rune} -d ${POSTGRES_DB:-snsa}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
-  
+
   backend:
     build:
       context: ./backend
+
+    user: "${UID:-1000}:${GID:-1000}"
+
     depends_on:
       db:
         condition: service_healthy
+
     env_file:
       - .env
+
     environment:
-      - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER:-rune}:${POSTGRES_PASSWORD:-dev_password_123}@db:5432/${POSTGRES_DB:-snsa}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-rune}:${POSTGRES_PASSWORD:-dev_password_123}@db:5432/${POSTGRES_DB:-snsa}
+      UPLOAD_ROOT: /app/uploads/sounds
+
     ports:
       - "8000:8000"
+
     volumes:
       - ./backend:/app
-      - /app/.venv
-  
+      - backend_venv:/app/.venv
+
   frontend:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_API_URL: https://smart-notification-system-for-appliances.onrender.com
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+
     depends_on:
       - backend
+
     environment:
-     NEXT_PUBLIC_API_URL: https://smart-notification-system-for-appliances.onrender.com
-     INTERNAL_API_URL: http://localhost:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      INTERNAL_API_URL: http://backend:8000
+
     ports:
       - "3000:3000"
+
 volumes:
   db_data:
+  backend_venv:

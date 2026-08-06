@@ -293,15 +293,14 @@ export async function waitForRecordingCompletion(
           handleStatusChange
         )
 
-        if (characteristic.isNotifying) {
-          try {
-            await characteristic.stopNotifications()
-          } catch (error) {
-            console.warn(
-              "Unable to stop recording notifications",
+
+        try {
+          await characteristic.stopNotifications()
+        } catch (error) {
+          console.warn(
+            "Unable to stop recording notifications",
               error
-            )
-          }
+          )
         }
       }
 
@@ -433,8 +432,11 @@ export async function readSNSARecordingResult(
     )
   }
 
+  const wavBytes = new Uint8Array(bytes.byteLength)
+  wavBytes.set(bytes)
+  
   return new File(
-    [bytes],
+    [wavBytes.buffer],
     `snsa-${serialNumber}.wav`,
     {
       type: "audio/wav"
