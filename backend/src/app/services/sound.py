@@ -193,7 +193,7 @@ class SoundService:
             account_id = os.getenv("R2_AC")
 
         if not sound_file_url:
-        return
+            return
 
         if self.is_using_r2():
             account_id = os.getenv("R2_ACCOUNT_ID")
