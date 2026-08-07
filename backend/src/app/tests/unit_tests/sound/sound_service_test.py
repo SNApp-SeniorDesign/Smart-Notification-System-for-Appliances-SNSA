@@ -444,3 +444,25 @@ def test_delete_sound_file_missing_file_does_not_raise(
     service = SoundService(upload_dir=tmp_path)
 
     service.delete_sound_file("/uploads/sounds/not-founs.wav")
+
+def test_delete_sound_file_r2(service, monkeypatch):
+    monkeypatch.setenv("STORAGE_BACKEND", "r2")
+    monkeypatch.setenv("R2_ACCOUNT_ID", "test-account-id")
+    monkeypatch.setenv("R2_ACCESS_KEY_ID", "test-access-key")
+    monkeypatch.setenv("R2_SECRET_ACCESS_KEY", "test-secret-key")
+    monkeypatch.setenv("R2_BUCKET_NAME", "snsa-sound-files")
+
+    fake_r2_client = Mock()
+
+    with patch(
+        "app.services.sound.boto3.client",
+        return_value=fake_r2_client,
+    ):
+        service.delete_sound_file(
+            "sounds/test-file.wav"
+        )
+    
+    fake_r2_client.delete_object.assert_called_once_with(
+        Bucket="snsa-sound-files",
+        Key="sounds/test-file.wav",
+    )
