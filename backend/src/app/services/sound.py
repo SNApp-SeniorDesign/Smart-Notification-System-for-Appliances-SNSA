@@ -135,7 +135,7 @@ class SoundService:
             )
 
         file_ext = Path(file.filename).suffix
-        stored_filename = f"{uuid4()}{file_ext}"
+        stored_file_name = f"{uuid4()}{file_ext}"
 
         #Soundflare storage
         if self.is_using_r2():
@@ -143,12 +143,12 @@ class SoundService:
 
 
         #Local Storage
-        file_path = self.upload_dir / stored_filename
+        file_path = self.upload_dir / stored_file_name
 
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        return f"/uploads/sounds/{stored_filename}"
+        return f"/uploads/sounds/{stored_file_name}"
 
     # Update
 

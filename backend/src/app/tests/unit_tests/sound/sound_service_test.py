@@ -225,6 +225,29 @@ def test_save_sound_file_to_r2(service, monkeypatch):
     assert args[1] == "snsa-sound-files"
     assert args[2] == "sounds/test-uuid.wav"
 
+def test_save_sound_file_uses_r2_when_configured(service, monkeypatch):
+    monkeypatch.setenv("STORAGE_BACKEND", "r2")
+
+    fake_file = UploadFile(
+        filename="test.wav",
+        file=BytesIO(b"fake audio data"),
+    )
+
+    service.save_sound_file_to_r2 = Mock(
+        return_value="sounds/test-file.wav"
+    )
+
+    result = service.save_sound_file(fake_file)
+
+    assert result == "sounds/test-file.wav"
+
+    service.save_sound_file_to_r2.assert_called_once()
+
+    args = service.save_sound_file_to_r2.call_args.args
+
+    assert args[0] == fake_file
+    assert args[1].endswith(".wav")
+
 # Update
 def test_sound_update_metadata_only(service, db):
     sound = SimpleNamespace(
