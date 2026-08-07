@@ -57,7 +57,7 @@ class SoundService:
         if not self.is_using_r2():
             return sound_file_url
         
-        account_id = os.getenv("R@_ACCOUNT_ID")
+        account_id = os.getenv("R2_ACCOUNT_ID")
         access_key_id = os.getenv("R2_ACCESS_KEY_ID")
         secret_access_key = os.getenv("R2_SECRET_ACCESS_KEY")
         bucket_name = os.getenv("R2_BUCKET_NAME")

@@ -143,6 +143,38 @@ def test_get_sound_file_url_local(service, monkeypatch):
 
     assert result == "/uploads/sounds/test.wav"
 
+def test_get_sound_file_url_r2(service, monkeypatch):
+    monkeypatch.setenv("STORAGE_BACKEND", "r2")
+    monkeypatch.setenv("R2_ACCOUNT_ID", "test-account-id")
+    monkeypatch.setenv("R2_ACCESS_KEY_ID", "test-access-key")
+    monkeypatch.setenv("R2_SECRET_ACCESS_KEY", "test-secret-key")
+    monkeypatch.setenv("R2_BUCKET_NAME", "snsa-sound-files")
+
+    fake_r2_client = Mock()
+
+    fake_r2_client.generate_presigned_url.return_value = (
+        "https://example.com/test-signed-url"
+    )
+
+    with patch(
+        "app.services.sound.boto3.client",
+        return_value=fake_r2_client,
+    ):
+        result = service.get_sound_file_url(
+            "sounds/test.wav"
+        )
+    
+    assert result == "https://example.com/test-signed-url"
+
+    fake_r2_client.generate_presigned_url.assert_called_once_with(
+        "get_object",
+        Params={
+            "Bucket": "snsa-sound-files",
+            "Key": "sounds/test.wav",
+        },
+        ExpiresIn=3600,
+    )
+
 # Post
 
 
