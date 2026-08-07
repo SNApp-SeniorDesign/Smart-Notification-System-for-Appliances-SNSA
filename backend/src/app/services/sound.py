@@ -49,6 +49,48 @@ class SoundService:
             sound_not_exist()
         return device_sound
 
+    #service to get the url to sound file save on Cloudflare
+    def get_sound_file_url(self, sound_file_url: str) -> str:
+        if not sound_file_url:
+            return ""
+        
+        if not self.is_using_r2():
+            return sound_file_url
+        
+        account_id = os.getenv("R@_ACCOUNT_ID")
+        access_key_id = os.getenv("R2_ACCESS_KEY_ID")
+        secret_access_key = os.getenv("R2_SECRET_ACCESS_KEY")
+        bucket_name = os.getenv("R2_BUCKET_NAME")
+
+        if not all(
+            [
+                account_id,
+                access_key_id,
+                secret_access_key,
+                bucket_name,
+            ]
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="R2 storage is not configured correctly",
+            )
+        r2_client = boto3.client(
+            "s3",
+            endpoint_url=f"https://{account_id}.r2.cloudflarestorage.com",
+            aws_access_key_id=access_key_id,
+            aws_secret_access_key=secret_access_key,
+            region_name="auto",
+        )
+
+        return r2_client.generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": bucket_name,
+                "Key": sound_file_url,
+            },
+            ExpiresIn=3600,
+        )
+
     # Post
 
     def create_sound(
