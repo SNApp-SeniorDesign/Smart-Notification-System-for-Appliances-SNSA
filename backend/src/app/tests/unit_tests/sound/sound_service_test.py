@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, call
+from unittest.mock import Mock, call, patch
 from fastapi import HTTPException, UploadFile
 from io import BytesIO
 from types import SimpleNamespace
@@ -195,6 +195,35 @@ def test_create_sound_no_file_name(service, db):
 
     service.repository.create_sound.assert_not_called()
 
+def test_save_sound_file_to_r2(service, monkeypatch):
+    monkeypatch.setenv("R2_ACCOUNT_ID", "test-account-id")
+    monkeypatch.setenv("R2_ACCESS_KEY_ID", "test-access-key")
+    monkeypatch.setenv("R2_SECRET_ACCESS_KEY", "test-secret-key")
+    monkeypatch.setenv("R2_BUCKET_NAME", "snsa-sound-files")
+
+    fake_file = UploadFile(
+        filename="test/wav",
+        file=BytesIO(b"fake audio data"),
+    )
+
+    fake_r2_client = Mock()
+
+    with patch(
+        "app.services.sound.boto3.client",
+        return_value=fake_r2_client,
+    ):
+        result = service.save_sound_file_to_r2(
+            fake_file,
+            "test-uuid.wav"
+        )
+    
+    assert result == "sounds/test-uuid.wav"
+    fake_r2_client.upload_fileobj.assert_called_once()
+
+    args = fake_r2_client.upload_fileobj.call_args.args
+
+    assert args[1] == "snsa-sound-files"
+    assert args[2] == "sounds/test-uuid.wav"
 
 # Update
 def test_sound_update_metadata_only(service, db):
