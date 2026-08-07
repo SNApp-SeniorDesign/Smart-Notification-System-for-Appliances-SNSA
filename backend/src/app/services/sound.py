@@ -76,7 +76,7 @@ class SoundService:
         return self.repository.create_sound(db, sound)
 
     
-    #function helper to save sound file to cloudflare
+    #function helper to save sound file to render
     def save_sound_file_to_r2(
         self,
         file: UploadFile,
@@ -189,6 +189,49 @@ class SoundService:
         if not sound_file_url:
             return
 
+        if self.is_using_r2():
+            account_id = os.getenv("R2_AC")
+
+        if not sound_file_url:
+        return
+
+        if self.is_using_r2():
+            account_id = os.getenv("R2_ACCOUNT_ID")
+            access_key_id = os.getenv("R2_ACCESS_KEY_ID")
+            secret_access_key = os.getenv("R2_SECRET_ACCESS_KEY")
+            bucket_name = os.getenv("R2_BUCKET_NAME")
+
+            if not all(
+                [
+                    account_id,
+                    access_key_id,
+                    secret_access_key,
+                    bucket_name,
+                ]
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="R2 storage is not configured correctly",
+                )
+
+            r2_client = boto3.client(
+                "s3",
+                endpoint_url=(
+                    f"https://{account_id}.r2.cloudflarestorage.com"
+                ),
+                aws_access_key_id=access_key_id,
+                aws_secret_access_key=secret_access_key,
+                region_name="auto",
+            )
+
+            r2_client.delete_object(
+                Bucket=bucket_name,
+                Key=sound_file_url,
+            )
+            return
+
+
+        #Local Storage
         filename = Path(sound_file_url).name
         file_path = self.upload_dir / filename
 
