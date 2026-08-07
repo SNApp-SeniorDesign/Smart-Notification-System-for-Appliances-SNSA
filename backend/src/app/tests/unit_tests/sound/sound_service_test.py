@@ -134,6 +134,14 @@ def test_get_sound_by_id_fail(service, db):
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "Sound not found"
 
+def test_get_sound_file_url_local(service, monkeypatch):
+    monkeypatch.setenv("STORAGE_BACKEND", "local")
+
+    result = service.get_sound_file_url(
+        "/uploads/sounds/test.wav"
+    )
+
+    assert result == "/uploads/sounds/test.wav"
 
 # Post
 
