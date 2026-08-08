@@ -27,8 +27,8 @@ def test_register_sound_success(client: TestClient, headers, device):
     data = response.json()
 
     assert data["sound_name"] == "test_sound"
-    assert data["sound_file_url"].startswith("/uploads/sounds/")
-    assert data["sound_file_url"].endswith(".wav")
+    assert data["sound_file_key"].startswith("/uploads/sounds/")
+    assert data["sound_file_key"].endswith(".wav")
 
 
 def test_register_sound_missing_file(
@@ -192,7 +192,7 @@ def test_sound_get_by_id_success(client: TestClient, headers, sound):
     assert data["id"] == sound.id
     assert data["sound_name"] == "testSound"
     assert data["device_id"] == sound.device_id
-    assert data["sound_file_url"] == "test-audio-files/testSound.wav"
+    assert data["sound_file_key"] == "test-audio-files/testSound.wav"
     assert data["sound_status"] == "monitoring"
     assert data["is_on"] is True
 
@@ -216,7 +216,7 @@ def test_get_all_sounds(client: TestClient, headers, device, db: Session):
         sound = SoundDB(
             sound_name=name,
             device_id=device.id,
-            sound_file_url=f"/uploads/sounds/{name}.wav",
+            sound_file_key=f"/uploads/sounds/{name}.wav",
             is_on=True,
             is_synced_to_device=False,
             profile_version=1,
@@ -263,7 +263,7 @@ def test_get_all_unsynced_sounds(client: TestClient, headers, device, db: Sessio
         sound = SoundDB(
             sound_name=name,
             device_id=device.id,
-            sound_file_url=f"/uploads/sounds/{name}.wav",
+            sound_file_key=f"/uploads/sounds/{name}.wav",
             is_on=True,
             is_synced_to_device=False,
             profile_version=1,
@@ -275,7 +275,7 @@ def test_get_all_unsynced_sounds(client: TestClient, headers, device, db: Sessio
     sound_sync = SoundDB(
         sound_name="SyncSound",
         device_id=device.id,
-        sound_file_url="/uploads/sounds/SyncSound.wav",
+        sound_file_key="/uploads/sounds/SyncSound.wav",
         is_on=True,
         is_synced_to_device=True,
         profile_version=1,
@@ -329,8 +329,8 @@ def test_sound_update(client: TestClient, headers, sound):
 
     assert data["is_synced_to_device"] is False
     assert data["profile_version"] == 2
-    assert data["sound_file_url"].startswith("/uploads/sounds/")
-    assert data["sound_file_url"].endswith(".wav")
+    assert data["sound_file_key"].startswith("/uploads/sounds/")
+    assert data["sound_file_key"].endswith(".wav")
 
 
 # Delete

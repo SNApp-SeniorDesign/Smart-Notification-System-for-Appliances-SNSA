@@ -10,7 +10,7 @@ def test_create_sound(db: Session, user, device):
     sound_db = SoundDB(
         sound_name="testSound",
         device_id=device.id,
-        sound_file_url="test-audio-files/testSound.wav",
+        sound_file_key="test-audio-files/testSound.wav",
     )
 
     sound = SoundRepository.create_sound(db, sound_db)
@@ -64,13 +64,13 @@ def test_get_all_sound(db: Session, device):
         ("Testsound", "test-audio-files/Test123.wav"),
     ]
 
-    for sound_name, sound_file_url in expected_sound:
+    for sound_name, sound_file_key in expected_sound:
         SoundRepository.create_sound(
             db,
             SoundDB(
                 sound_name=sound_name,
                 device_id=device.id,
-                sound_file_url=sound_file_url,
+                sound_file_key=sound_file_key,
             ),
         )
 
@@ -80,7 +80,7 @@ def test_get_all_sound(db: Session, device):
     assert len(actual_sound_list) == len(expected_sound)
 
     actual_sound = [
-        (sound.sound_name, sound.sound_file_url) for sound in actual_sound_list
+        (sound.sound_name, sound.sound_file_key) for sound in actual_sound_list
     ]
 
     assert actual_sound == expected_sound
@@ -93,13 +93,13 @@ def test_get_all_unsynced_sound(db: Session, device):
         ("Testsound", "test-audio-files/Test123.wav", False),
     ]
 
-    for sound_name, sound_file_url, is_synced in expected_sound:
+    for sound_name, sound_file_key, is_synced in expected_sound:
         SoundRepository.create_sound(
             db,
             SoundDB(
                 sound_name=sound_name,
                 device_id=device.id,
-                sound_file_url=sound_file_url,
+                sound_file_key=sound_file_key,
                 is_synced_to_device=is_synced,
                 sound_status="monitoring",
                 is_on=True,
@@ -113,7 +113,7 @@ def test_get_all_unsynced_sound(db: Session, device):
         SoundDB(
             sound_name="SyncedSound",
             device_id=device.id,
-            sound_file_url="test-audio-files/SyncedSound.wav",
+            sound_file_key="test-audio-files/SyncedSound.wav",
             is_synced_to_device=True,
             sound_status="monitoring",
             is_on=True,
@@ -129,7 +129,7 @@ def test_get_all_unsynced_sound(db: Session, device):
     actual_sound = [
         (
             sound.sound_name,
-            sound.sound_file_url,
+            sound.sound_file_key,
             sound.is_synced_to_device,
         )
         for sound in actual_sound_list
@@ -144,7 +144,7 @@ def test_update_sound(db: Session, sound):
     sound.sound_status = "online"
     sound.is_synced_to_device = True
     sound.profile_version = 2
-    sound.sound_file_url = "new_url/sound_file.wav"
+    sound.sound_file_key = "new_url/sound_file.wav"
 
     SoundRepository.sound_update(db, sound)
 
@@ -156,7 +156,7 @@ def test_update_sound(db: Session, sound):
     assert sound_new.sound_status == "online"
     assert sound_new.is_synced_to_device is True
     assert sound_new.profile_version == 2
-    assert sound_new.sound_file_url == "new_url/sound_file.wav"
+    assert sound_new.sound_file_key == "new_url/sound_file.wav"
 
 
 # Delete

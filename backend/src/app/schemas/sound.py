@@ -21,7 +21,7 @@ class SoundCreate(SoundBase):
 class SoundResponse(SoundBase):
     id: int
     device_id: int
-    sound_file_url: str
+    sound_file_key: str
     sound_status: SoundStatus
     is_on: bool
 
@@ -33,7 +33,7 @@ class SoundResponse(SoundBase):
 
 class SoundDB(SoundCreate):
     device_id: int
-    sound_file_url: str
+    sound_file_key: str
     is_synced_to_device: bool = False
     sound_status: SoundStatus = "offline"
     profile_version: int = 1
@@ -44,17 +44,17 @@ class SoundUpdate(BaseModel):
     sound_status: SoundStatus | None = None
     is_synced_to_device: bool | None = None
     profile_version: int | None = None
-    sound_file_url: str | None = None
+    sound_file_key: str | None = None
 
     @classmethod
     def as_form(
         cls,
         sound_name: str | None = Form(None),
         sound_status: SoundStatus | None = Form(None),
-        sound_file_url: str | None = Form(None),
+        sound_file_key: str | None = Form(None),
     ):
         return cls(
             sound_name=sound_name,
             sound_status=sound_status,
-            sound_file_url=sound_file_url,
+            sound_file_key=sound_file_key,
         )

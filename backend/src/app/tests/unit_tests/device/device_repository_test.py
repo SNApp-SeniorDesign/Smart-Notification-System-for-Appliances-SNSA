@@ -71,7 +71,7 @@ def test_get_device_with_sound(db: Session, user, device, sound):
     assert loaded_sound.id == sound.id
     assert loaded_sound.device_id == device.id
     assert loaded_sound.sound_name == "testSound"
-    assert loaded_sound.sound_file_url == "test-audio-files/testSound.wav"
+    assert loaded_sound.sound_file_key == "test-audio-files/testSound.wav"
 
 
 def test_get_device_with_sounds(db: Session, user, device):
@@ -81,13 +81,13 @@ def test_get_device_with_sounds(db: Session, user, device):
         ("Dryer Done", "test-audio-files/dryer.wav"),
     ]
 
-    for sound_name, sound_file_url in expected_sounds:
+    for sound_name, sound_file_key in expected_sounds:
         SoundRepository.create_sound(
             db,
             SoundDB(
                 sound_name=sound_name,
                 device_id=device.id,
-                sound_file_url=sound_file_url,
+                sound_file_key=sound_file_key,
             ),
         )
     device_with_sounds = DeviceRepository.get_device_with_sounds(
@@ -100,7 +100,7 @@ def test_get_device_with_sounds(db: Session, user, device):
     assert len(device_with_sounds.sounds) == len(expected_sounds)
 
     actual_sounds = {
-        (sound.sound_name, sound.sound_file_url) for sound in device_with_sounds.sounds
+        (sound.sound_name, sound.sound_file_key) for sound in device_with_sounds.sounds
     }
 
     assert actual_sounds == set(expected_sounds)

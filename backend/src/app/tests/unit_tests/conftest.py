@@ -137,7 +137,7 @@ def sound(db, device):
     sound_data = SoundDB(
         sound_name="testSound",
         device_id=device.id,
-        sound_file_url="test-audio-files/testSound.wav",
+        sound_file_key="test-audio-files/testSound.wav",
         sound_status="monitoring",
         is_on=True,
         is_synced_to_device=False,

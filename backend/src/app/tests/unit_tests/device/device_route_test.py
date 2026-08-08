@@ -176,13 +176,13 @@ def test_get_device_with_sounds_success(client: TestClient, db, user):
         ("Washer Done", "/uploads/sound/washer.wav"),
     ]
 
-    for sound_name, sound_file_url in expected_sounds:
+    for sound_name, sound_file_key in expected_sounds:
         SoundRepository.create_sound(
             db,
             Sound(
                 device_id=device_id,
                 sound_name=sound_name,
-                sound_file_url=sound_file_url,
+                sound_file_key=sound_file_key,
                 sound_status="monitoring",
                 is_on=True,
                 is_synced_to_device=False,
@@ -201,7 +201,7 @@ def test_get_device_with_sounds_success(client: TestClient, db, user):
     assert data["device_name"] == "Test Device"
 
     actual_sounds = [
-        (sound["sound_name"], sound["sound_file_url"]) for sound in data["sounds"]
+        (sound["sound_name"], sound["sound_file_key"]) for sound in data["sounds"]
     ]
 
     assert set(actual_sounds) == set(expected_sounds)

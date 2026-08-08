@@ -19,7 +19,7 @@ class SoundRepository:
             is_synced_to_device=sound_data.is_synced_to_device,
             sound_status=sound_data.sound_status,
             profile_version=sound_data.profile_version,
-            sound_file_url=sound_data.sound_file_url,
+            sound_file_key=sound_data.sound_file_key,
         )
         db.add(db_sound)
         db.commit()

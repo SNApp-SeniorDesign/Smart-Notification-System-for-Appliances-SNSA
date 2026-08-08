@@ -375,17 +375,17 @@ def test_delete_device(service, db):
         SimpleNamespace(
             id=1,
             sound_name="Doorbell",
-            sound_file_url="/uploads/sounds/sound_to_deleteOne.wav",
+            sound_file_key="/uploads/sounds/sound_to_deleteOne.wav",
         ),
         SimpleNamespace(
             id=2,
             sound_name="Microwave",
-            sound_file_url="/uploads/sounds/sound_to_deleteTwo.wav",
+            sound_file_key="/uploads/sounds/sound_to_deleteTwo.wav",
         ),
         SimpleNamespace(
             id=3,
             sound_name="Washing Machine",
-            sound_file_url="/uploads/sounds/sound_to_deleteThree.wav",
+            sound_file_key="/uploads/sounds/sound_to_deleteThree.wav",
         ),
     ]
 

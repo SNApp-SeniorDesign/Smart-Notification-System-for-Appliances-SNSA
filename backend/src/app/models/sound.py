@@ -19,7 +19,7 @@ class Sound(Base):
     )
 
     sound_name = Column(String, nullable=False)
-    sound_file_url = Column(String, nullable=False)
+    sound_file_key = Column(String, nullable=False)
 
     last_detected = Column(DateTime(timezone=True))
     sound_status = Column(String, default="monitoring", nullable=False)

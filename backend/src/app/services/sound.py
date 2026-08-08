@@ -51,12 +51,12 @@ class SoundService:
         return device_sound
 
     # service to get temporary url to dowload sound file save on Cloudflare
-    def generate_download_url(self, sound_file_url: str) -> str:
-        if not sound_file_url:
+    def generate_download_url(self, sound_file_key: str) -> str:
+        if not sound_file_key:
             return ""
 
         if not self.is_using_r2():
-            return sound_file_url
+            return sound_file_key
 
         account_id = os.getenv("R2_ACCOUNT_ID")
         access_key_id = os.getenv("R2_ACCESS_KEY_ID")
@@ -87,7 +87,7 @@ class SoundService:
             "get_object",
             Params={
                 "Bucket": bucket_name,
-                "Key": sound_file_url,
+                "Key": sound_file_key,
             },
             ExpiresIn=3600,
         )
@@ -104,12 +104,12 @@ class SoundService:
         if self.is_sound_name_taken(db, sound_name, device_id):
             sound_exist()
 
-        sound_file_url = self.save_sound_file(file)
+        sound_file_key = self.save_sound_file(file)
 
         sound = Sound(
             device_id=device_id,
             sound_name=sound_name,
-            sound_file_url=sound_file_url,
+            sound_file_key=sound_file_key,
             sound_status="monitoring",
             is_on=True,
             is_synced_to_device=False,
@@ -197,10 +197,10 @@ class SoundService:
         if sound_db.sound_status is not None:
             sound.sound_status = sound_db.sound_status
 
-        old_file_url = sound.sound_file_url
+        old_file_key = sound.sound_file_key
 
         if file is not None:
-            sound.sound_file_url = self.save_sound_file(file)
+            sound.sound_file_key = self.save_sound_file(file)
             sound.profile_version += 1
             sound.is_synced_to_device = False
 
@@ -209,23 +209,23 @@ class SoundService:
             sound,
         )
 
-        if file is not None and old_file_url:
-            self.delete_sound_file(old_file_url)
+        if file is not None and old_file_key:
+            self.delete_sound_file(old_file_key)
 
         return updated_sound
 
     # Delete
 
     # Delete old sound file helper
-    def delete_sound_file(self, sound_file_url: str) -> None:
+    def delete_sound_file(self, sound_file_key: str) -> None:
 
-        if not sound_file_url:
+        if not sound_file_key:
             return
 
         if self.is_using_r2():
             account_id = os.getenv("R2_AC")
 
-        if not sound_file_url:
+        if not sound_file_key:
             return
 
         if self.is_using_r2():
@@ -257,24 +257,24 @@ class SoundService:
 
             r2_client.delete_object(
                 Bucket=bucket_name,
-                Key=sound_file_url,
+                Key=sound_file_key,
             )
             return
 
         # Local Storage
-        filename = Path(sound_file_url).name
+        filename = Path(sound_file_key).name
         file_path = self.upload_dir / filename
 
         if file_path.exists() and file_path.is_file():
             file_path.unlink()  # Delete the file
 
     def delete_sound(self, db: Session, db_sound: Sound) -> None:
-        self.delete_sound_file(db_sound.sound_file_url)
+        self.delete_sound_file(db_sound.sound_file_key)
         self.repository.delete_sound(db, db_sound)
 
     def delete_all_sound_files(self, sounds: list[Sound]) -> None:
         for sound in sounds:
-            self.delete_sound_file(sound.sound_file_url)
+            self.delete_sound_file(sound.sound_file_key)
 
 
 sound_service = SoundService()

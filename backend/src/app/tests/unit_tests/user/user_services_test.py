@@ -365,18 +365,18 @@ def test_delete_user(service, db):
     device_one_sounds = [
         SimpleNamespace(
             id=1,
-            sound_file_url="/uploads/sounds/doorbell.wav",
+            sound_file_key="/uploads/sounds/doorbell.wav",
         ),
         SimpleNamespace(
             id=2,
-            sound_file_url="/uploads/sounds/microwave.wav",
+            sound_file_key="/uploads/sounds/microwave.wav",
         ),
     ]
 
     device_two_sounds = [
         SimpleNamespace(
             id=3,
-            sound_file_url="/uploads/sounds/washing-machine.wav",
+            sound_file_key="/uploads/sounds/washing-machine.wav",
         ),
     ]
 
@@ -434,18 +434,18 @@ def test_delete_user_sound_files(service, db, tmp_path: Path):
     device_one_sounds = [
         SimpleNamespace(
             id=1,
-            sound_file_url="/uploads/sounds/doorbell.wav",
+            sound_file_key="/uploads/sounds/doorbell.wav",
         ),
         SimpleNamespace(
             id=2,
-            sound_file_url="/uploads/sounds/microwave.wav",
+            sound_file_key="/uploads/sounds/microwave.wav",
         ),
     ]
 
     device_two_sounds = [
         SimpleNamespace(
             id=3,
-            sound_file_url="/uploads.sounds/washing-machine.wav",
+            sound_file_key="/uploads.sounds/washing-machine.wav",
         ),
     ]
 

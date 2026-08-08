@@ -205,8 +205,8 @@ def test_create_sound_success(service, db, monkeypatch):
 
     assert sound_arg.device_id == 1
     assert sound_arg.sound_name == "Microwave Beep"
-    assert sound_arg.sound_file_url.startswith("/uploads/sounds/")
-    assert sound_arg.sound_file_url.endswith(".wav")
+    assert sound_arg.sound_file_key.startswith("/uploads/sounds/")
+    assert sound_arg.sound_file_key.endswith(".wav")
     assert sound_arg.sound_status == "monitoring"
     assert sound_arg.is_on is True
     assert sound_arg.is_synced_to_device is False
@@ -295,7 +295,7 @@ def test_sound_update_metadata_only(service, db):
         is_on=True,
         is_synced_to_device=True,
         profile_version=1,
-        sound_file_url="/uploads/sounds/old_sound.wav",
+        sound_file_key="/uploads/sounds/old_sound.wav",
     )
 
     sound_update = SoundUpdate(
@@ -324,7 +324,7 @@ def test_sound_update_with_file(service, db):
         is_on=True,
         is_synced_to_device=True,
         profile_version=1,
-        sound_file_url="/uploads/sounds/old_sound.wav",
+        sound_file_key="/uploads/sounds/old_sound.wav",
     )
 
     sound_update = SoundUpdate(
@@ -349,7 +349,7 @@ def test_sound_update_with_file(service, db):
 
     assert result == sound
     assert sound.sound_name == "New Sound Name"
-    assert sound.sound_file_url == "/uploads/sounds/new_sound.wav"
+    assert sound.sound_file_key == "/uploads/sounds/new_sound.wav"
     assert sound.profile_version == 2
     assert sound.is_synced_to_device is False
 
@@ -369,7 +369,7 @@ def test_update_sound_file_missing_filename(service, db):
         sound_status="monitoring",
         is_synced_to_device=True,
         profile_version=1,
-        sound_file_url="/uploads/sounds/old_sound.wav",
+        sound_file_key="/uploads/sounds/old_sound.wav",
     )
 
     sound_update = SoundUpdate(sound_name="New Sound Name")
@@ -398,7 +398,7 @@ def test_update_sound_no_changes(service, db):
         sound_status="monitoring",
         is_synced_to_device=True,
         profile_version=1,
-        sound_file_url="/uploads/sounds/old_sound.wav",
+        sound_file_key="/uploads/sounds/old_sound.wav",
     )
 
     sound_update = SoundUpdate()
@@ -412,7 +412,7 @@ def test_update_sound_no_changes(service, db):
     assert sound.sound_status == "monitoring"
     assert sound.is_synced_to_device is True
     assert sound.profile_version == 1
-    assert sound.sound_file_url == "/uploads/sounds/old_sound.wav"
+    assert sound.sound_file_key == "/uploads/sounds/old_sound.wav"
 
     service.repository.sound_update.assert_called_once_with(db, sound)
 
@@ -428,7 +428,7 @@ def test_delete_sound(service, db):
         sound_status="monitoring",
         is_synced_to_device=True,
         profile_version=1,
-        sound_file_url="/uploads/sounds/sound_to_delete.wav",
+        sound_file_key="/uploads/sounds/sound_to_delete.wav",
     )
 
     service.delete_sound_file = Mock()
@@ -451,21 +451,21 @@ def test_delete_sound_all(service):
             id=1,
             sound_name="Doorbell",
             is_synced_to_device=False,
-            sound_file_url="/uploads/sounds/sound_to_deleteOne.wav",
+            sound_file_key="/uploads/sounds/sound_to_deleteOne.wav",
             device_id=device_id_fake,
         ),
         SimpleNamespace(
             id=2,
             sound_name="Microwave",
             is_synced_to_device=False,
-            sound_file_url="/uploads/sounds/sound_to_deleteTwo.wav",
+            sound_file_key="/uploads/sounds/sound_to_deleteTwo.wav",
             device_id=device_id_fake,
         ),
         SimpleNamespace(
             id=3,
             sound_name="Washing Machine",
             is_synced_to_device=False,
-            sound_file_url="/uploads/sounds/sound_to_deleteThree.wav",
+            sound_file_key="/uploads/sounds/sound_to_deleteThree.wav",
             device_id=device_id_fake,
         ),
     ]
