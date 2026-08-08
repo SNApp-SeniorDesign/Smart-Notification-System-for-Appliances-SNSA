@@ -1,8 +1,9 @@
 import { defineConfig, devices } from "@playwright/test"
 
+const isProduction = process.env.E2E_TARGET === "production"
+
 export default defineConfig({
   testDir: "./tests",
-
   timeout: 60_000,
 
   expect: {
@@ -10,18 +11,23 @@ export default defineConfig({
   },
 
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: isProduction
+      ? "https://smart-notification-dystem-for-appliances-snsa.snsa-app.workers.dev"
+      : "http://localhost:3000",
+
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
   },
 
-  webServer: {
-    command: "bun run dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: true,
-    timeout: 120_000,
-  },
+  webServer: isProduction
+    ? undefined
+    : {
+        command: "bun run dev",
+        url: "http://localhost:3000",
+        reuseExistingServer: true,
+        timeout: 120_000,
+      },
 
   projects: [
     {

@@ -20,8 +20,6 @@ test("a sound can be deleted", async ({ page }) => {
     await addDevice(page, "Kitchen SNSA")
     await addSound(page, "Test Sound")
 
-    await page.pause()
-
     const soundCard = page.getByRole("button", {
       name: /Test Sound/,
     })
