@@ -43,7 +43,7 @@ type Sound = {
   id: number
   device_id: number
   sound_name: string
-  sound_file_url: string
+  sound_file_key: string
   sound_status: string
   is_synced_to_device: boolean
   profile_version: number
