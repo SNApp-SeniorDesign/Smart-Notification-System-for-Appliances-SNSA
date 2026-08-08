@@ -12,13 +12,14 @@ from fastapi import status, HTTPException, UploadFile
 import os
 import boto3
 
+
 class SoundService:
     def __init__(self, upload_dir: Path | None = None) -> None:
         self.repository = SoundRepository
         self.upload_dir = upload_dir or Path("uploads/sounds")
         self.upload_dir.mkdir(parents=True, exist_ok=True)
 
-    #helper to know storage sound file locally or in soundflare
+    # helper to know storage sound file locally or in soundflare
     def is_using_r2(self) -> bool:
         return os.getenv("STORAGE_BACKEND", "local").lower() == "r2"
 
@@ -49,14 +50,14 @@ class SoundService:
             sound_not_exist()
         return device_sound
 
-    #service to get the url to sound file save on Cloudflare
-    def get_sound_file_url(self, sound_file_url: str) -> str:
+    # service to get temporary url to dowload sound file save on Cloudflare
+    def generate_download_url(self, sound_file_url: str) -> str:
         if not sound_file_url:
             return ""
-        
+
         if not self.is_using_r2():
             return sound_file_url
-        
+
         account_id = os.getenv("R2_ACCOUNT_ID")
         access_key_id = os.getenv("R2_ACCESS_KEY_ID")
         secret_access_key = os.getenv("R2_SECRET_ACCESS_KEY")
@@ -117,19 +118,14 @@ class SoundService:
 
         return self.repository.create_sound(db, sound)
 
-    
-    #function helper to save sound file to Cloudflare
-    def save_sound_file_to_r2(
-        self,
-        file: UploadFile,
-        stored_filename: str
-    ) -> str:
+    # function helper to save sound file to Cloudflare
+    def save_sound_file_to_r2(self, file: UploadFile, stored_filename: str) -> str:
         account_id = os.getenv("R2_ACCOUNT_ID")
         access_key_id = os.getenv("R2_ACCESS_KEY_ID")
         secret_access_key = os.getenv("R2_SECRET_ACCESS_KEY")
         bucket_name = os.getenv("R2_BUCKET_NAME")
 
-        if not all (
+        if not all(
             [
                 account_id,
                 access_key_id,
@@ -143,12 +139,10 @@ class SoundService:
             )
         r2_client = boto3.client(
             "s3",
-            endpoint_url = (
-                f"https:/{account_id}.r2.cloudflarestorage.com"
-            ),
+            endpoint_url=(f"https:/{account_id}.r2.cloudflarestorage.com"),
             aws_access_key_id=access_key_id,
             aws_secret_access=secret_access_key,
-            region_name="auto"
+            region_name="auto",
         )
 
         object_key = f"sounds/{stored_filename}"
@@ -160,10 +154,7 @@ class SoundService:
             bucket_name,
             object_key,
             ExtraArgs={
-                "Contenttype": (
-                    file.content_type
-                    or "application/octet-stream"
-                )
+                "Contenttype": (file.content_type or "application/octet-stream")
             },
         )
 
@@ -179,12 +170,11 @@ class SoundService:
         file_ext = Path(file.filename).suffix
         stored_file_name = f"{uuid4()}{file_ext}"
 
-        #Soundflare storage
+        # Soundflare storage
         if self.is_using_r2():
             return self.save_sound_file_to_r2(file, stored_file_name)
 
-
-        #Local Storage
+        # Local Storage
         file_path = self.upload_dir / stored_file_name
 
         with file_path.open("wb") as buffer:
@@ -259,9 +249,7 @@ class SoundService:
 
             r2_client = boto3.client(
                 "s3",
-                endpoint_url=(
-                    f"https://{account_id}.r2.cloudflarestorage.com"
-                ),
+                endpoint_url=(f"https://{account_id}.r2.cloudflarestorage.com"),
                 aws_access_key_id=access_key_id,
                 aws_secret_access_key=secret_access_key,
                 region_name="auto",
@@ -273,8 +261,7 @@ class SoundService:
             )
             return
 
-
-        #Local Storage
+        # Local Storage
         filename = Path(sound_file_url).name
         file_path = self.upload_dir / filename
 

@@ -134,16 +134,16 @@ def test_get_sound_by_id_fail(service, db):
     assert exc_info.value.status_code == 404
     assert exc_info.value.detail == "Sound not found"
 
-def test_get_sound_file_url_local(service, monkeypatch):
+
+def test_generate_download_url_local(service, monkeypatch):
     monkeypatch.setenv("STORAGE_BACKEND", "local")
 
-    result = service.get_sound_file_url(
-        "/uploads/sounds/test.wav"
-    )
+    result = service.generate_download_url("/uploads/sounds/test.wav")
 
     assert result == "/uploads/sounds/test.wav"
 
-def test_get_sound_file_url_r2(service, monkeypatch):
+
+def test_generate_download_url_r2(service, monkeypatch):
     monkeypatch.setenv("STORAGE_BACKEND", "r2")
     monkeypatch.setenv("R2_ACCOUNT_ID", "test-account-id")
     monkeypatch.setenv("R2_ACCESS_KEY_ID", "test-access-key")
@@ -160,10 +160,8 @@ def test_get_sound_file_url_r2(service, monkeypatch):
         "app.services.sound.boto3.client",
         return_value=fake_r2_client,
     ):
-        result = service.get_sound_file_url(
-            "sounds/test.wav"
-        )
-    
+        result = service.generate_download_url("sounds/test.wav")
+
     assert result == "https://example.com/test-signed-url"
 
     fake_r2_client.generate_presigned_url.assert_called_once_with(
@@ -175,12 +173,13 @@ def test_get_sound_file_url_r2(service, monkeypatch):
         ExpiresIn=3600,
     )
 
+
 # Post
 
 
 def test_create_sound_success(service, db, monkeypatch):
     monkeypatch.setenv("STORAGE_BACKEND", "local")
-    
+
     fake_file = UploadFile(
         filename="test.wav",
         file=BytesIO(b"fake audio data"),
@@ -235,6 +234,7 @@ def test_create_sound_no_file_name(service, db):
 
     service.repository.create_sound.assert_not_called()
 
+
 def test_save_sound_file_to_r2(service, monkeypatch):
     monkeypatch.setenv("R2_ACCOUNT_ID", "test-account-id")
     monkeypatch.setenv("R2_ACCESS_KEY_ID", "test-access-key")
@@ -252,11 +252,8 @@ def test_save_sound_file_to_r2(service, monkeypatch):
         "app.services.sound.boto3.client",
         return_value=fake_r2_client,
     ):
-        result = service.save_sound_file_to_r2(
-            fake_file,
-            "test-uuid.wav"
-        )
-    
+        result = service.save_sound_file_to_r2(fake_file, "test-uuid.wav")
+
     assert result == "sounds/test-uuid.wav"
     fake_r2_client.upload_fileobj.assert_called_once()
 
@@ -264,6 +261,7 @@ def test_save_sound_file_to_r2(service, monkeypatch):
 
     assert args[1] == "snsa-sound-files"
     assert args[2] == "sounds/test-uuid.wav"
+
 
 def test_save_sound_file_uses_r2_when_configured(service, monkeypatch):
     monkeypatch.setenv("STORAGE_BACKEND", "r2")
@@ -273,9 +271,7 @@ def test_save_sound_file_uses_r2_when_configured(service, monkeypatch):
         file=BytesIO(b"fake audio data"),
     )
 
-    service.save_sound_file_to_r2 = Mock(
-        return_value="sounds/test-file.wav"
-    )
+    service.save_sound_file_to_r2 = Mock(return_value="sounds/test-file.wav")
 
     result = service.save_sound_file(fake_file)
 
@@ -287,6 +283,7 @@ def test_save_sound_file_uses_r2_when_configured(service, monkeypatch):
 
     assert args[0] == fake_file
     assert args[1].endswith(".wav")
+
 
 # Update
 def test_sound_update_metadata_only(service, db):
@@ -508,6 +505,7 @@ def test_delete_sound_file_missing_file_does_not_raise(
 
     service.delete_sound_file("/uploads/sounds/not-founs.wav")
 
+
 def test_delete_sound_file_r2(service, monkeypatch):
     monkeypatch.setenv("STORAGE_BACKEND", "r2")
     monkeypatch.setenv("R2_ACCOUNT_ID", "test-account-id")
@@ -521,10 +519,8 @@ def test_delete_sound_file_r2(service, monkeypatch):
         "app.services.sound.boto3.client",
         return_value=fake_r2_client,
     ):
-        service.delete_sound_file(
-            "sounds/test-file.wav"
-        )
-    
+        service.delete_sound_file("sounds/test-file.wav")
+
     fake_r2_client.delete_object.assert_called_once_with(
         Bucket="snsa-sound-files",
         Key="sounds/test-file.wav",
