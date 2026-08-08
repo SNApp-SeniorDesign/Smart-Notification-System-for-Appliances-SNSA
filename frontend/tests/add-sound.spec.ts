@@ -7,7 +7,7 @@ import {
   addDevice,
 } from "./auths"
 
-test("a sound can be added", async ({ page }) => {
+test("a sound can be added using production storage", async ({ page }) => {
   await mockBluetooth(page)
 
   await page.goto("/")
@@ -32,17 +32,9 @@ test("a sound can be added", async ({ page }) => {
       .getByRole("button", { name: "Start Recording" })
       .click()
 
-    await expect(
-      page.getByText("Starting...")
-    ).toBeVisible()
-
-    await expect(
-      page.getByText("Recording...")
-    ).toBeVisible()
-
-    await expect(
-      page.getByText("Processing...")
-    ).toBeVisible()
+    await expect(page.getByText("Starting...")).toBeVisible()
+    await expect(page.getByText("Recording...")).toBeVisible()
+    await expect(page.getByText("Processing...")).toBeVisible()
 
     await expect(
       page.getByRole("button", { name: "Save Sound" })
@@ -50,26 +42,35 @@ test("a sound can be added", async ({ page }) => {
 
     await page
       .getByLabel("Sound Name")
-      .fill("test sound")
+      .fill("R2 test sound")
+
+    const createResponsePromise =
+      page.waitForResponse((response) => {
+        const url = new URL(response.url())
+
+        return (
+          response.request().method() === "POST" &&
+          url.pathname.includes("/sound/")
+        )
+      })
 
     await page
       .getByRole("button", { name: "Save Sound" })
       .click()
 
-    await expect(
-      page.getByText("Saving")
-    ).toBeVisible()
+    const createResponse = await createResponsePromise
 
-    await expect(
-      page.getByText("Complete")
-    ).toBeVisible()
+    expect(createResponse.ok()).toBeTruthy()
+
+    await expect(page.getByText("Saving")).toBeVisible()
+    await expect(page.getByText("Complete")).toBeVisible()
 
     await expect(
       page.getByText("Sound Added Successfully")
     ).toBeVisible()
 
     await expect(
-      page.getByText("test sound")
+      page.getByText("R2 test sound")
     ).toBeVisible()
   } finally {
     await Delete(page, user)
