@@ -17,7 +17,9 @@ class SoundService:
     def __init__(self, upload_dir: Path | None = None) -> None:
         self.repository = SoundRepository
         self.upload_dir = upload_dir or Path("uploads/sounds")
-        self.upload_dir.mkdir(parents=True, exist_ok=True)
+
+        if not self.is_using_r2():
+            self.upload_dir.mkdir(parents=True, exist_ok=True)
 
     # helper to know storage sound file locally or in soundflare
     def is_using_r2(self) -> bool:
