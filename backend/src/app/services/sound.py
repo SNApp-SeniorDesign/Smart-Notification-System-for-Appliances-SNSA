@@ -139,9 +139,9 @@ class SoundService:
             )
         r2_client = boto3.client(
             "s3",
-            endpoint_url=(f"https:/{account_id}.r2.cloudflarestorage.com"),
+            endpoint_url=f"https://{account_id}.r2.cloudflarestorage.com",
             aws_access_key_id=access_key_id,
-            aws_secret_access=secret_access_key,
+            aws_secret_access_key=secret_access_key,
             region_name="auto",
         )
 
@@ -154,7 +154,7 @@ class SoundService:
             bucket_name,
             object_key,
             ExtraArgs={
-                "Contenttype": (file.content_type or "application/octet-stream")
+                "ContentType": (file.content_type or "application/octet-stream")
             },
         )
 
