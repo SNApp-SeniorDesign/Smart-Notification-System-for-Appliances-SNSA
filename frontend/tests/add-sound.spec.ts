@@ -58,9 +58,6 @@ test("a sound can be added using production storage", async ({ page }) => {
       .getByRole("button", { name: "Save Sound" })
       .click()
 
-    const createResponse = await createResponsePromise
-
-    expect(createResponse.ok()).toBeTruthy()
 
     await expect(page.getByText("Saving")).toBeVisible()
     await expect(page.getByText("Complete")).toBeVisible()
@@ -68,6 +65,10 @@ test("a sound can be added using production storage", async ({ page }) => {
     await expect(
       page.getByText("Sound Added Successfully")
     ).toBeVisible()
+
+    const createResponse = await createResponsePromise
+
+    expect(createResponse.ok()).toBeTruthy()
 
     await expect(
       page.getByText("R2 test sound")
