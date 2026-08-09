@@ -415,7 +415,7 @@ export async function addDevice(page: Page, deviceName: string){
 
 export async function addSound(page: Page, soundName:string){
 
-  await page
+    await page
       .getByRole("button", { name: "Add Sound" })
       .click()
 
@@ -429,17 +429,9 @@ export async function addSound(page: Page, soundName:string){
       .getByRole("button", { name: "Start Recording" })
       .click()
 
-    await expect(
-      page.getByText("Starting...")
-    ).toBeVisible()
-
-    await expect(
-      page.getByText("Recording...")
-    ).toBeVisible()
-
-    await expect(
-      page.getByText("Processing...")
-    ).toBeVisible()
+    await expect(page.getByText("Starting...")).toBeVisible()
+    await expect(page.getByText("Recording...")).toBeVisible()
+    await expect(page.getByText("Processing...")).toBeVisible()
 
     await expect(
       page.getByRole("button", { name: "Save Sound" })
@@ -449,21 +441,31 @@ export async function addSound(page: Page, soundName:string){
       .getByLabel("Sound Name")
       .fill(soundName)
 
+    const createResponsePromise =
+      page.waitForResponse((response) => {
+        const url = new URL(response.url())
+
+        return (
+          response.request().method() === "POST" &&
+          url.pathname.includes("/sound/")
+        )
+      })
+
     await page
       .getByRole("button", { name: "Save Sound" })
       .click()
 
-    await expect(
-      page.getByText("Saving")
-    ).toBeVisible()
 
-    await expect(
-      page.getByText("Complete")
-    ).toBeVisible()
+    await expect(page.getByText("Saving")).toBeVisible()
+    await expect(page.getByText("Complete")).toBeVisible()
 
     await expect(
       page.getByText("Sound Added Successfully")
     ).toBeVisible()
+
+    const createResponse = await createResponsePromise
+
+    expect(createResponse.ok()).toBeTruthy()
 
     await expect(
       page.getByText(soundName)
