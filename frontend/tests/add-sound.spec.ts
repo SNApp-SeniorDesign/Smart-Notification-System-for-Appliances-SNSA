@@ -73,6 +73,8 @@ test("a sound can be added using production storage", async ({ page }) => {
     await expect(
       page.getByText("R2 test sound")
     ).toBeVisible()
+
+    await page.pause()
   } finally {
     await Delete(page, user)
   }

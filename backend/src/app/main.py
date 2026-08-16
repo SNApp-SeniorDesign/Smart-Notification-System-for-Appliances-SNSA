@@ -13,7 +13,7 @@ from app.routes.device import api_router as device_router
 from app.routes.sound import api_router as sound_router
 from app.routes.recording import api_router as recording_router
 
-NEXT_URL = settings.frontend_url
+FRONTEND_URL = settings.frontend_url
 
 
 @asynccontextmanager
@@ -36,7 +36,7 @@ app.include_router(recording_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", NEXT_URL, "http://192.168.0.187:3000"],
+    allow_origins=[FRONTEND_URL],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],

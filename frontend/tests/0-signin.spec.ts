@@ -26,6 +26,5 @@ test("test user can sign up, auto-login, close dialog, and go to dashboard", asy
 
     await expect(page).toHaveURL(/\/dashboard/)
     
-
     await Delete(page, user)
 })
