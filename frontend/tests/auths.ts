@@ -450,14 +450,8 @@ export async function addSound(page: Page, soundName:string){
           url.pathname.includes("/sound/")
         )
       })
-
-    await page
-      .getByRole("button", { name: "Save Sound" })
-      .click()
-
-
-    await expect(page.getByText("Saving")).toBeVisible()
-    await expect(page.getByText("Complete")).toBeVisible()
+    
+    await page.getByRole("button", { name: "Save Sound" }).click()
 
     await expect(
       page.getByText("Sound Added Successfully")

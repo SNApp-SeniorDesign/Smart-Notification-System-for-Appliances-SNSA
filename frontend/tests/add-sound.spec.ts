@@ -54,10 +54,7 @@ test("a sound can be added using production storage", async ({ page }) => {
         )
       })
 
-    await page
-      .getByRole("button", { name: "Save Sound" })
-      .click()
-
+    await page.getByRole("button", { name: "Save Sound" }).click()
 
     await expect(page.getByText("Saving")).toBeVisible()
     await expect(page.getByText("Complete")).toBeVisible()
@@ -74,7 +71,6 @@ test("a sound can be added using production storage", async ({ page }) => {
       page.getByText("R2 test sound")
     ).toBeVisible()
 
-    await page.pause()
   } finally {
     await Delete(page, user)
   }
