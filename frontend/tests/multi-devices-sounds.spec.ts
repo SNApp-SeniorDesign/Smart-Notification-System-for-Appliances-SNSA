@@ -11,7 +11,10 @@ import {
 
 test ("multiple devices can each have multiple sounds", async ({ page }) => {
 
-    await mockBluetooth(page)
+    await mockBluetooth(page, [
+        "SNSA-TEST-001",
+        "SNSA-TEST-002"
+    ])
     await page.goto("/")
 
     const user = MakeUser()

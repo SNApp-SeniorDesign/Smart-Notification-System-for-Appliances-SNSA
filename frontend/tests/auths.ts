@@ -126,7 +126,7 @@ export async function LogOut(page: Page, user: ReturnType<typeof MakeUser>){
 
 export async function mockBluetooth(
   page: Page,
-  serialNumber = "SNSA-TEST-001",
+  serialNumbers: string[] = ["SNSA-TEST-001"],
   isPaired = false
 ): Promise<void> {
   await page.addInitScript(
@@ -137,13 +137,12 @@ export async function mockBluetooth(
       recordCommandUUID,
       recordingStatusUUID,
       recordingResultUUID,
-      serial,
+      serials,
       paired,
     }) => {
       const normalize = (uuid: string) => uuid.toLowerCase()
 
       const createWavBytes = (): Uint8Array => {
-        // Minimal valid WAV header with no audio data.
         const buffer = new ArrayBuffer(44)
         const view = new DataView(buffer)
         const encoder = new TextEncoder()
@@ -154,14 +153,23 @@ export async function mockBluetooth(
         ): void => {
           const bytes = encoder.encode(value)
 
-          for (let index = 0; index < bytes.length; index++) {
-            view.setUint8(offset + index, bytes[index])
+          for (
+            let index = 0;
+            index < bytes.length;
+            index++
+          ) {
+            view.setUint8(
+              offset + index,
+              bytes[index]
+            )
           }
         }
 
         writeString(0, "RIFF")
         view.setUint32(4, 36, true)
+
         writeString(8, "WAVE")
+
         writeString(12, "fmt ")
         view.setUint32(16, 16, true)
         view.setUint16(20, 1, true)
@@ -170,6 +178,7 @@ export async function mockBluetooth(
         view.setUint32(28, 32000, true)
         view.setUint16(32, 2, true)
         view.setUint16(34, 16, true)
+
         writeString(36, "data")
         view.setUint32(40, 0, true)
 
@@ -191,7 +200,9 @@ export async function mockBluetooth(
         }
 
         async readValue(): Promise<DataView> {
-          this.value = await this.readValueFactory()
+          this.value =
+            await this.readValueFactory()
+
           return this.value
         }
 
@@ -225,160 +236,229 @@ export async function mockBluetooth(
           )
 
           this.dispatchEvent(
-            new Event("characteristicvaluechanged")
+            new Event(
+              "characteristicvaluechanged"
+            )
           )
         }
       }
 
-      const statusCharacteristic = new MockCharacteristic(
-        async () =>
-          new DataView(Uint8Array.from([0]).buffer)
-      )
-
-      const characteristics = new Map<
-        string,
-        MockCharacteristic
-      >()
-
-      characteristics.set(
-        normalize(serialUUID),
-        new MockCharacteristic(async () => {
-          const bytes = new TextEncoder().encode(serial)
-
-          return new DataView(
-            bytes.buffer,
-            bytes.byteOffset,
-            bytes.byteLength
-          )
-        })
-      )
-
-      characteristics.set(
-        normalize(pairedUUID),
-        new MockCharacteristic(async () => {
-          return new DataView(
-            Uint8Array.from([paired ? 1 : 0]).buffer
-          )
-        })
-      )
-
-      characteristics.set(
-        normalize(recordingStatusUUID),
-        statusCharacteristic
-      )
-
-      characteristics.set(
-        normalize(recordingResultUUID),
-        new MockCharacteristic(async () => {
-          const bytes = createWavBytes()
-
-          return new DataView(
-            bytes.buffer,
-            bytes.byteOffset,
-            bytes.byteLength
-          )
-        })
-      )
-
-      characteristics.set(
-        normalize(recordCommandUUID),
-        new MockCharacteristic(
-          async () => new DataView(new ArrayBuffer(0)),
-          async () => {
-            // Give the app time to update each UI state.
-            setTimeout(() => {
-              statusCharacteristic.emitValue(
-                Uint8Array.from([1])
+      function createMockDevice(
+        serial: string,
+        index: number
+      ) {
+        const statusCharacteristic =
+          new MockCharacteristic(
+            async () =>
+              new DataView(
+                Uint8Array.from([0]).buffer
               )
-            }, 50)
+          )
 
-            setTimeout(() => {
-              statusCharacteristic.emitValue(
-                Uint8Array.from([2])
-              )
-            }, 150)
+        const characteristics = new Map<
+          string,
+          MockCharacteristic
+        >()
 
-            setTimeout(() => {
-              statusCharacteristic.emitValue(
-                Uint8Array.from([3])
-              )
-            }, 250)
-          }
+        characteristics.set(
+          normalize(serialUUID),
+          new MockCharacteristic(async () => {
+            const bytes =
+              new TextEncoder().encode(serial)
+
+            return new DataView(
+              bytes.buffer,
+              bytes.byteOffset,
+              bytes.byteLength
+            )
+          })
         )
-      )
 
-      const service = {
-        uuid: serviceUUID,
-
-        getCharacteristic: async (uuid: string) => {
-          const characteristic = characteristics.get(
-            normalize(uuid)
-          )
-
-          if (!characteristic) {
-            throw new Error(
-              `Unknown characteristic: ${uuid}`
+        characteristics.set(
+          normalize(pairedUUID),
+          new MockCharacteristic(async () => {
+            return new DataView(
+              Uint8Array.from([
+                paired ? 1 : 0,
+              ]).buffer
             )
-          }
+          })
+        )
 
-          return characteristic
-        },
-      }
+        characteristics.set(
+          normalize(recordingStatusUUID),
+          statusCharacteristic
+        )
 
-      class MockBluetoothDevice extends EventTarget {
-        readonly id = "mock-snsa-device"
-        readonly name = "Mock SNSA Device"
+        characteristics.set(
+          normalize(recordingResultUUID),
+          new MockCharacteristic(async () => {
+            const bytes = createWavBytes()
 
-        readonly gatt = {
-          connected: false,
+            return new DataView(
+              bytes.buffer,
+              bytes.byteOffset,
+              bytes.byteLength
+            )
+          })
+        )
 
-          connect: async () => {
-            this.gatt.connected = true
-            return this.gatt
-          },
+        characteristics.set(
+          normalize(recordCommandUUID),
+          new MockCharacteristic(
+            async () =>
+              new DataView(
+                new ArrayBuffer(0)
+              ),
 
-          disconnect: () => {
-            if (!this.gatt.connected) {
-              return
+            async () => {
+              setTimeout(() => {
+                statusCharacteristic.emitValue(
+                  Uint8Array.from([1])
+                )
+              }, 50)
+
+              setTimeout(() => {
+                statusCharacteristic.emitValue(
+                  Uint8Array.from([2])
+                )
+              }, 150)
+
+              setTimeout(() => {
+                statusCharacteristic.emitValue(
+                  Uint8Array.from([3])
+                )
+              }, 250)
             }
+          )
+        )
 
-            this.gatt.connected = false
+        const service = {
+          uuid: serviceUUID,
 
-            this.dispatchEvent(
-              new Event("gattserverdisconnected")
-            )
-          },
+          getCharacteristic: async (
+            uuid: string
+          ) => {
+            const characteristic =
+              characteristics.get(
+                normalize(uuid)
+              )
 
-          getPrimaryService: async (uuid: string) => {
-            if (normalize(uuid) !== normalize(serviceUUID)) {
+            if (!characteristic) {
               throw new Error(
-                `Unknown service: ${uuid}`
+                `Unknown characteristic: ${uuid}`
               )
             }
 
-            return service
+            return characteristic
           },
         }
+
+        class MockBluetoothDevice
+          extends EventTarget {
+          readonly id =
+            `mock-snsa-device-${index + 1}`
+
+          readonly name =
+            `Mock SNSA Device ${index + 1}`
+
+          readonly gatt = {
+            connected: false,
+
+            connect: async () => {
+              this.gatt.connected = true
+              return this.gatt
+            },
+
+            disconnect: () => {
+              if (!this.gatt.connected) {
+                return
+              }
+
+              this.gatt.connected = false
+
+              this.dispatchEvent(
+                new Event(
+                  "gattserverdisconnected"
+                )
+              )
+            },
+
+            getPrimaryService: async (
+              uuid: string
+            ) => {
+              if (
+                normalize(uuid) !==
+                normalize(serviceUUID)
+              ) {
+                throw new Error(
+                  `Unknown service: ${uuid}`
+                )
+              }
+
+              return service
+            },
+          }
+        }
+
+        return new MockBluetoothDevice()
       }
 
-      const device = new MockBluetoothDevice()
+      const devices = serials.map(
+        (serial, index) =>
+          createMockDevice(
+            serial,
+            index
+          )
+      )
 
-      Object.defineProperty(navigator, "bluetooth", {
-        configurable: true,
-        value: {
-          requestDevice: async () => device,
-          getDevices: async () => [device],
-        },
-      })
+      let requestIndex = 0
+
+      Object.defineProperty(
+        navigator,
+        "bluetooth",
+        {
+          configurable: true,
+
+          value: {
+            requestDevice: async () => {
+              if (
+                requestIndex >=
+                devices.length
+              ) {
+                throw new Error(
+                  "No more mocked SNSA devices available"
+                )
+              }
+
+              const device =
+                devices[requestIndex]
+
+              requestIndex += 1
+
+              return device
+            },
+
+            getDevices: async () => {
+              return devices
+            },
+          },
+        }
+      )
     },
+
     {
       serviceUUID: SNSA_SERVICE_UUID,
       pairedUUID: IS_PAIRED_UUID,
       serialUUID: SERIAL_NUMBER_UUID,
-      recordCommandUUID: RECORD_COMMAND_UUID,
-      recordingStatusUUID: RECORDING_STATUS_UUID,
-      recordingResultUUID: RECORDING_RESULT_UUID,
-      serial: serialNumber,
+      recordCommandUUID:
+        RECORD_COMMAND_UUID,
+      recordingStatusUUID:
+        RECORDING_STATUS_UUID,
+      recordingResultUUID:
+        RECORDING_RESULT_UUID,
+
+      serials: serialNumbers,
       paired: isPaired,
     }
   )
