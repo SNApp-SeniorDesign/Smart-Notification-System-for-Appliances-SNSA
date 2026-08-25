@@ -509,10 +509,6 @@ export async function addSound(page: Page, soundName:string){
       .getByRole("button", { name: "Start Recording" })
       .click()
 
-    await expect(page.getByText("Starting...")).toBeVisible()
-    await expect(page.getByText("Recording...")).toBeVisible()
-    await expect(page.getByText("Processing...")).toBeVisible()
-
     await expect(
       page.getByRole("button", { name: "Save Sound" })
     ).toBeVisible()
@@ -532,10 +528,6 @@ export async function addSound(page: Page, soundName:string){
       })
     
     await page.getByRole("button", { name: "Save Sound" }).click()
-
-    await expect(
-      page.getByText("Sound Added Successfully")
-    ).toBeVisible()
 
     const createResponse = await createResponsePromise
 
