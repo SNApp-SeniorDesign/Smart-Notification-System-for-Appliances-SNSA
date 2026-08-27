@@ -6,7 +6,7 @@ import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
-import { getToken, clearToken } from "@/lib/auth"
+import { getToken} from "@/lib/auth"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -94,12 +94,9 @@ export function AccountForm() {
         getCurrentUser()
     }, [form])
 
-
-    //submitting update user information
     async function onSubmit(data: z.infer<typeof formSchema>) {
         const token = getToken()
         
-        const dirtyFields = form.formState.dirtyFields
         const filteredData = Object.fromEntries(
             Object.entries(data).filter(([key, value]) => {
                 const fieldState = form.getFieldState(key as keyof z.infer<typeof formSchema>)
@@ -136,25 +133,9 @@ export function AccountForm() {
 
         const returnedData = await res.json();
 
-        toast("Here is your Account Information:", {
-            description: (
-                <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-                    <code>
-                        {res.status === 200 ?
-                            "Account Updated Successfully!" :
-                            "Unexpected response from server. Please try again later."
-                        }
-                    </code>
-                </pre>
-            ),
-            position: "bottom-right",
-            classNames: {
-                content: "flex flex-col gap-2",
-            },
-            style: {
-                "--border-radius": "calc(var(--radius)  + 4px)",
-            } as React.CSSProperties,
-        });
+       toast.success("Account updated successfully", {
+        position: "top-center"
+       })
         return returnedData;
     }
     return (
@@ -167,7 +148,7 @@ export function AccountForm() {
                     Account Settings
                 </h1>
                 <p>
-                    Manage your profile and preferences
+                    Manage your account information and password
                 </p>
             </div>
 

@@ -3,11 +3,9 @@
 import Link from "next/link"
 import { usePathname} from 'next/navigation'
 import { UseDialSign } from "@/components/useComp/user/UseDialSign";
-import {UseDeleteButton} from "@/components/useComp/user/UseDeleteButton"
 import {UseDialLog} from "@/components/useComp/user/UseDialLog"
 import {LogOutButton} from "@/components/useComp/user/UseLogOut"
 import {getToken} from "@/lib/auth"
-import {Button} from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import * as React from "react"
 
@@ -79,7 +77,7 @@ export function Header(){
                     >
                     
                     {isLoggedIn? (
-                        <UseDeleteButton/>
+                        <LogOutButton/>
                     ): (
                         <>
                             <UseDialLog
