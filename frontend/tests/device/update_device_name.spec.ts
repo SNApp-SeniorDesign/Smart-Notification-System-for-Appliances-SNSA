@@ -39,14 +39,17 @@ test ("Test if able to change device name", async ( { page }) => {
 
         await page.mouse.up()
 
-        await page.getByLabel("new_device_name").fill("New Device Name")
-        await page.getByRole("button", { name: "Change Device Name"}).click()
-
-        await expect(page.getByText("Device Name updated successfully"))
 
         await page.pause()
 
+        await page.getByLabel("New Device Name").fill("New Device Name")
+        await page.getByRole("button", { name: "Change Device Name"}).click()
+
+        await expect(page.getByText("Device Name updated successfully")).toBeVisible()
+
         await page.getByRole("button", {name: "Close"}).click()
+
+        await page.pause()
 
         await expect(
             page.getByTestId("selected-device")

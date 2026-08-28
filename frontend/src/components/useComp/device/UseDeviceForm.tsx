@@ -32,7 +32,7 @@ type DeviceFormProps = {
 }
 
 const formSchema = z.object({
-    new_device_name: z.string()
+    device_name: z.string()
                 .trim()
                 .optional()
                 .or(z.literal("")),
@@ -46,7 +46,7 @@ export function DeviceForm({
     const form = useForm<z.infer<typeof formSchema>> ({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            new_device_name:"",
+            device_name:"",
         }
     })
 
@@ -104,7 +104,7 @@ export function DeviceForm({
         })
 
         form.reset({
-            new_device_name:"",
+            device_name:"",
         })
 
         return returnedData
@@ -137,17 +137,17 @@ export function DeviceForm({
                         <div className="flex flex-col gap-6">
                             <FieldGroup className="flex-col gap-4 sm:flex-row">
                                 <Controller 
-                                    name="new_device_name"
+                                    name="device_name"
                                     control={form.control}
                                     render={({ field, fieldState}) => (
                                         <Field data-invalid={fieldState.invalid}>
-                                            <FieldLabel htmlFor="new_device_name" className="text-gray-700 dark:text-slate-200">
+                                            <FieldLabel htmlFor="device_name" className="text-gray-700 dark:text-slate-200">
                                                 New Device Name
                                             </FieldLabel>
 
                                             <Input 
                                                 {...field}
-                                                id="new_device_name"
+                                                id="device_name"
                                                 aria-invalid={fieldState.invalid}
                                                 placeholder=""
                                                 autoComplete="off"
