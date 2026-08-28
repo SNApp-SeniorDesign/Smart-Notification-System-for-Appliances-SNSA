@@ -32,7 +32,6 @@ test("user profile allow user to update account information and delete user acco
 
         await expect(page).toHaveURL(/\/$/)
 
-        await page.pause()
         
         await expect(page.getByRole("button", {name:"Log In"})).toBeVisible()
 
@@ -53,7 +52,7 @@ test("user profile allow user to update account information and delete user acco
             localStorage.getItem("access_token"))
         expect(token).not.toBeNull()
         
-        await page.pause()
+
     } finally {
         await Delete(page, user)
     }
