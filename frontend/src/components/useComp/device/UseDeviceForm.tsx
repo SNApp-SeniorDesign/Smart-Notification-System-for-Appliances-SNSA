@@ -8,6 +8,9 @@ import {
     CardContent
 } from "@/components/ui/card"
 import {
+    Field,
+    FieldLabel,
+    FieldError,
     FieldGroup,
 } from "@/components/ui/field"
 
@@ -15,8 +18,13 @@ import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import * as z from "zod"
+import { getToken } from "@/lib/auth"
+import { toast } from "sonner"
+import { Input } from "@/components/ui/input"
 
 import { AlertDialogDeviceDelete } from "./UseDialogDeleteDevice"
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 type DeviceFormProps = {
     deviceID: number
@@ -24,7 +32,7 @@ type DeviceFormProps = {
 }
 
 const formSchema = z.object({
-    device_name: z.string()
+    new_device_name: z.string()
                 .trim()
                 .optional()
                 .or(z.literal("")),
@@ -35,6 +43,53 @@ export function DeviceForm({
     onDeleteSuccess,
 }: DeviceFormProps) {
     //function to handle form submission
+    const form = useForm<z.infer<typeof formSchema>> ({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            new_device_name:"",
+        }
+    })
+
+    async function onSubmit(data: z.infer<typeof formSchema>){
+        const token = getToken()
+
+        const filteredData = Object.fromEntries(
+            Object.entries(data).filter(([key, value]) => {
+                const fieldState = form.getFieldState(key as keyof z.infer<typeof formSchema>)
+                return fieldState.isDirty && value !=""
+            })
+        )
+
+        if(Object.keys(filteredData).length === 0){
+            toast.error("no changes to save")
+            return
+        }
+
+        const res = await fetch(`${API_URL}/device/${deviceID}/update`,{
+            method: "PUT",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(filteredData),
+        })
+
+        if (!res.ok) {
+            const errorData = await res.json()
+            toast.error(`Updating failed: ${errorData?.message || "Unkown error"}`, {
+                position: "top-center",
+            })
+            return
+        }
+        const returnedData = await res.json()
+
+        toast.success("Device Name updated successfully", {
+            position: "top-center"
+        })
+        return returnedData
+    }
+
 
     return (
         <div className={cn("flex flex-col gap-6")}>
@@ -58,11 +113,32 @@ export function DeviceForm({
             >
                 <CardContent className="flex flex-col gap-6">
     
-                    <form id="Device-form">
+                    <form id="Device-form" onSubmit={form.handleSubmit(onSubmit)}>
                         <div className="flex flex-col gap-6">
                             <FieldGroup className="flex-col gap-4 sm:flex-row">
-                                {/* device name */}
-                                <span> Placeholder for change device name</span>
+                                <Controller 
+                                    name="new_device_name"
+                                    control={form.control}
+                                    render={({ field, fieldState}) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                            <FieldLabel htmlFor="new_device_name" className="text-gray-700 dark:text-slate-200">
+                                                New Device Name
+                                            </FieldLabel>
+
+                                            <Input 
+                                                {...field}
+                                                id="new_device_name"
+                                                aria-invalid={fieldState.invalid}
+                                                placeholder=""
+                                                autoComplete="off"
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError errors={[fieldState.error]} />
+                                            )}
+
+                                        </Field>
+                                    )}
+                                />
                             </FieldGroup>
 
                             {/* action row — primary save, ghost log-out, destructive delete */}
