@@ -5,14 +5,16 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
     Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+    CardContent
 } from "@/components/ui/card"
 import {
     FieldGroup,
 } from "@/components/ui/field"
+
+import * as React from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Controller, useForm } from "react-hook-form"
+import * as z from "zod"
 
 import { AlertDialogDeviceDelete } from "./UseDialogDeleteDevice"
 
@@ -20,6 +22,13 @@ type DeviceFormProps = {
     deviceID: number
     onDeleteSuccess: () => void
 }
+
+const formSchema = z.object({
+    device_name: z.string()
+                .trim()
+                .optional()
+                .or(z.literal("")),
+})
 
 export function DeviceForm({
     deviceID,
@@ -31,9 +40,6 @@ export function DeviceForm({
         <div className={cn("flex flex-col gap-6")}>
             {/* eyebrow + heading mirror the dashboard's welcome block */}
             <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-600 dark:text-slate-300">
-                    Settings
-                </p>
                 <h1 className="mt-2 text-4xl font-bold leading-tight text-gray-900 sm:text-5xl dark:text-white">
                     Device Settings
                 </h1>
@@ -50,15 +56,6 @@ export function DeviceForm({
                     "dark:border-white/10 dark:bg-white/[0.03]"
                 )}
             >
-                <CardHeader>
-                    <CardTitle className="text-lg text-gray-900 dark:text-white">
-                        Device Profile
-                    </CardTitle>
-                    <CardDescription className="text-gray-600 dark:text-slate-400">
-                        Change your device name.
-                    </CardDescription>
-                </CardHeader>
-
                 <CardContent className="flex flex-col gap-6">
     
                     <form id="Device-form">
