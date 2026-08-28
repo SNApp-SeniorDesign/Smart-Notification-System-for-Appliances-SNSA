@@ -5,7 +5,7 @@ import {
     signUp, 
     mockBluetooth, 
     addDevice
-} from "./auths"
+} from "../helper/auths"
 
 test("test if device can be delete", async ( { page }) => {
     await mockBluetooth(page)

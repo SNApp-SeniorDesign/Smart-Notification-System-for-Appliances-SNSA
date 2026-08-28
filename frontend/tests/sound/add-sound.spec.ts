@@ -5,7 +5,7 @@ import {
   signUp,
   mockBluetooth,
   addDevice,
-} from "./auths"
+} from "../helper/auths"
 
 test("a sound can be added using production storage", async ({ page }) => {
   await mockBluetooth(page)

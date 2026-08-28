@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { MakeUser, Delete, signUp, mockBluetooth} from "./auths"
+import { MakeUser, Delete, signUp, mockBluetooth} from "../helper/auths"
 
 test("test if device can be add via bluetooth", async({page}) => {
     //make a fake bluetooth connection

@@ -7,7 +7,7 @@ import {
   mockBluetooth,
   addDevice,
   addSound,
-} from "./auths"
+} from "../helper/auths"
 
 test("a sound can be deleted", async ({ page }) => {
   await mockBluetooth(page)

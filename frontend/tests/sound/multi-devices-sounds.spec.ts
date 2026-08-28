@@ -7,7 +7,7 @@ import {
     mockBluetooth,
     addDevice,
     addSound,
-} from "./auths"
+} from "../helper/auths"
 
 test ("multiple devices can each have multiple sounds", async ({ page }) => {
 

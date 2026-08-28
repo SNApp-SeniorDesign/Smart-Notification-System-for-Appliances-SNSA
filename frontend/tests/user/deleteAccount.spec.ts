@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { MakeUser, signUp} from "./auths";
+import { MakeUser, signUp} from "../helper/auths";
 
 test("user can delete their account", async ({ page }) => {
   
