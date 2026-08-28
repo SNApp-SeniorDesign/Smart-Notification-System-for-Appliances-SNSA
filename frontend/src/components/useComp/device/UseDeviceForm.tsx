@@ -53,6 +53,21 @@ export function DeviceForm({
     async function onSubmit(data: z.infer<typeof formSchema>){
         const token = getToken()
 
+        if(!token){
+            toast.error("You are not authenticated", {
+                position: "top-center"
+            })
+            return
+        }
+
+        if(!API_URL){
+            toast.error("API is not configured", {
+                position: "top-center",
+            })
+            return
+        }
+
+
         const filteredData = Object.fromEntries(
             Object.entries(data).filter(([key, value]) => {
                 const fieldState = form.getFieldState(key as keyof z.infer<typeof formSchema>)
@@ -87,6 +102,11 @@ export function DeviceForm({
         toast.success("Device Name updated successfully", {
             position: "top-center"
         })
+
+        form.reset({
+            new_device_name:"",
+        })
+
         return returnedData
     }
 
@@ -143,7 +163,7 @@ export function DeviceForm({
 
                             {/* action row — primary save, ghost log-out, destructive delete */}
                             <div className="flex flex-wrap items-center gap-3 pt-2">
-                                <Button type="button">
+                                <Button type="submit">
                                     Change Device Name
                                 </Button>
 
