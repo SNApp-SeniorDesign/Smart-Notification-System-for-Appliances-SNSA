@@ -12,6 +12,7 @@ type DialogFormProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   onDeleteSuccess: () => void
+  onUpdateSuccess: () => void
 }
 
 export function DialogDeviceForm({
@@ -19,6 +20,7 @@ export function DialogDeviceForm({
   open,
   onOpenChange,
   onDeleteSuccess,
+  onUpdateSuccess,
 }: DialogFormProps) {
   const ignoreNextClose = React.useRef(false)
 
@@ -66,6 +68,7 @@ export function DialogDeviceForm({
         <DeviceForm
           deviceID={deviceID}
           onDeleteSuccess={onDeleteSuccess}
+          onUpdateSuccess={onUpdateSuccess}
         />
       </DialogContent>
     </Dialog>

@@ -26,9 +26,19 @@ import { AlertDialogDeviceDelete } from "./UseDialogDeleteDevice"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
+type Device = {
+  id: number
+  device_name: string
+  serial_number: string
+  user_id: number
+  device_status: string
+  is_paired: boolean
+}
+
 type DeviceFormProps = {
     deviceID: number
     onDeleteSuccess: () => void
+    onUpdateSuccess: () => void
 }
 
 const formSchema = z.object({
@@ -41,6 +51,7 @@ const formSchema = z.object({
 export function DeviceForm({
     deviceID,
     onDeleteSuccess,
+    onUpdateSuccess,
 }: DeviceFormProps) {
     //function to handle form submission
     const form = useForm<z.infer<typeof formSchema>> ({
@@ -97,7 +108,7 @@ export function DeviceForm({
             })
             return
         }
-        const returnedData = await res.json()
+        await res.json()
 
         toast.success("Device Name updated successfully", {
             position: "top-center"
@@ -107,7 +118,7 @@ export function DeviceForm({
             device_name:"",
         })
 
-        return returnedData
+        onUpdateSuccess()
     }
 
 
