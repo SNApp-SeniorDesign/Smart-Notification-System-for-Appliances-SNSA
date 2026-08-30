@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
-import { LogOutButton } from "@/components/useComp/user/UseLogOut"
 import { UseDeleteButton } from "./UseDeleteButton"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -241,8 +240,6 @@ export function AccountForm() {
                                 >
                                     Save changes
                                 </Button>
-
-                                <LogOutButton />
 
                                 <UseDeleteButton />
                             </div>
