@@ -29,6 +29,10 @@ export default function Dashboard(){
                     refreshSounds()
                     setSelectedSound(null)
                 }}
+                onUpdateSuccess={() => {
+                    refreshSounds()
+                    setSelectedSound(null)
+                }}
             />
                 {selectedDevice ? (
                     <SoundList

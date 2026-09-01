@@ -35,6 +35,7 @@ type DialogSoundFormProps = {
   onOpenChange: (open: boolean) => void
   sound: Sound | null
   onDeleteSuccess: (soundID: number) => void
+  onUpdateSuccess: () => void
 }
 
 const formSchema = z.object({
@@ -49,6 +50,7 @@ export function DialogSoundForm({
   onOpenChange,
   sound,
   onDeleteSuccess,
+  onUpdateSuccess,
 
 }: DialogSoundFormProps) {
   const [soundName, setSoundName] = React.useState("")
@@ -138,6 +140,8 @@ export function DialogSoundForm({
       position: "top-center"
     })
 
+    onUpdateSuccess()
+    onOpenChange(false)
     form.reset({
       sound_name: "",
     })
