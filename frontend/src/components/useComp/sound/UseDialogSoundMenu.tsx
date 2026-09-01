@@ -53,6 +53,14 @@ export function DialogSoundForm({
 }: DialogSoundFormProps) {
   const [soundName, setSoundName] = React.useState("")
 
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      sound_name: "",
+    }
+  })
+
   React.useEffect(() => {
     if (sound) {
       setSoundName(sound.sound_name)
@@ -69,13 +77,6 @@ export function DialogSoundForm({
     // Close the Sound Settings dialog after successful deletion.
     onOpenChange(false)
   }
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      sound_name: "",
-    }
-  })
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     const token = getToken()
