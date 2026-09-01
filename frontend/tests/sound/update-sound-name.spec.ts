@@ -34,17 +34,12 @@ test("a sound name can be updated", async ({ page }) => {
     ).toBeVisible()
 
 
-    await page.pause()
-
     await page.getByLabel("New Sound Name").fill("New Sound Name")
     await page.getByRole("button", { name: "Update Sound Name"}).click()
 
     await expect(page.getByText("Sound Name updated successfully")).toBeVisible()
-
-    await page.pause()
     await expect(page.getByText("New Sound Name")).toBeVisible()
 
-    await page.pause()
 
   } finally {
     await Delete(page, user)

@@ -116,14 +116,20 @@ export function DialogSoundForm({
       return
     }
 
+
+    const formData = new FormData()
+
+    Object.entries(filteredData).forEach(([key, value]) => {
+      formData.append(key, String(value))
+    })
+
     const res = await fetch(`${API_URL}/sound/${sound.device_id}/${sound.id}/update`, {
       method: "PUT",
       headers: {
         "Accept": "application/json",
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(filteredData),
+      body: formData,
     })
 
     if (!res.ok) {
