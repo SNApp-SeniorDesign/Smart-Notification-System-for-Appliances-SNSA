@@ -55,7 +55,7 @@ type AddSoundFormProps = {
   onSuccess?: (sound: Sound) => void
 }
 
-export function AddSoundForm({
+export function ReRecordSoundForm({
   onSuccess,
   deviceID,
   SoundID,
