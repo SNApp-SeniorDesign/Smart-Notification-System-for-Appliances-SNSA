@@ -17,15 +17,12 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import {
   Field,
-  FieldError,
   FieldGroup,
-  FieldLabel,
 } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
@@ -291,7 +288,7 @@ export function AddSoundForm({
           }
         )
 
-        setStatus("uploading")
+        setStatus("ready")
         return
       }
 
@@ -321,7 +318,7 @@ export function AddSoundForm({
         }
       )
 
-      setStatus("uploading")
+      setStatus("ready")
     }
   }
 
