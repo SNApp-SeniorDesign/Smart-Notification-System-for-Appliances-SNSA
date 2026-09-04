@@ -1,10 +1,7 @@
 "use client"
 
 import * as React from "react"
-import * as z from "zod"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
@@ -32,12 +29,6 @@ import { Input } from "@/components/ui/input"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
-const formSchema = z.object({
-  sound_name: z
-    .string()
-    .trim()
-    .min(1, "Sound Name is required"),
-})
 
 type Sound = {
   id: number
@@ -62,6 +53,7 @@ type AddSoundStatus =
 
 type AddSoundFormProps = {
   deviceID: number
+  SoundID: number
   deviceSerialNumber: string
   onSuccess?: (sound: Sound) => void
 }
@@ -69,6 +61,7 @@ type AddSoundFormProps = {
 export function AddSoundForm({
   onSuccess,
   deviceID,
+  SoundID,
   deviceSerialNumber,
 }: AddSoundFormProps) {
   const [status, setStatus] =
@@ -96,12 +89,6 @@ export function AddSoundForm({
     failed: "Try Again",
   }
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      sound_name: "",
-    },
-  })
 
   async function transitionStatus(
     currentStatus: AddSoundStatus,
@@ -169,7 +156,6 @@ export function AddSoundForm({
     const { token, apiURL } = requestRequirements
 
     setRecordingFile(null)
-    form.reset()
     setStatus("starting")
 
     try {
@@ -243,9 +229,7 @@ export function AddSoundForm({
     }
   }
 
-  async function onSubmit(
-    data: z.infer<typeof formSchema>
-  ) {
+  async function onSubmit() {
     if (status !== "naming") {
       return
     }
@@ -275,15 +259,14 @@ export function AddSoundForm({
 
     const formData = new FormData()
 
-    formData.append("sound_name", data.sound_name)
     formData.append("device_id", String(deviceID))
     formData.append("file", recordingFile)
 
     try {
       const response = await fetch(
-        `${apiURL}/sound/register`,
+        `${apiURL}/sound/${deviceID}/${SoundID}/update`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -302,25 +285,24 @@ export function AddSoundForm({
         }
 
         toast.error(
-          `Adding sound failed: ${detail}`,
+          `Updating sound file failed: ${detail}`,
           {
             position: "top-center",
           }
         )
 
-        setStatus("naming")
+        setStatus("uploading")
         return
       }
 
       const newSound: Sound =
         await response.json()
 
-      toast.success("Sound added successfully", {
+      toast.success("Sound file updated successfully", {
         position: "top-center",
       })
 
       setRecordingFile(null)
-      form.reset()
 
       await transitionStatus(
         "complete",
@@ -330,7 +312,7 @@ export function AddSoundForm({
 
       onSuccess?.(newSound)
     } catch (error) {
-      console.error("Failed to add sound", error)
+      console.error("Failed to update sound file", error)
 
       toast.error(
         "Unable to connect to the server.",
@@ -339,7 +321,7 @@ export function AddSoundForm({
         }
       )
 
-      setStatus("naming")
+      setStatus("uploading")
     }
   }
 
@@ -354,49 +336,9 @@ export function AddSoundForm({
         <CardHeader />
         <CardContent>
           <form
-            id="Add-Sound-form"
-            onSubmit={form.handleSubmit(onSubmit)}
+            id="Update-Sound-form"
           >
             <FieldGroup>
-              {status === "naming" && (
-                <Controller
-                  name="sound_name"
-                  control={form.control}
-                  render={({
-                    field,
-                    fieldState,
-                  }) => (
-                    <Field
-                      data-invalid={
-                        fieldState.invalid
-                      }
-                    >
-                      <FieldLabel htmlFor="sound_name">
-                        Sound Name
-                      </FieldLabel>
-
-                      <Input
-                        {...field}
-                        id="sound_name"
-                        aria-invalid={
-                          fieldState.invalid
-                        }
-                        placeholder="Laundry"
-                        autoComplete="off"
-                        autoFocus
-                      />
-
-                      {fieldState.invalid && (
-                        <FieldError
-                          errors={[
-                            fieldState.error,
-                          ]}
-                        />
-                      )}
-                    </Field>
-                  )}
-                />
-              )}
 
               <Field>
                 {status === "idle" ||
@@ -413,8 +355,6 @@ export function AddSoundForm({
                   <Button
                     type="submit"
                     disabled={
-                      form.formState
-                        .isSubmitting ||
                       recordingIsInProgress ||
                       status === "uploading" ||
                       status === "complete"
