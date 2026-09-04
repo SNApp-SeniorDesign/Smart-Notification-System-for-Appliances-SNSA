@@ -46,7 +46,7 @@ type AddSoundStatus =
   | "starting"
   | "recording"
   | "processing"
-  | "naming"
+  | "ready"
   | "uploading"
   | "complete"
   | "failed"
@@ -83,7 +83,7 @@ export function AddSoundForm({
     starting: "Starting...",
     recording: "Recording...",
     processing: "Processing...",
-    naming: "Save Sound",
+    ready: "Save Sound",
     uploading: "Saving...",
     complete: "Complete",
     failed: "Try Again",
@@ -208,7 +208,7 @@ export function AddSoundForm({
       )
 
       setRecordingFile(file)
-      setStatus("naming")
+      setStatus("ready")
     } catch (error) {
       console.error(
         "Failed to start recording",
@@ -230,7 +230,7 @@ export function AddSoundForm({
   }
 
   async function onSubmit() {
-    if (status !== "naming") {
+    if (status !== "ready") {
       return
     }
 
@@ -353,7 +353,8 @@ export function AddSoundForm({
                   </Button>
                 ) : (
                   <Button
-                    type="submit"
+                    type="button"
+                    onClick={onSubmit}
                     disabled={
                       recordingIsInProgress ||
                       status === "uploading" ||
