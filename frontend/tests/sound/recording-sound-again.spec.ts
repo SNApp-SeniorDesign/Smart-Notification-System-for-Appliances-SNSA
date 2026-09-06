@@ -18,7 +18,7 @@ test("a sound can be recorded again", async ({ page }) => {
   try {
     await signUp(page, user)
     await addDevice(page, "Kitchen SNSA")
-    await addSound(page, "Test Sound")
+    const originalSound = await addSound(page, "Test Sound")
 
     const soundCard = page.getByRole("button", {
       name: /Test Sound/,
@@ -43,11 +43,44 @@ test("a sound can be recorded again", async ({ page }) => {
     await expect(page.getByText("Starting...")).toBeVisible()
     await expect(page.getByText("Recording...")).toBeVisible()
     await expect(page.getByText("Processing...")).toBeVisible()
-    await expect(page.getByText("Uploading...")).toBeVisible()
-    await expect(page.getByText("Complete")).toBeVisible()
 
+    await expect(
+        page.getByRole("button", { name: "Save Sound" })
+    ).toBeVisible()
+
+    const updateResponsePromise =
+        page.waitForResponse((response) => {
+            const url = new URL(response.url())
+
+            return (
+            response.request().method() === "PUT" &&
+            url.pathname.includes("/sound/") &&
+            url.pathname.includes("/update")
+            )
+        })
+
+    await page
+        .getByRole("button", { name: "Save Sound" })
+        .click()
+
+    await expect(page.getByText("Saving...")).toBeVisible()
+    await expect(page.getByText("Complete")).toBeVisible()
+    
+    const updateResponse = await updateResponsePromise
+
+    expect(updateResponse.ok()).toBeTruthy()
+
+    const updatedSound = await updateResponse.json()
 
     await expect(page.getByText("Sound file updated successfully")).toBeVisible()
+
+    expect(updatedSound.id).toBe(originalSound.id)
+    
+    expect(updatedSound.sound_file_key)
+    .not.toBe(originalSound.sound_file_key)
+
+    expect(updatedSound.profile_version)
+    .toBe(originalSound.profile_version + 1)
 
   } finally {
     await Delete(page, user)

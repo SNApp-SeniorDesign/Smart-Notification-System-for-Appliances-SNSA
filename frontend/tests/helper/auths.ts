@@ -536,4 +536,6 @@ export async function addSound(page: Page, soundName:string){
     await expect(
       page.getByText(soundName)
     ).toBeVisible()  
+
+    return await createResponse.json()
 }
