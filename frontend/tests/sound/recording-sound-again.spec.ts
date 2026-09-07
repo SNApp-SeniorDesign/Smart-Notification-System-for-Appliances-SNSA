@@ -33,8 +33,6 @@ test("a sound can be recorded again", async ({ page }) => {
       })
     ).toBeVisible()
 
-    await page.pause()
-
     await page.getByRole("button", { name: "Record Sound Again"}).click()
 
     await page
@@ -44,8 +42,6 @@ test("a sound can be recorded again", async ({ page }) => {
     await expect(page.getByText("Starting...")).toBeVisible()
     await expect(page.getByText("Recording...")).toBeVisible()
     await expect(page.getByText("Processing...")).toBeVisible()
-
-    await page.pause()
 
     await expect(
         page.getByRole("button", { name: "Save Sound" })
@@ -89,8 +85,6 @@ test("a sound can be recorded again", async ({ page }) => {
     await soundSettingsDialog
     .getByRole("button", { name: "Close" })
     .click()
-
-    await page.pause()
 
     expect(updatedSound.id).toBe(originalSound.id)
     
