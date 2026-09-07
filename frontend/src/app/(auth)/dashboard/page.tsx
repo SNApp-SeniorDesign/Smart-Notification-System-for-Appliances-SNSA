@@ -17,23 +17,28 @@ export default function Dashboard(){
     return(
         <div>
             <CollapsibleDeviceMenu />
-            <DialogSoundForm 
-                open={soundDialogOpen}
-                onOpenChange={(open) => {setSoundDialogOpen(open)
-                    if(!open){
-                        setSelectedSound(null)
-                    }
-                }}
-                sound={selectedSound}
-                onDeleteSuccess={() => {
-                    refreshSounds()
-                    setSelectedSound(null)
-                }}
-                onUpdateSuccess={() => {
-                    refreshSounds()
-                    setSelectedSound(null)
-                }}
-            />
+            {selectedDevice && (
+        <DialogSoundForm
+            open={soundDialogOpen}
+            onOpenChange={(open) => {
+            setSoundDialogOpen(open)
+
+            if (!open) {
+                setSelectedSound(null)
+            }
+            }}
+            sound={selectedSound}
+            deviceSerialNumber={selectedDevice.serial_number}
+            onDeleteSuccess={() => {
+            refreshSounds()
+            setSelectedSound(null)
+            }}
+            onUpdateSuccess={() => {
+            refreshSounds()
+            setSelectedSound(null)
+            }}
+        />
+        )}
                 {selectedDevice ? (
                     <SoundList
                         deviceID={selectedDevice.id}
