@@ -40,8 +40,8 @@ export function Footer() {
   return (
     <footer>
       <div className="flex items-center gap-4 w-full h-auto justify-center">
-        <Link href="/dashboard">
-        < House />
+        <Link href="/dashboard" aria-label="Home">
+        < House size={30} />
         </Link>
 
 
@@ -50,13 +50,14 @@ export function Footer() {
           <Button
             type="button"
             onClick={handleOpenAddSound}
+            aria-label="Add sound"
           >
             <Plus />
           </Button>
         )}
 
 
-        <Link href="/setting">
+        <Link href="/setting" aria-label="Settings">
           <Settings />
         </Link>
 
