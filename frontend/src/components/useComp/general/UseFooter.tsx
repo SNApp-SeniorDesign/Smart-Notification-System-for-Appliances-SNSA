@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import { useDashboardContext } from "@/components/useComp/general/DashboardContext"
 import {UseDialogAddSound} from "@/components/useComp/sound/UseDialogAddSound"
 
+import { House, Plus, Settings } from 'lucide-react'
+
 
 export function Footer() {
   const pathname = usePathname()
@@ -39,21 +41,24 @@ export function Footer() {
     <footer>
       <div className="flex items-center gap-4 w-full h-auto justify-center">
         <Link href="/dashboard">
-          Home
+        < House />
         </Link>
 
-        <Link href="/setting">
-          Setting
-        </Link>
+
 
         {showAddSoundButton && (
           <Button
             type="button"
             onClick={handleOpenAddSound}
           >
-            Add Sound
+            <Plus />
           </Button>
         )}
+
+
+        <Link href="/setting">
+          <Settings />
+        </Link>
 
         {showAddSoundButton && selectedDevice && (
           <UseDialogAddSound
