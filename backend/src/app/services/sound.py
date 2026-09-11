@@ -120,6 +120,8 @@ class SoundService:
 
         return self.repository.create_sound(db, sound)
 
+    # FIXME: This function did not validate the uploaded file type
+
     # function helper to save sound file to Cloudflare
     def save_sound_file_to_r2(self, file: UploadFile, stored_filename: str) -> str:
         account_id = os.getenv("R2_ACCOUNT_ID")
