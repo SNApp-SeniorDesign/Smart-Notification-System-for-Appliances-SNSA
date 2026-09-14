@@ -74,7 +74,7 @@ export function AddSoundForm({
   const [status, setStatus] =
     React.useState<AddSoundStatus>("idle")
 
-  const [recordingFile, setRecordingFile] =
+  const [soundFile, setSoundFile] =
     React.useState<File | null>(null)
 
   const isMountedRef = React.useRef(true)
@@ -103,6 +103,9 @@ export function AddSoundForm({
     },
   })
 
+  const CanChoseUploaadSoundMethod = 
+    status === "idle" || status === "failed"
+
   async function transitionStatus(
     currentStatus: AddSoundStatus,
     delayMs = 750,
@@ -117,6 +120,25 @@ export function AddSoundForm({
     if (nextStatus && isMountedRef.current) {
       setStatus(nextStatus)
     }
+  }
+
+  function handleSoundFileSelection(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+
+    if(!CanChoseUploaadSoundMethod){
+      event.target.value=""
+    }
+    
+    const file = event.target.files?.[0]
+    if (!file){
+      return
+    }
+
+    setSoundFile(file)
+    form.reset()
+    setStatus("naming")
+
   }
 
   function getRequestRequirements() {
@@ -168,7 +190,7 @@ export function AddSoundForm({
 
     const { token, apiURL } = requestRequirements
 
-    setRecordingFile(null)
+    setSoundFile(null)
     form.reset()
     setStatus("starting")
 
@@ -221,7 +243,7 @@ export function AddSoundForm({
         deviceSerialNumber
       )
 
-      setRecordingFile(file)
+      setSoundFile(file)
       setStatus("naming")
     } catch (error) {
       console.error(
@@ -238,7 +260,7 @@ export function AddSoundForm({
         }
       )
 
-      setRecordingFile(null)
+      setSoundFile(null)
       setStatus("failed")
     }
   }
@@ -259,9 +281,9 @@ export function AddSoundForm({
 
     const { token, apiURL } = requestRequirements
 
-    if (!recordingFile) {
+    if (!soundFile) {
       toast.error(
-        "No completed recording is available",
+        "No sound file is available",
         {
           position: "top-center",
         }
@@ -277,7 +299,7 @@ export function AddSoundForm({
 
     formData.append("sound_name", data.sound_name)
     formData.append("device_id", String(deviceID))
-    formData.append("file", recordingFile)
+    formData.append("file", soundFile)
 
     try {
       const response = await fetch(
@@ -319,7 +341,7 @@ export function AddSoundForm({
         position: "top-center",
       })
 
-      setRecordingFile(null)
+      setSoundFile(null)
       form.reset()
 
       await transitionStatus(
@@ -397,33 +419,43 @@ export function AddSoundForm({
                   )}
                 />
               )}
-
-              <Field>
-                {status === "idle" ||
-                status === "failed" ? (
+            <Field>
+              {CanChoseUploaadSoundMethod ? (
+                <div className="flex flex-col gap-4">
                   <Button
                     type="button"
-                    onClick={
-                      handleStartRecording
-                    }
+                    onClick={handleStartRecording}
                   >
                     {buttonText[status]}
                   </Button>
-                ) : (
-                  <Button
-                    type="submit"
-                    disabled={
-                      form.formState
-                        .isSubmitting ||
-                      recordingIsInProgress ||
-                      status === "uploading" ||
-                      status === "complete"
-                    }
-                  >
-                    {buttonText[status]}
-                  </Button>
-                )}
-              </Field>
+
+                  <div className="grid gap-2">
+                    <FieldLabel htmlFor="sound-file">
+                      Or upload a sound file
+                    </FieldLabel>
+
+                    <Input
+                      id="sound-file"
+                      type="file"
+                      accept=".mp3,.wav,audio/mpeg,audio/wav"
+                      onChange={handleSoundFileSelection}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  type="submit"
+                  disabled={
+                    form.formState.isSubmitting ||
+                    recordingIsInProgress ||
+                    status === "uploading" ||
+                    status === "complete"
+                  }
+                >
+                  {buttonText[status]}
+                </Button>
+              )}
+            </Field>
             </FieldGroup>
           </form>
         </CardContent>
