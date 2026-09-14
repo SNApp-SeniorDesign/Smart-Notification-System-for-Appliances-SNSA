@@ -33,11 +33,14 @@ test("a sound file can be uploaded using production storage", async ({
     const soundFileInput =
       page.getByLabel("Or upload a sound file")
 
-    await expect(soundFileInput).toBeVisible()
+      await expect(soundFileInput).toBeVisible()
 
-    await soundFileInput.setInputFiles(
-      "tests/fixtures/test-sound.mp3"
-    )
+
+    await soundFileInput.setInputFiles({
+        name: "test-sound.mp3",
+        mimeType: "audio/mpeg",
+        buffer: Buffer.from("fake MP3 data for upload testing"),
+    })
 
     // Selecting a file should move the form to naming.
     await expect(
@@ -69,12 +72,14 @@ test("a sound file can be uploaded using production storage", async ({
         name: "Save Sound",
       })
       .click()
+    
 
     await expect(
       page.getByRole("button", {
         name: "Saving...",
       })
     ).toBeVisible()
+
 
     const createResponse =
       await createResponsePromise
@@ -88,6 +93,7 @@ test("a sound file can be uploaded using production storage", async ({
     await expect(
       page.getByText("R2 uploaded sound")
     ).toBeVisible()
+
   } finally {
     await Delete(page, user)
   }
