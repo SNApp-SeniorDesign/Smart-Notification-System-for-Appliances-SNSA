@@ -7,6 +7,8 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 
+import { Activity } from 'lucide-react'
+
 export type Sound = {
     id: number
     device_id: number
@@ -46,20 +48,24 @@ export function SoundCard({
             <CardHeader>
                 <CardTitle>{sound.sound_name}</CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-                <p>
-                    Status: {sound.sound_status}
-                </p>
-                <p>
-                    Enable: {sound.is_on ? "Yes" : "No"}
-                </p>
-                <p>
-                    Device sync: {" "}
-                    {sound.is_synced_to_device 
-                        ? "Synced"
-                        : "Not synced"}
-                </p>
-            </CardContent>
+            <div className="flex items-center">
+                <Activity className="size-[clamp(4rem,4vw,3rem)]"/>
+                <CardContent className="flex flex-col gap-2">
+                    <p>
+                        Status: {sound.sound_status}
+                    </p>
+                    <p>
+                        Enable: {sound.is_on ? "Yes" : "No"}
+                    </p>
+                    <p>
+                        Device sync: {" "}
+                        {sound.is_synced_to_device 
+                            ? "Synced"
+                            : "Not synced"}
+                    </p>
+                </CardContent>
+            </div>
+
         </Card>
 
     )
