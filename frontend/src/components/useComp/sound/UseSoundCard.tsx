@@ -49,7 +49,7 @@ export function SoundCard({
                 <CardTitle>{sound.sound_name}</CardTitle>
             </CardHeader>
             <div className="flex items-center w-fit h-auto">
-                <Activity className="size-[clamp(4rem,4vw,3rem)]"/>
+                <Activity className="size-[clamp(3rem,4vw,4rem)]"/>
                 <CardContent className="flex flex-col gap-2">
                     <p>
                         Status: {sound.sound_status}

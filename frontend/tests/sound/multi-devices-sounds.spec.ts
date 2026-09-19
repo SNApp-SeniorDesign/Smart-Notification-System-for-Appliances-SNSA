@@ -37,6 +37,8 @@ test ("multiple devices can each have multiple sounds", async ({ page }) => {
             page.getByText("Oven Timer")
         ).toBeVisible()
 
+        await page.pause()
+
         //Device 2
         await addDevice(page, "Laundry SNSA")
 

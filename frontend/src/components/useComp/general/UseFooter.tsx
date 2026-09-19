@@ -41,24 +41,23 @@ export function Footer() {
     <footer>
       <div className="flex items-center gap-4 w-full h-auto justify-center">
         <Link href="/dashboard" aria-label="Home">
-        < House size={30} />
+        < House className="size-[clamp(3rem,4vw,4rem)]" />
         </Link>
-
-
 
         {showAddSoundButton && (
           <Button
             type="button"
             onClick={handleOpenAddSound}
             aria-label="Add sound"
+            className="size-[clamp(3rem,4vw,4rem)] p-2"
           >
-            <Plus />
+            <Plus className="size-[clamp(3rem,4vw,4rem)]" />
           </Button>
         )}
 
 
         <Link href="/setting" aria-label="Settings">
-          <Settings />
+          <Settings className="size-[clamp(3rem,4vw,4rem)]" />
         </Link>
 
         {showAddSoundButton && selectedDevice && (
