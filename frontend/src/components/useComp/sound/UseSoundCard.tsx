@@ -33,7 +33,20 @@ export function SoundCard({
         <Card
             role="button"
             tabIndex={0}
-            className="cursor-pointer transition hover:bg-muted w-fit h-auto p-4 min-w-80"
+            className="
+            cursor-pointer 
+            transition 
+            hover:bg-muted 
+            w-fit 
+            h-auto 
+            p-4 
+            min-w-80
+            bg-secondary
+            text-secondary-foreground
+            transition-colors
+            hover:bg-primary
+            hover:text-primary-foreground
+            "
             onClick={() => onClick(sound)}
             onKeyDown={(event) => {
                 if (
@@ -44,6 +57,7 @@ export function SoundCard({
                     onClick(sound)
                 }
             }}
+
         >
             <CardHeader>
                 <CardTitle>{sound.sound_name}</CardTitle>
