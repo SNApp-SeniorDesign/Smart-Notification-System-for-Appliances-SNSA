@@ -33,7 +33,7 @@ export function SoundCard({
         <Card
             role="button"
             tabIndex={0}
-            className="cursor-pointer transition hover: bg-muted"
+            className="cursor-pointer transition hover:bg-muted w-fit h-auto p-4 min-w-80"
             onClick={() => onClick(sound)}
             onKeyDown={(event) => {
                 if (
@@ -48,7 +48,7 @@ export function SoundCard({
             <CardHeader>
                 <CardTitle>{sound.sound_name}</CardTitle>
             </CardHeader>
-            <div className="flex items-center">
+            <div className="flex items-center w-fit h-auto">
                 <Activity className="size-[clamp(4rem,4vw,3rem)]"/>
                 <CardContent className="flex flex-col gap-2">
                     <p>
