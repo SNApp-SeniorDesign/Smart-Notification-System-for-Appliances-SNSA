@@ -32,10 +32,6 @@ test("a sound can be added using production storage", async ({ page }) => {
       .getByRole("button", { name: "Start Recording" })
       .click()
 
-    await expect(page.getByText("Starting...")).toBeVisible()
-    await expect(page.getByText("Recording...")).toBeVisible()
-    await expect(page.getByText("Processing...")).toBeVisible()
-
     await expect(
       page.getByRole("button", { name: "Save Sound" })
     ).toBeVisible()

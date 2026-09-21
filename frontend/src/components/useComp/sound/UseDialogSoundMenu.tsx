@@ -202,6 +202,13 @@ export function DialogSoundForm({
               )}
 
             />
+
+            <Field>
+              <Button type="submit">
+                Update Sound Name
+              </Button>
+            </Field>
+
           </FieldGroup>
 
 
