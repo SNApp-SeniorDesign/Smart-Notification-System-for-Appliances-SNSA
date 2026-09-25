@@ -10,7 +10,9 @@ import { cn } from "@/lib/utils"
 import * as React from "react"
 
 const AUTH_NAV = [
-    {label: "Dashboard", href:"/dashboard"}
+    {label: "Dashboard", href:"/dashboard"},
+    {label: "Settings", href:"/setting"},
+    {label: "Home", href:"/"},
 ] as const;
 
 export function Header(){
@@ -41,7 +43,7 @@ export function Header(){
     if(pathname === '/'){
         return (
             <header className="w-full h-fit">
-                <div className="w-full h-fit items-center gap-4 sm: grid sm:items-center sm:gap-4">
+                <div className="w-full h-fit items-center gap-4 sm:grid sm:items-center sm:gap-4">
                     <Link
                         href="/"
                         aria-label="Go to welcome page"
@@ -112,7 +114,7 @@ export function Header(){
     else {
         return(
             <header className="w-full h-fit">
-                <div className="w-full h-fit flex flex-col items-center gap-4 sm:grid sm:grid-cols-3 sm:items-center sm: gap:4">
+                <div className="w-full h-fit flex flex-col items-center gap-4 sm:grid sm:grid-cols-3 sm:items-center sm:gap:4">
                     <Link
                         href="/"
                         aria-label="Go to landing page"
@@ -125,21 +127,22 @@ export function Header(){
                     <nav
                         className={cn(
                             "hidden md:flex items-center gap-1",
-                            "sm: col-start-2 sm: justify-self-center"
+                            "sm:col-start-2 sm:justify-self-center"
                         )}
                         aria-label="Primary"
                     >
                         {AUTH_NAV.map((item) => {
-                            const active = pathname === item.href || pathname?.startsWith(item.href + "/")
-                            return(
+                            const active = 
+                            pathname === item.href || pathname?.startsWith(item.href + "/")
+
+                            if (!active) return null
+
+                            return (
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    aira-current={active ? "page" : undefined}
-                                    className={cn(
-                                        "text-sm font-medium",
-                                        active?"text-primary":"text-gray-700"
-                                    )}
+                                    aria-current="page"
+                                    className="text-sm font-medium text-primary"
                                 >
                                     {item.label}
                                 </Link>
