@@ -26,7 +26,7 @@ test ("multiple devices can each have multiple sounds", async ({ page }) => {
         await addDevice(page, "Kitchen SNSA")
 
         await addSound(page, "Microwave Beep")
-        
+        await page.pause()        
         await addSound(page, "Oven Timer")
 
         await expect(

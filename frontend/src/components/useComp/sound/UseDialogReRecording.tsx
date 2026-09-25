@@ -39,7 +39,7 @@ export function UseDialogReRecordSound({
         {showTrigger && (
           <DialogTrigger
           render={
-            <Button>
+            <Button className="w-full">
               Record Sound Again
             </Button>
           }
