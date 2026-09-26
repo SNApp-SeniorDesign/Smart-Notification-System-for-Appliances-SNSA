@@ -49,7 +49,7 @@ export function Header(){
                         className={cn(
                             "group inline-flex items-center gap-2 text-primary"
                         )}
-                    >Home
+                    ><h6>Home</h6>
                     </Link>
                     {isLoggedIn && (
                         <nav
@@ -69,7 +69,7 @@ export function Header(){
                                     hover:text-primary
                                     "
                                 >
-                                    {item.label}
+                                    <h6>{item.label}</h6>
                                 </Link>
                             ))}
 
@@ -126,7 +126,7 @@ export function Header(){
                             "sm:col-start-1 sm:justify-self-start",
                             "hover:text-primary"
                         )}
-                    > Home
+                    > <h6>Home</h6>
                     </Link>
                     <nav
                         className={cn(
@@ -148,7 +148,7 @@ export function Header(){
                                     aria-current="page"
                                     className="text-sm font-medium text-primary"
                                 >
-                                    {item.label}
+                                    <h6>{item.label}</h6>
                                 </Link>
                             )
                         })}

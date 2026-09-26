@@ -16,8 +16,8 @@ export default function Dashboard(){
     }
     return(
         <div>
-            <div className="text- flex justify-center bg-primary text-primary-foreground p-4 text-6xl font-semibold">
-                SNSA Device
+            <div className="flex items-center justify-center bg-primary text-primary-foreground p-4">
+                <h1>SNSA Device</h1>
             </div>
             <CollapsibleDeviceMenu />
             {selectedDevice && (
