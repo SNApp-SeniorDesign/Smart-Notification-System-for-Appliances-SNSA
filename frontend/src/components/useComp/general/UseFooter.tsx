@@ -41,7 +41,7 @@ export function Footer() {
     <footer>
       <div className="flex items-center gap-4 w-full h-auto justify-center">
         <Link href="/dashboard" aria-label="Home">
-        < House className="size-[clamp(3rem,4vw,4rem)]" />
+        < House className="size-[clamp(3rem,4vw,4rem)] hover:text-primary" />
         </Link>
 
         {showAddSoundButton && (
@@ -57,7 +57,7 @@ export function Footer() {
 
 
         <Link href="/setting" aria-label="Settings">
-          <Settings className="size-[clamp(3rem,4vw,4rem)]" />
+          <Settings className="size-[clamp(3rem,4vw,4rem)] hover:text-primary" />
         </Link>
 
         {showAddSoundButton && selectedDevice && (
