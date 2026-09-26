@@ -12,7 +12,6 @@ import * as React from "react"
 const AUTH_NAV = [
     {label: "Dashboard", href:"/dashboard"},
     {label: "Settings", href:"/setting"},
-    {label: "Home", href:"/"},
 ] as const;
 
 export function Header(){
@@ -48,14 +47,14 @@ export function Header(){
                         href="/"
                         aria-label="Go to welcome page"
                         className={cn(
-                            "group inline-flex items-center gap-2 "
+                            "group inline-flex items-center gap-2 text-primary"
                         )}
                     >Home
                     </Link>
                     {isLoggedIn && (
                         <nav
                             className={cn(
-                                "hidden md:flex items-center gap-1",
+                                "hidden md:flex items-center gap-10",
                                 "sm:col-start-2 sm:justify-self-center"
                             )}
                             aria-label="Primary"
@@ -64,7 +63,11 @@ export function Header(){
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    className="text-sm font-medium"
+                                    className="
+                                    text-sm 
+                                    font-medium 
+                                    hover:text-primary
+                                    "
                                 >
                                     {item.label}
                                 </Link>
@@ -120,7 +123,8 @@ export function Header(){
                         aria-label="Go to landing page"
                         className={cn(
                             "group inline-flex items-center gap-2",
-                            "sm:col-start-1 sm:justify-self-start"
+                            "sm:col-start-1 sm:justify-self-start",
+                            "hover:text-primary"
                         )}
                     > Home
                     </Link>
