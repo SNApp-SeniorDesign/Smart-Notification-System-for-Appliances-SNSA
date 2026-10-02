@@ -110,9 +110,19 @@ export function CollapsibleDeviceMenu() {
         <Collapsible
             open={isOpen}
             onOpenChange={setIsOpen}
-            className="flex w-screen flex-col gap-2 items-center"
+            className="mx-auto flex w-full max-w-5xl
+                flex-col
+                items-center
+                gap-2
+                px-4 py-2
+            "
         >
-            <div className="flex items-center justify-between rounded-md border px-4 py-2 text-sm w-screen h-fit">
+            <div className="
+                flex h-fit w-full
+                items-center justify-between
+                rounded-md border px-4
+                py-2 text-sm
+            ">
                 <span
                     data-testid="selected-device"
                     className="text-muted-foreground"
@@ -129,7 +139,7 @@ export function CollapsibleDeviceMenu() {
                         <span className="sr-only">Toggle details</span>
                     </Button>} />
             </div>
-            <div className="h-fit border w-max rounded-md px-[40%] bg-gray-200">
+            <div className="h-fit border w-full rounded-md border bg-gray-200 px-4">
                 <CollapsibleContent className="flex flex-col gap-2">
                     {devices.map((device) => (
                         <Button

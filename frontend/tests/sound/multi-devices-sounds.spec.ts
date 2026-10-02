@@ -43,10 +43,7 @@ test ("multiple devices can each have multiple sounds", async ({ page }) => {
 
         await addSound(page, "Washer Done")
         
-        
-
         await addSound(page, "Dryer Done")
-        
         
         
         await expect(
