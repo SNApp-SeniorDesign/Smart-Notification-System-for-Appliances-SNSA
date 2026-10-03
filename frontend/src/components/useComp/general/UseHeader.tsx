@@ -41,7 +41,7 @@ export function Header(){
 
     if(pathname === '/'){
         return (
-            <header className="w-full h-fit">
+            <header className="w-full h-fit p-2">
                 <div className="w-full h-fit items-center gap-4 sm:grid sm:items-center sm:gap-4">
                     <Link
                         href="/"
@@ -116,7 +116,7 @@ export function Header(){
     }
     else {
         return(
-            <header className="w-full h-fit">
+            <header className="w-full h-fit p-2">
                 <div className="w-full h-fit flex flex-col items-center gap-4 sm:grid sm:grid-cols-3 sm:items-center sm:gap:4">
                     <Link
                         href="/"
