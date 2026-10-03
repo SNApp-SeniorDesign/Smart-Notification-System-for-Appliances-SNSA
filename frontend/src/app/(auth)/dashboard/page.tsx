@@ -20,6 +20,8 @@ export default function Dashboard(){
                 <h1>SNSA Device</h1>
             </div>
             <CollapsibleDeviceMenu />
+        <div className="p-2">
+
             {selectedDevice && (
         <DialogSoundForm
             open={soundDialogOpen}
@@ -51,6 +53,7 @@ export default function Dashboard(){
                 ) : (
                     <p>Select a device to view its sounds.</p>
                 )}
+        </div>
         </div>
         
     )
