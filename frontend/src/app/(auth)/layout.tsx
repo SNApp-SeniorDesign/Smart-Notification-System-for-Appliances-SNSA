@@ -63,7 +63,7 @@ export default function AuthLayout({children}: {children: React.ReactNode}){
     return( 
         <>
             <DashboardProvider>
-                <div className="min-h-screen flex flex-col">
+                <div className="flex flex-1 flex-col">
                     <main className="flex-1">
                         {children}
                     </main>
