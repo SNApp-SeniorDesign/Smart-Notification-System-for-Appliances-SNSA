@@ -38,7 +38,7 @@ export function Footer() {
   }
 
   return (
-    <footer>
+    <footer className="p-2">
       <div className="flex items-center gap-4 w-full h-auto justify-center">
         <Link href="/dashboard" aria-label="Home">
         < House className="size-[clamp(3rem,4vw,4rem)] hover:text-primary" />

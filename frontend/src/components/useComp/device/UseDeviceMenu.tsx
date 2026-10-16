@@ -122,10 +122,11 @@ export function CollapsibleDeviceMenu() {
                 items-center justify-between
                 rounded-md border px-4
                 py-2 text-sm
+                bg-foreground text-background
             ">
                 <span
                     data-testid="selected-device"
-                    className="text-muted-foreground"
+                    className="text-background"
                 >
                     {selectedDevice?.device_name ?? "Device Name"}
                 </span>
