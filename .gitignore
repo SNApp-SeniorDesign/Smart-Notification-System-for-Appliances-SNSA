@@ -27,3 +27,5 @@ replay_pid*
 *.db
 __pycache__/
 CLAUDE.md
+private_key.pem
+public_key.pem
