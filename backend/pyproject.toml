@@ -10,6 +10,7 @@ dependencies = [
     "psycopg[binary]>=3.3.4",
     "pwdlib[argon2]>=0.3.0",
     "pyjwt>=2.13.0",
+    "pywebpush>=2.5.0",
     "requests>=2.33.0",
     "sqlmodel>=0.0.38",
 ]
