@@ -46,5 +46,20 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    vapid_private_key_path: str = Field(
+        default="private_key.pem",
+        alias="VAPID_PRIVATE_KEY_PATH",
+    )
+
+    vapid_public_key: str = Field(
+        default="",
+        alias="VAPID_PUBLIC_KEY",
+    )
+
+    vapid_claim_email: str = Field(
+        default="",
+        alias="VAPID_CLAIM_EMAIL",
+    )
+
 
 settings = Settings()
