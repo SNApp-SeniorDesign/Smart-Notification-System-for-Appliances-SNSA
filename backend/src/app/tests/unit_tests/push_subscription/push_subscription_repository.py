@@ -4,6 +4,7 @@ from app.models.push_subscription import PushSubscription
 from app.repository.push_subcription import PushSubscriptionRepository
 
 
+# Get
 def test_get_by_endpoint(db: Session, user):
     endpoint = "https://example.com/push/test-endpoint"
 

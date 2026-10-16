@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.push_subscription import PushSubscription
+from app.schemas.push_subscription import PushSubscriptionCreate
 
 
 class PushSubscriptionRepository:
@@ -16,3 +17,23 @@ class PushSubscriptionRepository:
             .filter(PushSubscription.endpoint == endpoint)
             .first()
         )
+
+    # Post
+
+    @staticmethod
+    def create_subscription(
+        db: Session,
+        data: PushSubscriptionCreate,
+        user_id: int,
+    ) -> PushSubscription:
+        subscription = PushSubscription(
+            user_id=user_id,
+            endpoint=data.endpoint,
+            p256dh=data.keys.p256dg,
+            auth=data.keys.auth,
+        )
+
+        db.add(subscription)
+        db.commit()
+        db.refresh(subscription)
+        return subscription
