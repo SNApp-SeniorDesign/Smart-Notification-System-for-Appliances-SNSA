@@ -37,3 +37,20 @@ class PushSubscriptionRepository:
         db.commit()
         db.refresh(subscription)
         return subscription
+
+    # Update
+    @staticmethod
+    def update_subscription(
+        db: Session,
+        subscription: PushSubscription,
+        data: PushSubscriptionCreate,
+        user_id: int,
+    ) -> PushSubscription:
+        subscription.user_id = user_id
+        subscription.p256dh = data.keys.p256dh
+        subscription.auth = data.keys.auth
+
+        db.commit()
+        db.refresh(subscription)
+
+        return subscription
