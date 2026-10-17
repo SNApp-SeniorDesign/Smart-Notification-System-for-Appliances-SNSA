@@ -41,3 +41,29 @@ def test_create_subscription(db: Session, user):
     assert subscription.endpoint == "https://example.com/push/new-endpoint"
     assert subscription.p256dh == "new-p256dh-key"
     assert subscription.auth == "new-auth-key"
+
+
+# Update
+
+
+def test_update_subscription(db: Session, user, push_subscription):
+    update_data = PushSubscriptionCreate(
+        endpoint=push_subscription.endpoint,
+        keys=PushSubscriptionKeys(
+            p256dh="updated-p256dh-key",
+            auth="updated-auth-key",
+        ),
+    )
+
+    result = PushSubscriptionRepository.update_subscription(
+        db,
+        push_subscription,
+        update_data,
+        user.id,
+    )
+
+    assert result.id == push_subscription.id
+    assert result.user_id == user.id
+    assert result.endpoint == push_subscription.endpoint
+    assert result.p256dh == "updated-p256dh-key"
+    assert result.auth == "updated-auth-key"
