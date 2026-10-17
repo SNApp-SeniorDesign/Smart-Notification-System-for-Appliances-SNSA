@@ -54,3 +54,23 @@ class PushSubscriptionRepository:
         db.refresh(subscription)
 
         return subscription
+
+    # Delete
+    @staticmethod
+    def delete_subscription(
+        db: Session,
+        endpoint: str,
+        user_id: int,
+    ) -> None:
+        subscription = (
+            db.query(PushSubscription)
+            .filter(
+                PushSubscription.endpoint == endpoint,
+                PushSubscription.user_id == user_id,
+            )
+            .first()
+        )
+
+        if subscription:
+            db.delete(subscription)
+            db.commit()

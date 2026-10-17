@@ -67,3 +67,25 @@ def test_update_subscription(db: Session, user, push_subscription):
     assert result.endpoint == push_subscription.endpoint
     assert result.p256dh == "updated-p256dh-key"
     assert result.auth == "updated-auth-key"
+
+
+# Delete
+
+
+def test_delete_subscription(db: Session, user, push_subscription):
+    endpoint = push_subscription.endpoint
+
+    result = PushSubscriptionRepository.delete_subscription(
+        db,
+        endpoint,
+        user.id,
+    )
+
+    assert result is None
+
+    deleted_subscription = PushSubscriptionRepository.get_by_endpoint(
+        db,
+        endpoint,
+    )
+
+    assert deleted_subscription is None
