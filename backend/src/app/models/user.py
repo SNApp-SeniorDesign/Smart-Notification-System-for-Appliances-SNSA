@@ -15,3 +15,9 @@ class User(Base):
 
     # token version for invalidating tokens when user log-in
     token_version = Column(Integer, nullable=False, default=0)
+
+    push_subscriptions = relationship(
+        "PushSubscription",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )

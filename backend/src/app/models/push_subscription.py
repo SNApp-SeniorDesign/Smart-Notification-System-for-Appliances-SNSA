@@ -3,6 +3,7 @@ from datetime import datetime, UTC
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
 from app.core.database import Base
+from sqlalchemy.orm import relationship
 
 
 class PushSubscription(Base):
@@ -22,3 +23,6 @@ class PushSubscription(Base):
     auth = Column(String, nullable=False)
 
     created_at = Column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
+
+    # Relationship with User
+    user = relationship("User", back_populates="push_subscriptions")
