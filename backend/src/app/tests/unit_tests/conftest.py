@@ -12,10 +12,16 @@ from app.core.auth import create_access_token
 from app.schemas.user import UserDB
 from app.schemas.device import DeviceDB
 from app.schemas.sound import SoundDB
+from app.schemas.push_subscription import (
+    PushSubscriptionCreate,
+    PushSubscriptionKeys,
+)
+
 
 from app.repository.user import UserRepository
 from app.repository.device import DeviceRepository
 from app.repository.sound import SoundRepository
+from app.repository.push_subcription import PushSubscriptionRepository
 
 from app.services.sound import SoundService
 
@@ -145,6 +151,24 @@ def sound(db, device):
     )
 
     return SoundRepository.create_sound(db, sound_data)
+
+
+# Fixture to create a push subscription through the repository
+@pytest.fixture
+def push_subscription(db, user):
+    subscription_data = PushSubscriptionCreate(
+        endpoint="https://example.com/push/test-endpoint",
+        keys=PushSubscriptionKeys(
+            p256dh="test-p256dh-key",
+            auth="test-auth-key",
+        ),
+    )
+
+    return PushSubscriptionRepository.create_subscription(
+        db,
+        subscription_data,
+        user.id,
+    )
 
 
 # fixture to create temporary directory for sound files
