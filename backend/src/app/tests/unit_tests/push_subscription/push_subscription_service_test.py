@@ -4,9 +4,10 @@ from app.schemas.push_subscription import (
     PushSubscriptionCreate,
     PushSubscriptionKeys,
 )
-from app.services.push_subscription import push_subscription_service
+from app.services.push_subscription import PushSubscriptionRepository
 
 
+# Post
 def test_create_subscription(
     db: Session,
     user,
@@ -19,7 +20,7 @@ def test_create_subscription(
         ),
     )
 
-    result = push_subscription_service.create_subscription(
+    result = PushSubscriptionRepository.create_subscription(
         db,
         subscription_data,
         user.id,
@@ -32,6 +33,7 @@ def test_create_subscription(
     assert result.auth == subscription_data.keys.auth
 
 
+# Update
 def test_update_subscription(
     db: Session,
     user,
@@ -45,7 +47,7 @@ def test_update_subscription(
         ),
     )
 
-    result = push_subscription_service.update_subscription(
+    result = PushSubscriptionRepository.update_subscription(
         db,
         push_subscription,
         subscription_data,
@@ -57,3 +59,28 @@ def test_update_subscription(
     assert result.endpoint == push_subscription.endpoint
     assert result.p256dh == "service-updated-p256dh-key"
     assert result.auth == "service-updated-auth-key"
+
+
+# delete
+
+
+def test_delete_subscription(
+    db: Session,
+    user,
+    push_subscription,
+):
+    endpoint = push_subscription.endpoint
+
+    result = PushSubscriptionRepository.delete_subscription(
+        db,
+        endpoint,
+        user.id,
+    )
+
+    assert result is None
+    deleted_subscription = PushSubscriptionRepository.get_by_endpoint(
+        db,
+        endpoint,
+    )
+
+    assert deleted_subscription is None
