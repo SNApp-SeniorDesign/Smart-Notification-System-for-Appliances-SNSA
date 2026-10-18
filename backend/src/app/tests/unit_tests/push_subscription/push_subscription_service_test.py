@@ -31,3 +31,29 @@ def test_save_subscription_creates_new_subscription(
     assert result.endpoint == subscription_data.endpoint
     assert result.p256dh == subscription_data.keys.p256dh
     assert result.auth == subscription_data.keys.auth
+
+
+def test_save_subscription_updates_existing_subscription(
+    db: Session,
+    user,
+    push_subscription,
+):
+    subscription_data = PushSubscriptionCreate(
+        endpoint=push_subscription.endpoint,
+        keys=PushSubscriptionKeys(
+            p256dh="service-updated-p256dh-key",
+            auth="service-updated-auth-key",
+        ),
+    )
+
+    result = push_subscription_service.save_subscription(
+        db,
+        subscription_data,
+        user.id,
+    )
+
+    assert result.id == push_subscription.id
+    assert result.user_id == user.id
+    assert result.endpoint == push_subscription.endpoint
+    assert result.p256dh == "service-updated-p256dh-key"
+    assert result.auth == "service-updated-auth-key"
