@@ -9,28 +9,44 @@ class PushSubscriptionService:
     def __init__(self) -> None:
         self.repository = PushSubscriptionRepository
 
-    def save_subscription(
+    # Post
+    def create_subscription(
         self,
         db: Session,
         data: PushSubscriptionCreate,
         user_id: int,
     ) -> PushSubscription:
-        existing_subscription = self.repository.get_by_endpoint(
-            db,
-            data.endpoint,
-        )
-
-        if existing_subscription is not None:
-            return self.repository.update_subscription(
-                db,
-                existing_subscription,
-                data,
-                user_id,
-            )
-
         return self.repository.create_subscription(
             db,
             data,
+            user_id,
+        )
+
+    # Update
+    def update_subscription(
+        self,
+        db: Session,
+        subscription: PushSubscription,
+        data: PushSubscriptionCreate,
+        user_id: int,
+    ) -> PushSubscription:
+        return self.repository.update_subscription(
+            db,
+            subscription,
+            data,
+            user_id,
+        )
+
+    # Delete
+    def delete_subscription(
+        self,
+        db: Session,
+        endpoint: str,
+        user_id: int,
+    ) -> None:
+        self.repository.delete_subscription(
+            db,
+            endpoint,
             user_id,
         )
 

@@ -4,11 +4,10 @@ from app.schemas.push_subscription import (
     PushSubscriptionCreate,
     PushSubscriptionKeys,
 )
-
 from app.services.push_subscription import push_subscription_service
 
 
-def test_save_subscription_creates_new_subscription(
+def test_create_subscription(
     db: Session,
     user,
 ):
@@ -16,11 +15,11 @@ def test_save_subscription_creates_new_subscription(
         endpoint="https://example.com/push/service-new-endpoint",
         keys=PushSubscriptionKeys(
             p256dh="service-p256dh-key",
-            auth="service=auth-key",
+            auth="service-auth-key",
         ),
     )
 
-    result = push_subscription_service.save_subscription(
+    result = push_subscription_service.create_subscription(
         db,
         subscription_data,
         user.id,
@@ -33,7 +32,7 @@ def test_save_subscription_creates_new_subscription(
     assert result.auth == subscription_data.keys.auth
 
 
-def test_save_subscription_updates_existing_subscription(
+def test_update_subscription(
     db: Session,
     user,
     push_subscription,
@@ -46,8 +45,9 @@ def test_save_subscription_updates_existing_subscription(
         ),
     )
 
-    result = push_subscription_service.save_subscription(
+    result = push_subscription_service.update_subscription(
         db,
+        push_subscription,
         subscription_data,
         user.id,
     )
