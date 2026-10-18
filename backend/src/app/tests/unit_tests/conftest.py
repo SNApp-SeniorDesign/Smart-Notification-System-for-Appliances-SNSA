@@ -171,6 +171,23 @@ def push_subscription(db, user):
     )
 
 
+# Fixture to create another push subscription for another user
+@pytest.fixture
+def another_push_subscription(db, user):
+    subscription_data = PushSubscriptionCreate(
+        endpoint="https://example.com/push/second-endpoint",
+        keys=PushSubscriptionKeys(
+            p256dh="second-p256dh-key",
+            auth="second-auth-key",
+        ),
+    )
+    return PushSubscriptionRepository.create_subscription(
+        db,
+        subscription_data,
+        user.id,
+    )
+
+
 # fixture to create temporary directory for sound files
 @pytest.fixture
 def service(tmp_path):

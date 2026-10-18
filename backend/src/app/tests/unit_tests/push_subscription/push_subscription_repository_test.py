@@ -22,6 +22,31 @@ def test_get_by_endpoint(db: Session, push_subscription):
     assert result.auth == push_subscription.auth
 
 
+def test_get_all_by_user(
+    db: Session,
+    user,
+    push_subscription,
+    another_push_subscription,
+):
+    result = PushSubscriptionRepository.get_all_by_user(
+        db,
+        user.id,
+    )
+
+    assert len(result) == 2
+
+    acutal_endpoints = {subscription.endpoint for subscription in result}
+
+    expected_endpoints = {
+        push_subscription.endpoint,
+        another_push_subscription.endpoint,
+    }
+
+    assert acutal_endpoints == expected_endpoints
+
+    assert all(subscription.user_id == user.id for subscription in result)
+
+
 # Post
 
 

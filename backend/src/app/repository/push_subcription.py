@@ -18,6 +18,15 @@ class PushSubscriptionRepository:
             .first()
         )
 
+    @staticmethod
+    def get_all_by_user(
+        db: Session,
+        user_id: int,
+    ) -> list[PushSubscription]:
+        return (
+            db.query(PushSubscription).filter(PushSubscription.user_id == user_id).all()
+        )
+
     # Post
 
     @staticmethod
