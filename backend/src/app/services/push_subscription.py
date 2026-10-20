@@ -9,6 +9,28 @@ class PushSubscriptionService:
     def __init__(self) -> None:
         self.repository = PushSubscriptionRepository
 
+    #Get
+
+    def get_by_endpoint(
+        self,
+        db: Session,
+        endpoint: str,
+    ) -> PushSubscription | None:
+        return self.repository.get_by_endpoint(
+            db,
+            endpoint,
+        )
+
+    def get_all_subscriptions(
+        self,
+        db:Session,
+        user_id: int,
+    ) -> list[PushSubscription]:
+        return self.repository.get_all_by_user(
+            db,
+            user_id,
+        )
+
     # Post
     def create_subscription(
         self,
