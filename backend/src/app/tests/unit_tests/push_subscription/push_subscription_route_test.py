@@ -50,7 +50,7 @@ def test_delete_subscription(
 
     response = client.request(
         "DELETE",
-        "notifications/unsubscribe",
+        "/notifications/unsubscribe",
         json={"endpoint": endpoint},
         headers=headers,
     )
