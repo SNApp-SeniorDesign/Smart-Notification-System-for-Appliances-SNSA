@@ -9,3 +9,6 @@ class PushSubscriptionKeys(BaseModel):
 class PushSubscriptionCreate(BaseModel):
     endpoint: str
     keys: PushSubscriptionKeys
+
+class PushSubscriptionDelete(BaseModel):
+    endpoint: str

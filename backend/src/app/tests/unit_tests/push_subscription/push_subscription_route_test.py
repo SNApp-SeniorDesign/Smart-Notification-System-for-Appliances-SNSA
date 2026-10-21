@@ -38,3 +38,29 @@ def test_create_subscription(
     assert subscription.user_id == user.id
     assert subscription.p256dh == "route-p256dh-key"
     assert subscription.auth == "route-auth-key"
+
+#Delete
+def test_delete_subscription(
+    client: TestClient,
+    headers,
+    db:Session,
+    push_subscription,
+):
+    endpoint = push_subscription.endpoint
+
+    response = client.request(
+        "DELETE",
+        "notifications/unsubscribe",
+        json={"endpoint": endpoint},
+        headers=headers,
+    )
+
+    assert response.status_code == 204
+
+    deleted_subscription = (
+        db.query(PushSubscription)
+        .filter(PushSubscription.endpoint == endpoint)
+        .first()
+    )
+
+    assert deleted_subscription is None
