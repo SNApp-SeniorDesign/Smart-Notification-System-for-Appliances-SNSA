@@ -30,11 +30,11 @@ class EventService:
         if not sound.is_on:
             return 0
         
-        notification = PushNotitificationsData(
+        notification = PushNotificationData(
             title=f"{sound.sound_name} Detected",
             body=(
                 f'{sound.sound_name} was detected by '
-                f'"{device.device_name}".', 
+                f'"{device.device_name}".' 
             ),
             device_id=device.id,
             device_name=device.device_name,
