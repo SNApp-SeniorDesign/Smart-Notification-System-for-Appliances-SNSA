@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, UTC
 
 from app.core.settings import settings
 from app.core.database import create_db_tb
@@ -13,7 +13,6 @@ from app.routes.device import api_router as device_router
 from app.routes.sound import api_router as sound_router
 from app.routes.recording import api_router as recording_router
 from app.routes.push_subscription import api_router as push_subscription_router
-
 
 from typing import Annotated
 
@@ -87,7 +86,7 @@ async def eventTrigger(
         "success": True,
         "message": "Event received",
         "notificationsSent": sent_count,
-        "receiveAt": dateTime.utcnow().isoformat(),
+        "receiveAt": datetime.now(UTC).isoformat(),
     }
     
 
