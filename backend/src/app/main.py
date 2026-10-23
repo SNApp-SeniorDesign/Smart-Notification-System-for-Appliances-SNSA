@@ -13,6 +13,17 @@ from app.routes.device import api_router as device_router
 from app.routes.sound import api_router as sound_router
 from app.routes.recording import api_router as recording_router
 from app.routes.push_subscription import api_router as push_subscription_router
+
+
+from typing import Annotated
+
+from fastapi import Depends
+from sqlalchemy.orm import Session
+
+from app.core.database import get_db
+from app.schemas.event import EventMessage
+from app.services.event import event_service
+
 FRONTEND_URL = settings.frontend_url
 
 
@@ -58,21 +69,27 @@ latest_event = {}
 
 
 @app.post("/event")
-async def eventTrigger(event_message: EventMessage):
+async def eventTrigger(
+    event_message: EventMessage,
+    db: Annotated[Session, Depends(get_db)]
+):
     global latest_event
 
-    # log the event (for debugging purposes)
-    print("Received event: ", event_message.dict())
+    print("Received event:", event_message.model_dump())
 
-    # store event (so fonrtend can fetch it)
-    latest_event = event_message.dict()
+    latest_event = event_message.model_dump()
 
-    # return response
+    sent_count = event_service.process_sound_detection(
+        db,
+        event_message,
+    )
     return {
         "success": True,
         "message": "Event received",
-        "receiveAt": datetime.utcnow().isoformat(),
+        "notificationsSent": sent_count,
+        "receiveAt": dateTime.utcnow().isoformat(),
     }
+    
 
 
 @app.get("/latest-event")
