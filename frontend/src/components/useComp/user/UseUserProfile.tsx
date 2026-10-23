@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input"
 
 import { UseDeleteButton } from "./UseDeleteButton"
+import { EnableNotificationsButton } from "@/components/useComp/notification/EnableNotificationsButton"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -249,6 +250,8 @@ export function AccountForm() {
                                     </Button>
 
                                     <UseDeleteButton />
+                                    <EnableNotificationsButton />
+
                                 </div>
                             </div>
                         </form>
