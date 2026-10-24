@@ -68,8 +68,14 @@ export async function Login(page: Page, user: ReturnType<typeof MakeUser>){
 }
 
 export async function Delete(page: Page, user: ReturnType<typeof MakeUser>){
-  await page.getByRole("link", { name: "Setting" }).click()
-  await expect(page).toHaveURL(/\/setting/)
+    
+    const currentPath = new URL(page.url()).pathname;
+
+    if (!currentPath.startsWith("/setting")) {
+      await page.getByRole("link", { name: "Settings" }).click();
+
+      await expect(page).toHaveURL(/\/setting/);
+    }
 
   page.once("dialog", async dialog => {
     expect(dialog.message()).toContain(
