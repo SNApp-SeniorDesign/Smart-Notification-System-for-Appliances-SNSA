@@ -75,3 +75,50 @@ export async function enableNotifications(): Promise<void> {
         throw new Error("Failed to save push subscription.")
     }
 }
+
+export async function getNotificationStatus() : Promise<boolean>{
+    if (!("serviceWorker" in navigator)) {
+        return false;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+
+    const subscription = await registration.pushManager.getSubscription();
+
+    return subscription !== null;
+
+}
+
+export async function disableNotifications(): Promise<void> {
+    const token = getToken();
+
+    if(!token) {
+        throw new Error("You must be logged in first.");
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+
+    const subscription = await registration.pushManager.getSubscription();
+
+    if(!subscription){
+        return;
+    }
+
+    const response = await fetch(
+        `${API_URL}/notifications/unsubscribe`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                endpoint: subscription.endpoint,
+            }),
+        }
+    );
+
+    if (!response.ok && response.status !== 404) {
+        throw new Error("Failed to remove no")
+    }
+}
