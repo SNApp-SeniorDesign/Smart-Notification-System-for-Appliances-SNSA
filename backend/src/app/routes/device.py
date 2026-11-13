@@ -4,9 +4,12 @@ from typing import Annotated
 
 from app.core.database import get_db
 from app.services.device import device_service
+from app.services.device_key import device_key_service
 from app.services.user import user_service
 
 from app.schemas.device import (
+    DeviceClaimRequest,
+    DeviceClaimResponse,
     DeviceCreate,
     DeviceResponse,
     DeviceWithSounds,
@@ -30,6 +33,19 @@ def create_device(
 ) -> DeviceResponse:
     return device_service.register_device(
         db=db, device_db=data, user_id=current_user.id
+    )
+
+
+# Called by the device itself, so no user login
+@api_router.post(
+    "/claim", response_model=DeviceClaimResponse, status_code=status.HTTP_201_CREATED
+)
+def claim_device_key(
+    data: DeviceClaimRequest,
+    db: Annotated[Session, Depends(get_db)],
+) -> DeviceClaimResponse:
+    return device_key_service.claim_device_key(
+        db=db, serial_number=data.serial_number
     )
 
 

@@ -3,6 +3,7 @@ from app.models.device import Device
 from app.schemas.device import DeviceDB, DeviceCreate, DeviceUpdate
 from app.exceptions.device import device_not_exist
 from app.services.sound import sound_service
+from app.core.device_auth import normalize_serial
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
@@ -17,7 +18,10 @@ class DeviceService:
         return self.repository.get_by_device_name(db, device_name, user_id) is not None
 
     def is_serial_number_taken(self, db: Session, serial_number: str) -> bool:
-        return self.repository.get_by_serial_number(db, serial_number) is not None
+        return (
+            self.repository.get_by_serial_number(db, normalize_serial(serial_number))
+            is not None
+        )
 
     def get_by_device_name(self, db: Session, device_name: str) -> Device | None:
         user_device = self.repository.get_by_device_name(db, device_name)
@@ -26,7 +30,9 @@ class DeviceService:
         return user_device
 
     def get_by_serial_number(self, db: Session, serial_number: str) -> Device | None:
-        user_device = self.repository.get_by_serial_number(db, serial_number)
+        user_device = self.repository.get_by_serial_number(
+            db, normalize_serial(serial_number)
+        )
         if user_device is None:
             device_not_exist()
         return user_device
@@ -68,7 +74,7 @@ class DeviceService:
 
         device_db = DeviceDB(
             device_name=device_db.device_name,
-            serial_number=device_db.serial_number,
+            serial_number=normalize_serial(device_db.serial_number),
             user_id=user_id,
             is_paired=True,
             device_status="online",

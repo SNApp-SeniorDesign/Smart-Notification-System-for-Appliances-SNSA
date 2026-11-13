@@ -30,3 +30,10 @@ class Device(Base):
     sounds = relationship(
         "Sound", back_populates="device", cascade="all, delete-orphan"
     )
+    # Key the device uses to authenticate its events (stored in device_keys)
+    device_key = relationship(
+        "DeviceKey",
+        back_populates="device",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )

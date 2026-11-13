@@ -2,7 +2,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from datetime import datetime, UTC
 
 from app.core.settings import settings
@@ -22,6 +21,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.event import EventMessage
 from app.services.event import event_service
+from app.services.device_key import device_key_service
 
 FRONTEND_URL = settings.frontend_url
 
@@ -54,23 +54,17 @@ app.add_middleware(
 )
 
 
-class EventMessage(BaseModel):
-    """Event message model"""
-
-    deviceID: str
-    event: str
-    soundName: str
-    timestamp: str
-
-
 # temporary storage for event messages
 latest_event = {}
 
 
 @app.post("/event")
 async def eventTrigger(
-    event_message: EventMessage,
-    db: Annotated[Session, Depends(get_db)]
+    # Runs the device key check first, then hands back the validated event
+    event_message: Annotated[
+        EventMessage, Depends(device_key_service.verify_device_key)
+    ],
+    db: Annotated[Session, Depends(get_db)],
 ):
     global latest_event
 

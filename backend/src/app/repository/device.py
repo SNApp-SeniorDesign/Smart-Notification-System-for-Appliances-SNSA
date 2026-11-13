@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
 from app.schemas.device import DeviceDB
@@ -31,7 +32,12 @@ class DeviceRepository:
 
     @staticmethod
     def get_by_serial_number(db: Session, serial_number: str) -> Device | None:
-        return db.query(Device).filter(Device.serial_number == serial_number).first()
+        # Case-insensitive so serials saved before normalization still match
+        return (
+            db.query(Device)
+            .filter(func.lower(Device.serial_number) == serial_number.lower())
+            .first()
+        )
 
     @staticmethod
     def get_device_with_sounds(
