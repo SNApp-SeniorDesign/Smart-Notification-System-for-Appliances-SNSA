@@ -47,3 +47,16 @@ class DeviceUpdate(BaseModel):
 
 class DeviceWithSounds(DeviceResponse):
     sounds: list[SoundResponse] = []
+
+
+class DeviceClaimRequest(BaseModel):
+    "Input sent by the device itself to get its key"
+
+    serial_number: str = Field(min_length=1)
+
+
+class DeviceClaimResponse(BaseModel):
+    "Key returned to the device once, only its hash is stored"
+
+    device_id: int
+    device_key: str

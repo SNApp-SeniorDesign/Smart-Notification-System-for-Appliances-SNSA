@@ -38,6 +38,12 @@ class Settings(BaseSettings):
         description="Frontend URL that allowing to communicate",
     )
 
+    require_device_key: bool = Field(
+        default=False,
+        alias="REQUIRE_DEVICE_KEY",
+        description="Reject /event requests that do not send a valid device key",
+    )
+
     # Config for .env file
     model_config = SettingsConfigDict(
         env_file=str(ENV_FILE),
